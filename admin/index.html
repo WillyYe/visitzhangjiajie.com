@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 — 张家界国家森林公园</title>
+<style>
+:root {
+  --pink: #e91e63; --pink-light: #fce4ec; --pink-dark: #c2185b;
+  --bg: #fafafa; --card-bg: #fff; --text: #333; --text-light: #777;
+  --border: #e0e0e0; --radius: 10px; --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --sidebar-w: 220px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+/* Login Screen */
+.login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.login-card { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 8px 40px rgba(233,30,99,0.15); width: 380px; text-align: center; }
+.login-card h1 { font-size: 24px; margin-bottom: 8px; }
+.login-card .sub { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
+.login-card .cat { font-size: 48px; margin-bottom: 16px; }
+.login-card input { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 16px; outline: none; transition: border-color 0.2s; }
+.login-card input:focus { border-color: var(--pink); }
+.login-card button { width: 100%; padding: 12px; background: var(--pink); color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+.login-card button:hover { background: var(--pink-dark); }
+.login-error { color: #e53935; font-size: 13px; margin-top: 8px; display: none; }
+
+/* Sidebar */
+.sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10; }
+.sidebar-brand { padding: 20px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.sidebar-brand .icon { font-size: 24px; }
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: var(--text); text-decoration: none; font-size: 14px; transition: all 0.15s; border-left: 3px solid transparent; }
+.sidebar-nav a:hover { background: var(--pink-light); }
+.sidebar-nav a.active { background: var(--pink-light); color: var(--pink); border-left-color: var(--pink); font-weight: 600; }
+.sidebar-nav a .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-light); }
+
+/* Main Content */
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px 32px; }
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.main-header h2 { font-size: 22px; }
+.btn { padding: 8px 18px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.btn-primary { background: var(--pink); color: #fff; }
+.btn-primary:hover { background: var(--pink-dark); }
+.btn-outline { background: #fff; color: var(--pink); border: 1.5px solid var(--pink); }
+.btn-outline:hover { background: var(--pink-light); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-danger { background: #ef5350; color: #fff; }
+.btn-danger:hover { background: #d32f2f; }
+.btn-ghost { background: transparent; color: var(--pink); }
+.btn-ghost:hover { background: var(--pink-light); }
+
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.stat-card .stat-num { font-size: 32px; font-weight: 700; color: var(--pink); }
+.stat-card .stat-label { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+/* Data Table */
+.table-wrapper { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.table-wrapper table { width: 100%; border-collapse: collapse; }
+.table-wrapper th { background: var(--pink-light); color: var(--pink-dark); font-weight: 600; font-size: 13px; text-align: left; padding: 12px 16px; }
+.table-wrapper td { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.table-wrapper tr:last-child td { border-bottom: none; }
+.table-wrapper tr:hover td { background: #fafafa; }
+.table-actions { display: flex; gap: 6px; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 28px; width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15); }
+.modal h3 { margin-bottom: 20px; font-size: 18px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; outline: none; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--pink); }
+.form-group textarea { min-height: 100px; resize: vertical; }
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* Toast */
+.toast { position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: #4caf50; }
+.toast.error { background: #ef5350; }
+
+/* Gallery Grid (admin) */
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.gallery-item { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; }
+.gallery-item img { width: 100%; height: 140px; object-fit: cover; }
+.gallery-item .gallery-info { padding: 10px; font-size: 12px; }
+.gallery-item .gallery-actions { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.gallery-item:hover .gallery-actions { opacity: 1; }
+.gallery-item .gallery-actions button { background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+
+/* Settings area */
+.settings-section { background: var(--card-bg); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.settings-section h3 { font-size: 16px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.token-hint { font-size: 12px; color: var(--text-light); margin-top: 6px; }
+
+/* Content sections */
+.content-section { display: none; }
+.content-section.active { display: block; }
+
+@media (max-width: 768px) {
+  .sidebar { width: 60px; }
+  .sidebar-brand span, .sidebar-nav a span:not(.nav-icon) { display: none; }
+  .main { margin-left: 60px; padding: 16px; }
+  .modal { width: 95%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="cat">🐱</div>
+    <h1>管理后台</h1>
+    <div class="sub">张家界国家森林公园</div>
+    <input type="password" id="loginPwd" placeholder="请输入管理密码" autofocus>
+    <button onclick="doLogin()">登 录</button>
+    <div class="login-error" id="loginError">密码错误，请重试</div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" style="display:none">
+  <div class="sidebar-brand"><span class="icon">🐱</span><span>管理后台</span></div>
+  <nav class="sidebar-nav">
+    <a href="#" data-section="dashboard" class="active"><span class="nav-icon">📊</span><span>仪表盘</span></a>
+    <a href="#" data-section="news"><span class="nav-icon">📰</span><span>新闻管理</span></a>
+    <a href="#" data-section="scenic"><span class="nav-icon">🏔️</span><span>景区管理</span></a>
+    <a href="#" data-section="experience"><span class="nav-icon">🎯</span><span>体验管理</span></a>
+    <a href="#" data-section="gallery"><span class="nav-icon">🖼️</span><span>图库管理</span></a>
+    <a href="#" data-section="hero"><span class="nav-icon">🎬</span><span>Hero 管理</span></a>
+    <a href="#" data-section="settings"><span class="nav-icon">⚙️</span><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer">v1.0 · visitzhangjiajie.com</div>
+</aside>
+
+<!-- Main Content -->
+<div class="main" id="mainContent" style="display:none">
+  <div class="main-header">
+    <h2 id="pageTitle">仪表盘</h2>
+    <button class="btn btn-outline btn-sm" onclick="doLogout()">退出登录</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="content-section active" id="sec-dashboard">
+    <div class="stats-grid" id="dashboardStats"></div>
+  </div>
+
+  <!-- News -->
+  <div class="content-section" id="sec-news">
+    <div class="main-header" style="margin-bottom:16px"><h2>新闻管理</h2><button class="btn btn-primary" onclick="openNewsModal()">+ 新增新闻</button></div>
+    <div class="table-wrapper"><table><thead><tr><th>日期</th><th>标签</th><th>标题</th><th>图片</th><th>操作</th></tr></thead><tbody id="newsTableBody"></tbody></table></div>
+  </div>
+
+  <!-- Scenic -->
+  <div class="content-section" id="sec-scenic">
+    <div class="main-header" style="margin-bottom:16px"><h2>景区管理</h2><button class="btn btn-primary" onclick="openScenicModal()">+ 新增景区</button></div>
+    <div class="table-wrapper"><table><thead><tr><th>ID</th><th>名称</th><th>标签</th><th>图片</th><th>大图</th><th>操作</th></tr></thead><tbody id="scenicTableBody"></tbody></table></div>
+  </div>
+
+  <!-- Experience -->
+  <div class="content-section" id="sec-experience">
+    <div class="main-header" style="margin-bottom:16px"><h2>体验管理</h2><button class="btn btn-primary" onclick="openExpModal()">+ 新增体验</button></div>
+    <div class="table-wrapper"><table><thead><tr><th>ID</th><th>标题</th><th>描述</th><th>图片</th><th>操作</th></tr></thead><tbody id="expTableBody"></tbody></table></div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="content-section" id="sec-gallery">
+    <div class="main-header" style="margin-bottom:16px"><h2>图库管理</h2><button class="btn btn-primary" onclick="openGalleryModal()">+ 新增图片</button></div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <!-- Hero -->
+  <div class="content-section" id="sec-hero">
+    <div class="main-header" style="margin-bottom:16px"><h2>Hero 轮播管理</h2><button class="btn btn-primary" onclick="openHeroModal()">+ 新增 Slide</button></div>
+    <div class="table-wrapper"><table><thead><tr><th>#</th><th>图片</th><th>标题</th><th>副标题</th><th>操作</th></tr></thead><tbody id="heroTableBody"></tbody></table></div>
+  </div>
+
+  <!-- Settings -->
+  <div class="content-section" id="sec-settings">
+    <div class="settings-section">
+      <h3>🔑 GitHub API Token</h3>
+      <div class="form-group"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx"><div class="token-hint">用于自动保存修改到 GitHub 仓库。需要 repo 权限。<br>获取: GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens</div></div>
+      <div class="form-group"><label>仓库路径</label><input id="ghRepo" value="WillyYe/visitzhangjiajie.com" placeholder="owner/repo"></div>
+      <div class="form-group"><label>分支</label><input id="ghBranch" value="main"></div>
+      <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+    </div>
+    <div class="settings-section">
+      <h3>🔒 修改管理密码</h3>
+      <div class="form-group"><label>新密码</label><input type="password" id="newPwd" placeholder="输入新密码"></div>
+      <button class="btn btn-primary" onclick="changePassword()">修改密码</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalContent"></div></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== AUTH ====================
+var ADMIN_PWD = 'zhangjiajie2026';
+var AUTH_KEY = 'zjj_admin_auth';
+
+function doLogin() {
+  var pwd = document.getElementById('loginPwd').value;
+  if (pwd === ADMIN_PWD) {
+    localStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+// Auto-login
+if (localStorage.getItem(AUTH_KEY) === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'block';
+}
+
+// ==================== DATA ====================
+var DATA_BASE = '../data/';
+var newsData = [], scenicData = [], expData = [], galleryData = [], heroData = {slides:[]};
+
+function loadAllData() {
+  return Promise.all([
+    fetch(DATA_BASE + 'news.json').then(function(r){return r.json()}).then(function(d){newsData=d}),
+    fetch(DATA_BASE + 'scenic.json').then(function(r){return r.json()}).then(function(d){scenicData=d}),
+    fetch(DATA_BASE + 'experience.json').then(function(r){return r.json()}).then(function(d){expData=d}),
+    fetch(DATA_BASE + 'gallery.json').then(function(r){return r.json()}).then(function(d){galleryData=d}),
+    fetch(DATA_BASE + 'hero.json').then(function(r){return r.json()}).then(function(d){heroData=d})
+  ]);
+}
+
+// ==================== NAVIGATION ====================
+document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar-nav a').forEach(function(x){x.classList.remove('active')});
+    this.classList.add('active');
+    var section = this.dataset.section;
+    document.querySelectorAll('.content-section').forEach(function(s){s.classList.remove('active')});
+    document.getElementById('sec-' + section).classList.add('active');
+    document.getElementById('pageTitle').textContent = this.textContent.trim();
+  });
+});
+
+// ==================== TOAST ====================
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type||'') + ' show';
+  setTimeout(function(){t.classList.remove('show')}, 2500);
+}
+
+// ==================== RENDER FUNCTIONS ====================
+function renderDashboard() {
+  document.getElementById('dashboardStats').innerHTML =
+    '<div class="stat-card"><div class="stat-num">'+newsData.length+'</div><div class="stat-label">新闻</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+scenicData.length+'</div><div class="stat-label">景区</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+expData.length+'</div><div class="stat-label">体验</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+galleryData.length+'</div><div class="stat-label">图库</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+heroData.slides.length+'</div><div class="stat-label">Hero Slide</div></div>';
+}
+
+function renderNews() {
+  var h = '';
+  newsData.forEach(function(n,i){
+    h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td>'+esc(n.img)+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
+  });
+  document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
+}
+
+function renderScenic() {
+  var h = '';
+  scenicData.forEach(function(s,i){
+    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.nameEn)+'</td><td>'+esc(s.tagEn)+'</td><td>'+esc(s.img)+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
+  });
+  document.getElementById('scenicTableBody').innerHTML = h || '<tr><td colspan="6" style="text-align:center;color:#999">暂无数据</td></tr>';
+}
+
+function renderExp() {
+  var h = '';
+  expData.forEach(function(e,i){
+    h += '<tr><td>'+esc(e.id)+'</td><td>'+esc(e.titleEn)+'</td><td>'+esc(e.descEn)+'</td><td>'+esc(e.img)+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteExp('+i+')">删除</button></td></tr>';
+  });
+  document.getElementById('expTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
+}
+
+function renderGallery() {
+  var h = '';
+  galleryData.forEach(function(g,i){
+    h += '<div class="gallery-item"><img src="../'+g.img+'" alt=""><div class="gallery-actions"><button onclick="editGallery('+i+')">✏️</button><button onclick="deleteGallery('+i+')">🗑️</button></div><div class="gallery-info"><b>'+esc(g.titleEn)+'</b><br>'+esc(g.cat)+'</div></div>';
+  });
+  document.getElementById('galleryGrid').innerHTML = h || '<p style="color:#999;text-align:center">暂无图片</p>';
+}
+
+function renderHero() {
+  var h = '';
+  heroData.slides.forEach(function(s,i){
+    h += '<tr><td>'+(i+1)+'</td><td>'+esc(s.img)+'</td><td>'+esc(s.title)+'</td><td>'+esc(s.subtitle)+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openHeroModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteHero('+i+')">删除</button></td></tr>';
+  });
+  document.getElementById('heroTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
+}
+
+// ==================== MODALS ====================
+var editingIndex = -1;
+
+function showModal(title, bodyHtml) {
+  document.getElementById('modalContent').innerHTML = '<h3>'+title+'</h3>'+bodyHtml;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// --- News Modal ---
+function openNewsModal(idx) {
+  editingIndex = idx !== undefined ? idx : -1;
+  var n = editingIndex >= 0 ? newsData[editingIndex] : {date:{day:'',month:'',year:''},tag:'',titleEn:'',descEn:'',contentEn:'',img:''};
+  showModal(editingIndex>=0?'编辑新闻':'新增新闻',
+    '<div class="form-group"><label>日期 (Day)</label><input id="fDay" value="'+esc(n.date.day)+'"></div>'+
+    '<div class="form-group"><label>日期 (Month)</label><input id="fMonth" value="'+esc(n.date.month)+'"></div>'+
+    '<div class="form-group"><label>日期 (Year)</label><input id="fYear" value="'+esc(n.date.year||'')+'"></div>'+
+    '<div class="form-group"><label>标签</label><select id="fTag"><option value="overview" '+(n.tag==='overview'?'selected':'')+'>overview</option><option value="honor" '+(n.tag==='honor'?'selected':'')+'>honor</option><option value="geo" '+(n.tag==='geo'?'selected':'')+'>geo</option><option value="eco" '+(n.tag==='eco'?'selected':'')+'>eco</option><option value="avatar" '+(n.tag==='avatar'?'selected':'')+'>avatar</option></select></div>'+
+    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(n.titleEn)+'"></div>'+
+    '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(n.descEn)+'</textarea></div>'+
+    '<div class="form-group"><label>正文 (HTML)</label><textarea id="fContent" style="min-height:150px">'+esc(n.contentEn||'')+'</textarea></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(n.img)+'"></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNews()">保存</button></div>');
+}
+
+function saveNews() {
+  var obj = {
+    date: {day: document.getElementById('fDay').value, month: document.getElementById('fMonth').value, year: document.getElementById('fYear').value},
+    tag: document.getElementById('fTag').value,
+    titleEn: document.getElementById('fTitle').value,
+    descEn: document.getElementById('fDesc').value,
+    contentEn: document.getElementById('fContent').value,
+    img: document.getElementById('fImg').value
+  };
+  if (editingIndex >= 0) newsData[editingIndex] = obj; else newsData.push(obj);
+  closeModal(); renderNews(); renderDashboard();
+  showToast('新闻已保存 ✅', 'success');
+}
+
+function deleteNews(i) { if(confirm('确定删除 "'+newsData[i].titleEn+'" 吗？')){newsData.splice(i,1); renderNews(); renderDashboard(); showToast('已删除','success');} }
+
+// --- Scenic Modal ---
+function openScenicModal(idx) {
+  editingIndex = idx !== undefined ? idx : -1;
+  var s = editingIndex >= 0 ? scenicData[editingIndex] : {id:'',href:'',img:'',large:false,tagEn:'',nameEn:'',subTitleEn:'',descEn:''};
+  showModal(editingIndex>=0?'编辑景区':'新增景区',
+    '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(s.id)+'"></div>'+
+    '<div class="form-group"><label>名称</label><input id="fName" value="'+esc(s.nameEn)+'"></div>'+
+    '<div class="form-group"><label>标签</label><input id="fTag" value="'+esc(s.tagEn)+'"></div>'+
+    '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subTitleEn)+'"></div>'+
+    '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(s.descEn)+'</textarea></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(s.img)+'"></div>'+
+    '<div class="form-group"><label><input type="checkbox" id="fLarge" '+(s.large?'checked':'')+'> 大图显示</label></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveScenic()">保存</button></div>');
+}
+
+function saveScenic() {
+  var id = document.getElementById('fId').value;
+  var obj = {
+    id: id, href: 'scenic-detail.html?id='+id, img: document.getElementById('fImg').value,
+    large: document.getElementById('fLarge').checked, tagEn: document.getElementById('fTag').value,
+    nameEn: document.getElementById('fName').value, subTitleEn: document.getElementById('fSub').value,
+    descEn: document.getElementById('fDesc').value
+  };
+  if (editingIndex >= 0) scenicData[editingIndex] = obj; else scenicData.push(obj);
+  closeModal(); renderScenic(); renderDashboard(); showToast('景区已保存 ✅','success');
+}
+function deleteScenic(i) { if(confirm('确定删除 "'+scenicData[i].nameEn+'" 吗？')){scenicData.splice(i,1); renderScenic(); renderDashboard(); showToast('已删除','success');} }
+
+// --- Experience Modal ---
+function openExpModal(idx) {
+  editingIndex = idx !== undefined ? idx : -1;
+  var e = editingIndex >= 0 ? expData[editingIndex] : {id:'',titleEn:'',descEn:'',img:''};
+  showModal(editingIndex>=0?'编辑体验':'新增体验',
+    '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(e.id)+'"></div>'+
+    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(e.titleEn)+'"></div>'+
+    '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(e.descEn)+'</textarea></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(e.img)+'"></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">保存</button></div>');
+}
+function saveExp() {
+  var obj = {id:document.getElementById('fId').value,titleEn:document.getElementById('fTitle').value,descEn:document.getElementById('fDesc').value,img:document.getElementById('fImg').value};
+  if (editingIndex >= 0) expData[editingIndex] = obj; else expData.push(obj);
+  closeModal(); renderExp(); renderDashboard(); showToast('体验已保存 ✅','success');
+}
+function deleteExp(i) { if(confirm('确定删除 "'+expData[i].titleEn+'" 吗？')){expData.splice(i,1); renderExp(); renderDashboard(); showToast('已删除','success');} }
+
+// --- Gallery Modal ---
+function openGalleryModal() {
+  showModal('新增图片',
+    '<div class="form-group"><label>标题</label><input id="fTitle" value=""></div>'+
+    '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic">scenic</option><option value="culture">culture</option><option value="season">season</option></select></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value=""></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveGallery()">保存</button></div>');
+}
+function saveGallery() {
+  galleryData.push({img:document.getElementById('fImg').value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value});
+  closeModal(); renderGallery(); renderDashboard(); showToast('图片已添加 ✅','success');
+}
+function editGallery(i) {
+  var g = galleryData[i];
+  editingIndex = i;
+  showModal('编辑图片',
+    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(g.titleEn)+'"></div>'+
+    '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic" '+(g.cat==='scenic'?'selected':'')+'>scenic</option><option value="culture" '+(g.cat==='culture'?'selected':'')+'>culture</option><option value="season" '+(g.cat==='season'?'selected':'')+'>season</option></select></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(g.img)+'"></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="updateGallery('+i+')">保存</button></div>');
+}
+function updateGallery(i) {
+  galleryData[i] = {img:document.getElementById('fImg').value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value};
+  closeModal(); renderGallery(); showToast('已更新 ✅','success');
+}
+function deleteGallery(i) { if(confirm('确定删除此图片吗？')){galleryData.splice(i,1); renderGallery(); renderDashboard(); showToast('已删除','success');} }
+
+// --- Hero Modal ---
+function openHeroModal(idx) {
+  editingIndex = idx !== undefined ? idx : -1;
+  var s = editingIndex >= 0 ? heroData.slides[editingIndex] : {img:'',title:'',subtitle:''};
+  showModal(editingIndex>=0?'编辑 Hero Slide':'新增 Hero Slide',
+    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(s.title)+'"></div>'+
+    '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subtitle)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(s.img)+'"></div>'+
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveHero()">保存</button></div>');
+}
+function saveHero() {
+  var obj = {img:document.getElementById('fImg').value,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
+  if (editingIndex >= 0) heroData.slides[editingIndex] = obj; else heroData.slides.push(obj);
+  closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
+}
+function deleteHero(i) { if(confirm('确定删除此 Slide 吗？')){heroData.slides.splice(i,1); renderHero(); renderDashboard(); showToast('已删除','success');} }
+
+// ==================== GITHUB API SAVE ====================
+function saveAllToGitHub() {
+  var token = localStorage.getItem('zjj_gh_token') || '';
+  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
+  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
+
+  var files = {
+    'data/news.json': JSON.stringify(newsData, null, 2),
+    'data/scenic.json': JSON.stringify(scenicData, null, 2),
+    'data/experience.json': JSON.stringify(expData, null, 2),
+    'data/gallery.json': JSON.stringify(galleryData, null, 2),
+    'data/hero.json': JSON.stringify(heroData, null, 2)
+  };
+
+  showToast('正在保存到 GitHub...','');
+  var promises = Object.keys(files).map(function(path) {
+    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
+      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
+    }).then(function(r){return r.json()}).then(function(fileInfo) {
+      return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
+        method: 'PUT',
+        headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
+        body: JSON.stringify({
+          message: 'Admin: Update '+path,
+          content: btoa(unescape(encodeURIComponent(files[path]))),
+          sha: fileInfo.sha,
+          branch: branch
+        })
+      });
+    });
+  });
+
+  Promise.all(promises).then(function() {
+    showToast('已保存到 GitHub！页面将在几分钟内更新 🎉','success');
+  }).catch(function(err) {
+    showToast('保存失败: '+err.message,'error');
+  });
+}
+
+// ==================== SETTINGS ====================
+function saveSettings() {
+  localStorage.setItem('zjj_gh_token', document.getElementById('ghToken').value);
+  localStorage.setItem('zjj_gh_repo', document.getElementById('ghRepo').value);
+  localStorage.setItem('zjj_gh_branch', document.getElementById('ghBranch').value);
+  showToast('设置已保存 ✅','success');
+}
+
+function changePassword() {
+  var np = document.getElementById('newPwd').value;
+  if (!np) { showToast('请输入新密码','error'); return; }
+  ADMIN_PWD = np;
+  showToast('密码已修改 ✅ 请牢记新密码','success');
+}
+
+// Restore settings
+function restoreSettings() {
+  var t = localStorage.getItem('zjj_gh_token');
+  if (t) document.getElementById('ghToken').value = t;
+  var r = localStorage.getItem('zjj_gh_repo');
+  if (r) document.getElementById('ghRepo').value = r;
+  var b = localStorage.getItem('zjj_gh_branch');
+  if (b) document.getElementById('ghBranch').value = b;
+}
+
+// ==================== INIT ====================
+function initApp() {
+  loadAllData().then(function() {
+    renderDashboard();
+    renderNews();
+    renderScenic();
+    renderExp();
+    renderGallery();
+    renderHero();
+    restoreSettings();
+  }).catch(function(err) {
+    showToast('数据加载失败: ' + err.message, 'error');
+  });
+
+  // Add global save button
+  var header = document.querySelector('.main-header');
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-primary btn-sm';
+  saveBtn.textContent = '💾 保存到 GitHub';
+  saveBtn.style.marginLeft = '12px';
+  saveBtn.onclick = saveAllToGitHub;
+  header.appendChild(saveBtn);
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Init on load if already authed
+if (localStorage.getItem(AUTH_KEY) === '1') initApp();
+</script>
+</body>
+</html>
