@@ -408,7 +408,6 @@ function directHeroUpload(path, base64Content, fileName, idx) {
   var token = GH_TOKEN;
   var repo = GH_REPO;
   var branch = GH_BRANCH;
-  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   showToast('⏳ 正在上传图片...','');
 
@@ -592,7 +591,6 @@ function saveHeroToGitHub() {
   var token = GH_TOKEN;
   var repo = GH_REPO;
   var branch = GH_BRANCH;
-  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   showToast('⏳ 正在同步 hero.json 到 GitHub...','');
   var content = JSON.stringify(heroData, null, 2);
@@ -624,7 +622,6 @@ function saveAllToGitHub() {
   var token = GH_TOKEN;
   var repo = GH_REPO;
   var branch = GH_BRANCH;
-  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   var files = {
     'data/news.json': JSON.stringify(newsData, null, 2),
@@ -685,7 +682,6 @@ function uploadToGitHub(path, base64Content, fileName, inputId) {
   var token = GH_TOKEN;
   var repo = GH_REPO;
   var branch = GH_BRANCH;
-  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   var previewDiv = document.getElementById('prev_' + inputId);
   previewDiv.innerHTML = '<div class="upload-progress">⏳ 上传中...</div>';
