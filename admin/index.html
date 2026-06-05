@@ -235,11 +235,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   <!-- Settings -->
   <div class="content-section" id="sec-settings">
     <div class="settings-section">
-      <h3>⚙️ GitHub 仓库配置</h3>
+      <h3>⚙️ GitHub 配置</h3>
+      <div class="form-group">
+        <label>Fine-Grained Token <span style="color:#e91e63;font-size:12px">(建议)</span></label>
+        <input type="password" id="ghToken" placeholder="github_pat_xxxxxxxxxxxx">
+        <div class="token-hint">
+          建议用 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="color:#2196f3">Fine-grained token</a>：
+          仅授权当前仓库，权限选 <b>Contents: Read and write</b>。即使泄露也只影响这一个仓库。
+        </div>
+      </div>
       <div class="form-group">
         <label>仓库名</label>
         <input type="text" id="ghRepo" value="WillyYe/visitzhangjiajie.com" placeholder="用户名/仓库名">
-        <div class="token-hint">GitHub Token 已安全存储在服务器端（Cloudflare Pages 环境变量 <b>GH_TOKEN</b>），前端不可见</div>
       </div>
       <button class="btn btn-primary" onclick="saveGitHubConfig()">保存配置</button>
       <button class="btn btn-outline" onclick="testGitHubConnection()" style="margin-left:8px">测试连接</button>
@@ -266,13 +273,17 @@ var AUTH_KEY = 'zjj_admin_auth';
 var GH_REPO = localStorage.getItem('gh_repo') || 'WillyYe/visitzhangjiajie.com';
 var GH_BRANCH = 'main';
 
-// 通过 Cloudflare Pages Function 代理 GitHub API（Token 存在服务端，前端不可见）
+function getGhToken() { return localStorage.getItem('gh_token'); }
+
+// 直接调用 GitHub API（CORS 已支持），建议使用 Fine-Grained Token（仅限当前仓库权限）
 function ghFetch(path, method, body) {
-  var url = '/api/github/repos/' + GH_REPO + '/contents/' + path;
+  var token = getGhToken();
+  if (!token) { return Promise.reject(new Error('GitHub Token 未配置，请在「设置」中配置')); }
+  var url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + path;
   if (!method || method === 'GET') url += '?ref=' + GH_BRANCH;
   var opts = {
     method: method || 'GET',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' }
+    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }
   };
   if (body) {
     var payload = { message: body.message, content: body.content, branch: GH_BRANCH };
@@ -835,24 +846,30 @@ function formatBytes(bytes) {
 
 // ==================== SETTINGS ====================
 function saveGitHubConfig() {
+  var token = document.getElementById('ghToken').value.trim();
   var repo = document.getElementById('ghRepo').value.trim();
+  if (!token) { showToast('请输入 GitHub Token','error'); return; }
   if (!repo || repo.indexOf('/') === -1) { showToast('仓库名格式错误，应为：用户名/仓库名','error'); return; }
+  localStorage.setItem('gh_token', token);
   localStorage.setItem('gh_repo', repo);
   GH_REPO = repo;
-  showToast('仓库配置已保存 ✅','success');
+  showToast('GitHub 配置已保存 ✅','success');
   renderGhStatus();
 }
 function testGitHubConnection() {
-  var repo = GH_REPO;
+  var token = getGhToken();
+  if (!token) { showToast('请先保存 GitHub Token','error'); return; }
   showToast('正在测试连接...','');
-  fetch('/api/github/repos/' + repo, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-    .then(function(r){ if (r.ok) return r.json(); throw new Error('HTTP ' + r.status); })
-    .then(function(d){ showToast('连接成功！仓库: ' + d.full_name + ' ✅','success'); })
+  fetch('https://api.github.com/user', { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } })
+    .then(function(r){ if (r.ok) return r.json(); throw new Error('Token 验证失败: HTTP ' + r.status); })
+    .then(function(d){ showToast('连接成功！用户: ' + d.login + ' ✅','success'); })
     .catch(function(err){ showToast('连接失败: ' + err.message,'error'); });
 }
 function renderGhStatus() {
   var el = document.getElementById('ghConfigStatus');
-  el.innerHTML = '<span style="color:#43a047">✅ 已配置仓库: ' + esc(GH_REPO) + '（Token 存储在服务器端，安全）</span>';
+  var token = getGhToken();
+  if (!token) { el.innerHTML = '<span style="color:#e53935">⚠️ GitHub Token 未配置，无法同步到 GitHub</span>'; return; }
+  el.innerHTML = '<span style="color:#43a047">✅ 已配置 Token，仓库: ' + esc(GH_REPO) + '</span>';
 }
 function changePassword() {
   var np = document.getElementById('newPwd').value;
@@ -866,6 +883,12 @@ var appInitialized = false;
 function initApp() {
   if (appInitialized) return;
   appInitialized = true;
+
+  // Load saved GitHub config into inputs
+  var savedToken = localStorage.getItem('gh_token');
+  var savedRepo = localStorage.getItem('gh_repo');
+  if (savedToken) document.getElementById('ghToken').value = savedToken;
+  if (savedRepo) document.getElementById('ghRepo').value = savedRepo;
   renderGhStatus();
 
   loadAllData().then(function() {
