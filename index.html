@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>张家界国家森林公园 | Zhangjiajie National Forest Park</title>
-  <meta name="description" content="张家界国家森林公园官方网站 — 世界自然遗产，阿凡达取景地，中国第一个国家森林公园。" />
+  <title>Zhangjiajie National Forest Park | Official Website</title>
+  <meta name="description" content="Official website of Zhangjiajie National Forest Park — UNESCO World Natural Heritage, filming location of Avatar, China's first national forest park." />
   <meta name="theme-color" content="#1a4a30" />
   
   <!-- DNS Prefetch for faster DNS resolution -->
@@ -126,22 +126,6 @@
       color: var(--white);
       background: rgba(255,255,255,0.1);
     }
-    .lang-switch {
-      display: flex;
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .lang-switch button {
-      padding: 6px 14px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.7);
-      transition: background 0.2s, color 0.2s;
-    }
-    .lang-switch button.active {
-      background: var(--gold);
-      color: var(--white);
-    }
     .mobile-menu-btn {
       display: none;
       flex-direction: column;
@@ -200,23 +184,6 @@
       font-size: 18px;
       padding: 16px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .mobile-nav-lang {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-    .mobile-nav-lang button {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid var(--gold);
-      background: transparent;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .mobile-nav-lang button.active {
-      background: var(--gold);
     }
     .mobile-nav-overlay {
       position: fixed;
@@ -1135,7 +1102,7 @@
   </style>
 </head>
 <body>
-  <a href="#header" class="skip-link" data-i18n="skip_link">Skip to main content</a>
+  <a href="#header" class="skip-link">Skip to main content</a>
   
   <!-- ========== HEADER ========== -->
   <header class="header" id="header">
@@ -1143,21 +1110,17 @@
       <a href="#" class="logo">
         <div class="logo-icon">🏔</div>
         <div class="logo-text">
-          <span class="logo-cn">张家界国家森林公园</span>
+          <span class="logo-cn">Zhangjiajie National Forest Park</span>
           <span class="logo-en">ZHANGJIAJIE PARK</span>
         </div>
       </a>
       <nav class="nav" id="nav">
-        <a href="#news" data-i18n="nav_news">Park News</a>
-        <a href="#scenic" data-i18n="nav_scenic">Core Scenic</a>
-        <a href="#experience" data-i18n="nav_exp">Experiences</a>
-        <a href="#gallery" data-i18n="nav_gallery">Gallery</a>
-        <a href="getting-here/" data-i18n="nav_transport">Transport</a>
+        <a href="#news">Park News</a>
+        <a href="#scenic">Core Scenic</a>
+        <a href="#experience">Experiences</a>
+        <a href="#gallery">Gallery</a>
+        <a href="getting-here/">Transport</a>
       </nav>
-      <div class="lang-switch">
-        <button onclick="switchLang('zh')" data-lang="zh">中文</button>
-        <button onclick="switchLang('en')" class="active" data-lang="en">EN</button>
-      </div>
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -1168,15 +1131,11 @@
   <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
   <nav class="mobile-nav" id="mobileNav">
     <button class="mobile-nav-close" id="mobileNavClose">&times;</button>
-    <a href="#news" data-i18n="nav_news">Park News</a>
-    <a href="#scenic" data-i18n="nav_scenic">Core Scenic</a>
-    <a href="#experience" data-i18n="nav_exp">Experiences</a>
-    <a href="#gallery" data-i18n="nav_gallery">Gallery</a>
-    <a href="getting-here/" data-i18n="nav_transport">Transport</a>
-    <div class="mobile-nav-lang">
-      <button onclick="switchLang('zh')" data-lang="zh">中文</button>
-      <button onclick="switchLang('en')" class="active" data-lang="en">EN</button>
-    </div>
+    <a href="#news">Park News</a>
+    <a href="#scenic">Core Scenic</a>
+    <a href="#experience">Experiences</a>
+    <a href="#gallery">Gallery</a>
+    <a href="getting-here/">Transport</a>
   </nav>
 
   <!-- ========== HERO ========== -->
@@ -1196,13 +1155,13 @@
     <div class="hero-content">
       <div class="hero-badge">
         <span class="hero-badge-dot"></span>
-        <span data-i18n="hero_badge">World Natural Heritage · UNESCO</span>
+        <span>World Natural Heritage · UNESCO</span>
       </div>
       <h1 class="hero-title">
-        张家界国家森林公园
+        Zhangjiajie National Forest Park
         <span class="hero-title-en">ZHANGJIAJIE NATIONAL FOREST PARK</span>
       </h1>
-      <p class="hero-desc" data-i18n="hero_desc">Explore the pillar-like peaks and experience natural wonders. China's first national forest park, filming location of Avatar.</p>
+      <p class="hero-desc">Explore the pillar-like peaks and experience natural wonders. China's first national forest park, filming location of Avatar.</p>
     </div>
     <div class="hero-dots" id="heroDots">
       <button class="hero-dot active" data-slide="0"></button>
@@ -1220,28 +1179,28 @@
       <div class="info-item">
         <div class="info-icon">🎫</div>
         <div>
-          <div class="info-label" data-i18n="info_ticket">Ticket Price</div>
-          <div class="info-value">¥225 / <span data-i18n="info_days">4 Days</span></div>
+          <div class="info-label">Ticket Price</div>
+          <div class="info-value">¥225 / <span>4 Days</span></div>
         </div>
       </div>
       <div class="info-item">
         <div class="info-icon">🕐</div>
         <div>
-          <div class="info-label" data-i18n="info_hours">Opening Hours</div>
+          <div class="info-label">Opening Hours</div>
           <div class="info-value">06:30 - 18:30</div>
         </div>
       </div>
       <div class="info-item">
         <div class="info-icon">📍</div>
         <div>
-          <div class="info-label" data-i18n="info_location">Location</div>
+          <div class="info-label">Location</div>
           <div class="info-value">Zhangjiajie City, Hunan Province</div>
         </div>
       </div>
       <div class="info-item">
         <div class="info-icon">📧</div>
         <div>
-          <div class="info-label" data-i18n="info_contact">Contact</div>
+          <div class="info-label">Contact</div>
           <div class="info-value"><a href="mailto:zjjpark@outlook.com" class="info-email">zjjpark@outlook.com</a></div>
         </div>
       </div>
@@ -1251,9 +1210,9 @@
   <!-- ========== NEWS ========== -->
   <section class="section" id="news">
     <div class="section-header">
-      <div class="section-tag" data-i18n="news_tag">PARK NEWS</div>
-        <h2 class="section-title" data-i18n="news_title">Park News</h2>
-        <p class="section-desc" data-i18n="news_desc">Stay updated with the latest news, events and visitor information</p>
+      <div class="section-tag">PARK NEWS</div>
+        <h2 class="section-title">Park News</h2>
+        <p class="section-desc">Stay updated with the latest news, events and visitor information</p>
     </div>
     <div class="news-carousel-wrapper" id="newsCarouselWrapper">
       <div class="news-carousel" id="newsCarousel">
@@ -1272,9 +1231,9 @@
   <section id="scenic">
     <div class="scenic-inner">
       <div class="section-header">
-        <div class="section-tag" data-i18n="scenic_tag">CORE SCENIC</div>
-        <h2 class="section-title" data-i18n="scenic_title">Core Scenic Spots</h2>
-        <p class="section-desc" data-i18n="scenic_desc">Mother Nature's masterpieces that will leave you in awe</p>
+        <div class="section-tag">CORE SCENIC</div>
+        <h2 class="section-title">Core Scenic Spots</h2>
+        <p class="section-desc">Mother Nature's masterpieces that will leave you in awe</p>
       </div>
       <div class="scenic-grid" id="scenicGrid">
         <!-- Scenic cards will be rendered by JS -->
@@ -1288,9 +1247,9 @@
   <!-- ========== EXPERIENCE ========== -->
   <section class="section" id="experience">
     <div class="section-header">
-        <div class="section-tag" data-i18n="exp_tag">EXPERIENCES</div>
-        <h2 class="section-title" data-i18n="exp_title">Experiences</h2>
-        <p class="section-desc" data-i18n="exp_desc">Explore Zhangjiajie in many unique ways</p>
+        <div class="section-tag">EXPERIENCES</div>
+        <h2 class="section-title">Experiences</h2>
+        <p class="section-desc">Explore Zhangjiajie in many unique ways</p>
     </div>
     <div class="exp-grid" id="expGrid">
       <!-- Experience cards will be rendered by JS -->
@@ -1301,15 +1260,15 @@
   <section id="gallery">
     <div class="gallery-inner">
       <div class="section-header">
-        <div class="section-tag" data-i18n="gallery_tag">GALLERY</div>
-        <h2 class="section-title" data-i18n="gallery_title">Photo Gallery</h2>
-        <p class="section-desc" data-i18n="gallery_desc">Capturing the stunning beauty of Zhangjiajie</p>
+        <div class="section-tag">GALLERY</div>
+        <h2 class="section-title">Photo Gallery</h2>
+        <p class="section-desc">Capturing the stunning beauty of Zhangjiajie</p>
       </div>
       <div class="gallery-filter">
-        <button class="active" onclick="filterGallery('all', this)" data-i18n="gallery_all">All</button>
-        <button onclick="filterGallery('scenic', this)" data-i18n="gallery_scenic">Scenic</button>
-        <button onclick="filterGallery('culture', this)" data-i18n="gallery_culture">Culture</button>
-        <button onclick="filterGallery('season', this)" data-i18n="gallery_season">Season</button>
+        <button class="active" onclick="filterGallery('all', this)">All</button>
+        <button onclick="filterGallery('scenic', this)">Scenic</button>
+        <button onclick="filterGallery('culture', this)">Culture</button>
+        <button onclick="filterGallery('season', this)">Season</button>
       </div>
       <div class="gallery-masonry" id="galleryMasonry">
         <!-- Gallery items will be rendered by JS -->
@@ -1320,9 +1279,9 @@
   <!-- ========== TRANSPORT ========== -->
   <section class="section" id="transport">
       <div class="section-header">
-        <div class="section-tag" data-i18n="transport_tag">TRANSPORT</div>
-        <h2 class="section-title" data-i18n="transport_title">Getting Here</h2>
-        <p class="section-desc" data-i18n="transport_desc">Multiple ways to reach Zhangjiajie National Forest Park</p>
+        <div class="section-tag">TRANSPORT</div>
+        <h2 class="section-title">Getting Here</h2>
+        <p class="section-desc">Multiple ways to reach Zhangjiajie National Forest Park</p>
       </div>
     <div class="transport-layout">
       <div class="transport-map">
@@ -1333,36 +1292,36 @@
           title="Zhangjiajie National Forest Park location map"
         ></iframe>
         <div style="position:absolute;bottom:12px;right:12px;">
-          <a href="getting-here/" style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.95);border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;color:#2d6a4f;box-shadow:0 2px 8px rgba(0,0,0,0.12);" data-i18n="map_view_detail">View detailed map →</a>
+          <a href="getting-here/" style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.95);border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;color:#2d6a4f;box-shadow:0 2px 8px rgba(0,0,0,0.12);">View detailed map →</a>
         </div>
       </div>
       <div class="transport-ways">
         <div class="transport-card">
           <div class="transport-icon">✈️</div>
           <div>
-            <h4 class="transport-title" data-i18n="transport_plane">By Plane</h4>
-            <p class="transport-desc" data-i18n="transport_plane_desc">Zhangjiajie Hehua International Airport, about 35km from the park, with flights to major Chinese cities.</p>
+            <h4 class="transport-title">By Plane</h4>
+            <p class="transport-desc">Zhangjiajie Hehua International Airport, about 35km from the park, with flights to major Chinese cities.</p>
           </div>
         </div>
         <div class="transport-card">
           <div class="transport-icon">🚄</div>
           <div>
-            <h4 class="transport-title" data-i18n="transport_train">By Train</h4>
-            <p class="transport-desc" data-i18n="transport_train_desc">Zhangjiajie Station and Zhangjiajie West Station (high-speed), about 20km from the park.</p>
+            <h4 class="transport-title">By Train</h4>
+            <p class="transport-desc">Zhangjiajie Station and Zhangjiajie West Station (high-speed), about 20km from the park.</p>
           </div>
         </div>
         <div class="transport-card">
           <div class="transport-icon">🚌</div>
           <div>
-            <h4 class="transport-title" data-i18n="transport_bus">By Bus</h4>
-            <p class="transport-desc" data-i18n="transport_bus_desc">Direct buses from Zhangjiajie Bus Station, about 40 minutes, approximately ¥15.</p>
+            <h4 class="transport-title">By Bus</h4>
+            <p class="transport-desc">Direct buses from Zhangjiajie Bus Station, about 40 minutes, approximately ¥15.</p>
           </div>
         </div>
         <div class="transport-card">
           <div class="transport-icon">🚗</div>
           <div>
-            <h4 class="transport-title" data-i18n="transport_car">By Car</h4>
-            <p class="transport-desc" data-i18n="transport_car_desc">Navigate to Zhangjiajie National Forest Park Ticket Station, parking available.</p>
+            <h4 class="transport-title">By Car</h4>
+            <p class="transport-desc">Navigate to Zhangjiajie National Forest Park Ticket Station, parking available.</p>
           </div>
         </div>
       </div>
@@ -1377,51 +1336,51 @@
           <div class="footer-logo">
             <div class="logo-icon">🏔</div>
             <div class="logo-text">
-              <span class="logo-cn">张家界国家森林公园</span>
+              <span class="logo-cn">Zhangjiajie National Forest Park</span>
               <span class="logo-en">ZHANGJIAJIE PARK</span>
             </div>
           </div>
-          <p class="footer-desc" data-i18n="footer_desc">World Natural Heritage, World Geopark, National AAAAA Tourist Attraction. Filming location of Avatar, China's first national forest park.</p>
+          <p class="footer-desc">World Natural Heritage, World Geopark, National AAAAA Tourist Attraction. Filming location of Avatar, China's first national forest park.</p>
           <div class="footer-social">
-            <a href="#" aria-label="微信">💬</a>
-            <a href="#" aria-label="微博">📱</a>
-            <a href="#" aria-label="抖音">🎵</a>
+            <a href="#" aria-label="WeChat">💬</a>
+            <a href="#" aria-label="Weibo">📱</a>
+            <a href="#" aria-label="TikTok">🎵</a>
           </div>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="footer_quick">Quick Links</h4>
+          <h4>Quick Links</h4>
           <ul>
-            <li><a href="#news" data-i18n="nav_news">Park News</a></li>
-            <li><a href="#scenic" data-i18n="nav_scenic">Core Scenic</a></li>
-            <li><a href="#experience" data-i18n="nav_exp">Experiences</a></li>
-            <li><a href="#gallery" data-i18n="nav_gallery">Gallery</a></li>
+            <li><a href="#news">Park News</a></li>
+            <li><a href="#scenic">Core Scenic</a></li>
+            <li><a href="#experience">Experiences</a></li>
+            <li><a href="#gallery">Gallery</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="footer_service">Support</h4>
+          <h4>Support</h4>
           <ul>
-            <li><a href="getting-here/" data-i18n="nav_transport">Getting Here</a></li>
-            <li><a href="#" data-i18n="footer_faq">FAQ</a></li>
-            <li><a href="#" data-i18n="footer_contact">Contact Us</a></li>
+            <li><a href="getting-here/">Getting Here</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Contact Us</a></li>
             <li><a href="mailto:zjjpark@outlook.com" class="footer-email">(zjjpark@outlook.com)</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="footer_info">Park Info</h4>
+          <h4>Park Info</h4>
           <ul>
-            <li><a href="#" data-i18n="footer_ticket">Book Tickets</a></li>
-            <li><a href="#" data-i18n="footer_notice">Visitor Guide</a></li>
-            <li><a href="#" data-i18n="footer_guide">Guided Tours</a></li>
-            <li><a href="#" data-i18n="footer_shop">Official Shop</a></li>
+            <li><a href="#">Book Tickets</a></li>
+            <li><a href="#">Visitor Guide</a></li>
+            <li><a href="#">Guided Tours</a></li>
+            <li><a href="#">Official Shop</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <p class="footer-copy">© 2024 Zhangjiajie National Forest Park</p>
         <div class="footer-links">
-          <a href="#" data-i18n="footer_privacy">Privacy Policy</a>
-          <a href="#" data-i18n="footer_terms">Terms of Use</a>
-          <a href="#" data-i18n="footer_icp">ICP XXXXXXXX-X</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">ICP XXXXXXXX-X</a>
         </div>
       </div>
     </div>
@@ -1435,11 +1394,10 @@
     <button class="lightbox-nav lightbox-next" onclick="lightboxNext()">›</button>
   </div>
 
-  <!-- 延迟加载 JavaScript，不阻塞页面渲染 -->
+  <!-- Deferred JavaScript, non-blocking -->
   <script defer>
     /* ========== APP STATE ========== */
     var AppState = {
-      currentLang: 'en',
       scenicPage: 1,
       heroSlider: null,
       currentSlide: 0,
@@ -1454,171 +1412,40 @@
       return div.innerHTML;
     }
 
-    /* ========== I18N DATA ========== */
-    var i18n = {
-      en: {
-        nav_news: 'Park News',
-        nav_scenic: 'Core Scenic',
-        nav_exp: 'Experiences',
-        nav_gallery: 'Gallery',
-        nav_transport: 'Transport',
-        hero_badge: 'World Natural Heritage · UNESCO',
-        hero_desc: 'Explore the pillar-like peaks and experience natural wonders. China\'s first national forest park, filming location of Avatar.',
-        info_ticket: 'Ticket Price',
-        info_days: '4 Days',
-        info_hours: 'Opening Hours',
-        info_location: 'Location',
-        info_contact: 'Contact',
-        news_tag: 'PARK NEWS',
-        news_title: 'Park News',
-        news_desc: 'Stay updated with the latest news, events and visitor information',
-        scenic_tag: 'CORE SCENIC',
-        scenic_title: 'Core Scenic Spots',
-        scenic_desc: 'Mother Nature\'s masterpieces that will leave you in awe',
-        exp_tag: 'EXPERIENCES',
-        exp_title: 'Experiences',
-        exp_desc: 'Explore Zhangjiajie in many unique ways',
-        gallery_tag: 'GALLERY',
-        gallery_title: 'Photo Gallery',
-        gallery_desc: 'Capturing the stunning beauty of Zhangjiajie',
-        gallery_all: 'All',
-        gallery_scenic: 'Scenic',
-        gallery_culture: 'Culture',
-        gallery_season: 'Season',
-        transport_tag: 'TRANSPORT',
-        transport_title: 'Getting Here',
-        transport_desc: 'Multiple ways to reach Zhangjiajie National Forest Park',
-        transport_plane: 'By Plane',
-        transport_plane_desc: 'Zhangjiajie Hehua International Airport, about 35km from the park, with flights to major Chinese cities.',
-        transport_train: 'By Train',
-        transport_train_desc: 'Zhangjiajie Station and Zhangjiajie West Station (high-speed) are available, about 20km from the park.',
-        transport_bus: 'By Bus',
-        transport_bus_desc: 'Direct buses from Zhangjiajie Bus Station, about 40 minutes, approximately ¥15.',
-        transport_car: 'By Car',
-        transport_car_desc: 'Navigate to Zhangjiajie National Forest Park Ticket Station, parking available.',
-        map_loading: 'Loading map...',
-        footer_desc: 'World Natural Heritage, World Geopark, National AAAAA Tourist Attraction. Filming location of Avatar, China\'s first national forest park.',
-        footer_quick: 'Quick Links',
-        footer_service: 'Support',
-        footer_contact: 'Contact Us',
-        footer_faq: 'FAQ',
-        footer_info: 'Park Info',
-        footer_ticket: 'Book Tickets',
-        footer_notice: 'Visitor Guide',
-        footer_guide: 'Guided Tours',
-        footer_shop: 'Official Shop',
-        footer_privacy: 'Privacy Policy',
-        footer_terms: 'Terms of Use',
-        footer_icp: 'ICP 00000000-X',
-        skip_link: 'Skip to main content'
-      },
-      zh: {
-        nav_news: '公园资讯',
-        nav_scenic: '核心景观',
-        nav_exp: '体验活动',
-        nav_gallery: '精选图库',
-        nav_transport: '交通指南',
-        hero_badge: '世界自然遗产 · UNESCO 世界遗产',
-        hero_desc: '探索云端石柱，感受自然奇观。中国第一个国家森林公园，阿凡达取景地。',
-        info_ticket: '门票价格',
-        info_days: '4天',
-        info_hours: '开放时间',
-        info_location: '所在地',
-        info_contact: '联系我们',
-        news_tag: '公园资讯',
-        news_title: '公园资讯',
-        news_desc: '了解张家界最新动态、活动公告与游客须知',
-        scenic_tag: '核心景观',
-        scenic_title: '核心景观',
-        scenic_desc: '鬼斧神工的自然奇观，每一处都令人叹为观止',
-        exp_tag: '体验活动',
-        exp_title: '体验活动',
-        exp_desc: '多种方式感受张家界的独特魅力',
-        gallery_tag: '精选图库',
-        gallery_title: '精选图库',
-        gallery_desc: '用镜头记录张家界的每一帧绝美瞬间',
-        gallery_all: '全部',
-        gallery_scenic: '风景',
-        gallery_culture: '人文',
-        gallery_season: '四季',
-        transport_tag: '交通指南',
-        transport_title: '交通指南',
-        transport_desc: '多种方式轻松抵达张家界国家森林公园',
-        transport_plane: '飞机',
-        transport_plane_desc: '张家界荷花国际机场，距景区约35公里，有航班往返全国主要城市。',
-        transport_train: '火车/高铁',
-        transport_train_desc: '张家界站和张家界西站（高铁）均有到达，高铁站距景区约20公里。',
-        transport_bus: '旅游巴士',
-        transport_bus_desc: '张家界汽车站有直达景区的大巴，车程约40分钟，票价约15元。',
-        transport_car: '自驾',
-        transport_car_desc: '导航至张家界国家森林公园门票站，景区设有多处停车场。',
-        map_loading: '加载地图中...',
-        footer_desc: '世界自然遗产、世界地质公园、国家AAAAA级旅游景区。电影《阿凡达》取景地，中国第一个国家森林公园。',
-        footer_quick: '快速链接',
-        footer_service: '服务支持',
-        footer_contact: '联系我们',
-        footer_faq: '常见问题',
-        footer_info: '景区信息',
-        footer_ticket: '门票预约',
-        footer_notice: '游览须知',
-        footer_guide: '导游服务',
-        footer_shop: '官方商城',
-        footer_privacy: '隐私政策',
-        footer_terms: '使用条款',
-        footer_icp: '湘ICP备XXXXXXXX号',
-        skip_link: '跳转到主要内容'
-      }
-    };
-
     /* ========== DATA ========== */
     var newsData = [
       {
         date: { day: '13', month: 'MAY' },
         tag: 'overview',
-        tagText: '基本概况',
-        title: '张家界国家森林公园概况',
         titleEn: 'Zhangjiajie at a Glance',
-        desc: '位于湖南张家界武陵源，总面积4810公顷，海拔400-1334米，1982年经国务院批准建立为中国首个国家森林公园。',
         descEn: 'Located in Wulingyuan, Zhangjiajie, Hunan — 4,810 hectares, elevation 400–1,334m, established in 1982 as China\'s first national forest park.',
         img: 'assets/images/news-park.jpg'
       },
       {
         date: { day: '11', month: 'MAY' },
         tag: 'honor',
-        tagText: '荣誉称号',
-        title: '世界级认证与荣誉',
         titleEn: 'World-Class Recognition',
-        desc: '中国首个国家森林公园（1982）、世界自然遗产（1992）、世界地质公园（2004）、国家5A级景区（2007），四重荣誉加持。',
         descEn: 'China\'s first national forest park (1982), World Natural Heritage (1992), World Geopark (2004), National 5A scenic spot (2007) — four prestigious designations.',
         img: 'assets/images/news-festival.jpg'
       },
       {
         date: { day: '10', month: 'MAY' },
         tag: 'geo',
-        tagText: '地质奇观',
-        title: '3.8亿年石英砂岩峰林地貌',
         titleEn: '380 Million Years of Geological Heritage',
-        desc: '拥有3.8亿年历史的石英砂岩峰林地貌，分布着3000余座奇峰与800余条溪流，被誉为"缩小的仙境"。',
         descEn: '380-million-year-old quartz sandstone pillar formations with 3,000+ peaks and 800+ streams — a paradise in miniature.',
         img: 'assets/images/news-cableway.jpg'
       },
       {
         date: { day: '07', month: 'MAY' },
         tag: 'eco',
-        tagText: '生态数据',
-        title: '森林覆盖率85.28%的天然氧吧',
         titleEn: '85.28% Forest Coverage — A Natural Oxygen Bar',
-        desc: '园区森林覆盖率高达85.28%，记录有4000余种动植物，其中81种受国家级保护，是真正的生态宝库。',
         descEn: 'With 85.28% forest coverage, 4,000+ species of flora and fauna, and 81 nationally protected species, the park is a true ecological treasure.',
         img: 'assets/images/news-cableway.jpg'
       },
       {
         date: { day: '05', month: 'MAY' },
         tag: 'avatar',
-        tagText: '阿凡达关联',
-        title: '哈利路亚山的灵感之源',
         titleEn: 'Where Avatar\'s Floating Mountains Came From',
-        desc: '袁家界景区被认为是电影《阿凡达》中"哈利路亚山"的灵感来源地，中美地质学家共同认可这一自然奇观的独特价值。',
         descEn: 'Yuanjiajie is widely recognized by Chinese and American geologists as the inspiration for the floating Hallelujah Mountains in Avatar.',
         img: 'assets/images/news-cableway.jpg'
       }
@@ -1627,33 +1454,25 @@
     var expData = [
       {
         id: 'hiking',
-        title: '徒步探险',
         titleEn: 'Hiking Adventure',
-        desc: '穿越金鞭溪，探秘原始森林',
         descEn: 'Trek through Jinbian Stream and explore primeval forests',
         img: 'assets/images/exp-hiking.jpg'
       },
       {
         id: 'photography',
-        title: '摄影之旅',
         titleEn: 'Photography Tour',
-        desc: '用镜头捕捉大自然的鬼斧神工',
         descEn: 'Capture nature\'s masterpieces through your lens',
         img: 'assets/images/exp-photo.jpg'
       },
       {
         id: 'eco',
-        title: '生态研学',
         titleEn: 'Eco Education',
-        desc: '了解地质奇观与生态系统',
         descEn: 'Learn about geological wonders and ecosystems',
         img: 'assets/images/exp-eco.jpg'
       },
       {
         id: 'stargazing',
-        title: '云海星空',
         titleEn: 'Sea of Clouds & Stargazing',
-        desc: '观赏日出云海与满天繁星',
         descEn: 'Witness sunrise, sea of clouds, and starry skies',
         img: 'assets/images/exp-stargaze.jpg'
       }
@@ -1665,13 +1484,9 @@
         href: 'scenic-detail.html?id=yuanjiajie',
         img: 'assets/images/yuanjiajie.jpg',
         large: true,
-        tag: 'UNESCO 世界遗产',
         tagEn: 'UNESCO World Heritage',
-        name: '袁家界',
         nameEn: 'Yuanjiajie',
-        subTitle: '阿凡达取景地',
         subTitleEn: 'Avatar Filming Site',
-        desc: '电影《阿凡达》中潘多拉星球悬浮山的原型——南天一柱所在地，云雾缭绕，宛如仙境。',
         descEn: 'The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical.'
       },
       {
@@ -1679,13 +1494,9 @@
         href: 'scenic-detail.html?id=tianzishan',
         img: 'assets/images/tianzishan.jpg',
         large: false,
-        tag: '天子御笔',
         tagEn: 'Imperial Brush',
-        name: '天子山',
         nameEn: 'Tianzi Mountain',
-        subTitle: '缩小的仙境',
         subTitleEn: 'Miniature Fairyland',
-        desc: '因《阿凡达》电影名声大噪，被誉为"缩小的仙境"，日出云海蔚为壮观。',
         descEn: 'Famous from Avatar, known as the "Miniature Fairyland". Spectacular sunrise and sea of clouds.'
       },
       {
@@ -1693,13 +1504,9 @@
         href: 'scenic-detail.html?id=jinbianxi',
         img: 'assets/images/jinbianxi.jpg',
         large: false,
-        tag: '天然氧吧',
         tagEn: 'Natural Oxygen Bar',
-        name: '金鞭溪',
         nameEn: 'Jinbian Stream',
-        subTitle: '7.5公里徒步胜境',
         subTitleEn: '7.5km Hiking Paradise',
-        desc: '全长7.5公里，溪水清澈，两岸奇峰耸立，是公园内最经典的徒步路线。',
         descEn: '7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park.'
       },
       {
@@ -1707,13 +1514,9 @@
         href: 'scenic-detail.html?id=huangshijia',
         img: 'assets/images/gal-yuanjiajie.jpg',
         large: false,
-        tag: '土家风情',
         tagEn: 'Tujia Culture',
-        name: '黄石寨',
         nameEn: 'Huangshijia',
-        subTitle: '不上黄石寨，枉到张家界',
         subTitleEn: 'Essential Zhangjiajie',
-        desc: '相传张良在此修行，有"不上黄石寨，枉到张家界"之说，是公园最大的凌空观景台。',
         descEn: 'Legend says Zhang Liang cultivated here. The largest aerial viewing platform in the park with stunning panoramic views.'
       },
       {
@@ -1721,13 +1524,9 @@
         href: 'scenic-detail.html?id=silkongqiao',
         img: 'assets/images/gal-clouds.jpg',
         large: false,
-        tag: '天下第一桥',
         tagEn: 'First Bridge Under Heaven',
-        name: '天下第一桥',
         nameEn: 'First Bridge Under Heaven',
-        subTitle: '天然石桥奇观',
         subTitleEn: 'Natural Stone Bridge',
-        desc: '两座石峰之间自然形成的石桥，距谷底高约387米，堪称自然界的一大奇迹。',
         descEn: 'A natural stone bridge formed between two peaks, standing 387m above the valley floor. A true wonder of nature.'
       },
       {
@@ -1735,13 +1534,9 @@
         href: 'scenic-detail.html?id=yongding',
         img: 'assets/images/gal-culture.jpg',
         large: false,
-        tag: '土家古镇',
         tagEn: 'Tujia Ancient Town',
-        name: '永定古城',
         nameEn: 'Yongding Ancient Town',
-        subTitle: '土家族文化中心',
         subTitleEn: 'Tujia Cultural Center',
-        desc: '保存完好的土家古镇，体验土家族传统文化、建筑风格和民俗风情。',
         descEn: 'A well-preserved Tujia ancient town with traditional culture, architecture and folk customs.'
       },
       {
@@ -1749,13 +1544,9 @@
         href: 'scenic-detail.html?id=shadao',
         img: 'assets/images/gal-sunrise.jpg',
         large: false,
-        tag: '精华路线',
         tagEn: 'Classic Route',
-        name: '沙刀沟',
         nameEn: 'Shadao Valley',
-        subTitle: '探险者的天堂',
         subTitleEn: 'Adventurer\'s Paradise',
-        desc: '沟壑纵横，景观独特，是喜欢探险的游客必去之地，充满原始森林的神秘感。',
         descEn: 'A maze of gullies with unique landscapes, perfect for adventurers seeking wilderness experiences.'
       },
       {
@@ -1763,13 +1554,9 @@
         href: 'scenic-detail.html?id=shuangshiyoupu',
         img: 'assets/images/gal-spring.jpg',
         large: false,
-        tag: '山水画廊',
         tagEn: 'Scenic Gallery',
-        name: '双壁映秀',
         nameEn: 'Twin Peaks',
-        subTitle: '两峰对峙奇观',
         subTitleEn: 'Facing Peaks',
-        desc: '两座笔直的石峰相对而立，形成独特的门户景观，是拍照留念的绝佳地点。',
         descEn: 'Two towering stone peaks facing each other, forming a unique gateway. Perfect for photos.'
       },
       {
@@ -1777,13 +1564,9 @@
         href: 'scenic-detail.html?id=wulongkarst',
         img: 'assets/images/gal-autumn.jpg',
         large: false,
-        tag: '喀斯特地貌',
         tagEn: 'Karst Landscape',
-        name: '武隆溶洞',
         nameEn: 'Wulong Karst Caves',
-        subTitle: '地下奇幻世界',
         subTitleEn: 'Underground Wonderland',
-        desc: '典型的喀斯特溶洞景观，洞内石笋、石柱、石花形态万千，美不胜收。',
         descEn: 'Typical karst cave landscape with diverse stalactites, stalagmites and stone flowers.'
       },
       {
@@ -1791,61 +1574,24 @@
         href: 'scenic-detail.html?id=tianpingshan',
         img: 'assets/images/gal-winter.jpg',
         large: false,
-        tag: '云海日出',
         tagEn: 'Sunrise & Sea of Clouds',
-        name: '天平山',
         nameEn: 'Tianping Mountain',
-        subTitle: '观日出最佳点',
         subTitleEn: 'Best Sunrise Viewpoint',
-        desc: '海拔1200米，是观赏日出、俯瞰云海的最佳地点之一，视野开阔壮美。',
         descEn: 'At 1,200m elevation, one of the best spots for sunrise views and sea of clouds. Breathtaking panoramic scenery.'
       }
     ];
 
     var galleryData = [
-      { img: 'assets/images/gal-yuanjiajie.jpg', title: '袁家界晨曦', titleEn: 'Yuanjiajie Sunrise', cat: 'scenic' },
-      { img: 'assets/images/gal-clouds.jpg', title: '云海翻涌', titleEn: 'Sea of Clouds', cat: 'scenic' },
-      { img: 'assets/images/gal-autumn.jpg', title: '秋染森林', titleEn: 'Autumn Colors', cat: 'season' },
-      { img: 'assets/images/gal-culture.jpg', title: '土家风情', titleEn: 'Tujia Culture', cat: 'culture' },
-      { img: 'assets/images/gal-sunrise.jpg', title: '天子山日出', titleEn: 'Tianzishan Sunrise', cat: 'scenic' },
-      { img: 'assets/images/gal-winter.jpg', title: '冬雪覆盖', titleEn: 'Winter Snow', cat: 'season' },
-      { img: 'assets/images/gal-stream.jpg', title: '金鞭溪畔', titleEn: 'Jinbian Stream', cat: 'scenic' },
-      { img: 'assets/images/gal-village.jpg', title: '山村民宿', titleEn: 'Mountain Village', cat: 'culture' },
-      { img: 'assets/images/gal-spring.jpg', title: '春花烂漫', titleEn: 'Spring Flowers', cat: 'season' }
+      { img: 'assets/images/gal-yuanjiajie.jpg', titleEn: 'Yuanjiajie Sunrise', cat: 'scenic' },
+      { img: 'assets/images/gal-clouds.jpg', titleEn: 'Sea of Clouds', cat: 'scenic' },
+      { img: 'assets/images/gal-autumn.jpg', titleEn: 'Autumn Colors', cat: 'season' },
+      { img: 'assets/images/gal-culture.jpg', titleEn: 'Tujia Culture', cat: 'culture' },
+      { img: 'assets/images/gal-sunrise.jpg', titleEn: 'Tianzishan Sunrise', cat: 'scenic' },
+      { img: 'assets/images/gal-winter.jpg', titleEn: 'Winter Snow', cat: 'season' },
+      { img: 'assets/images/gal-stream.jpg', titleEn: 'Jinbian Stream', cat: 'scenic' },
+      { img: 'assets/images/gal-village.jpg', titleEn: 'Mountain Village', cat: 'culture' },
+      { img: 'assets/images/gal-spring.jpg', titleEn: 'Spring Flowers', cat: 'season' }
     ];
-
-    /* ========== SWITCH LANGUAGE ========== */
-    function switchLang(lang) {
-      AppState.currentLang = lang;
-      
-      // Update all lang switch buttons (header + mobile nav)
-      document.querySelectorAll('.lang-switch button, .mobile-nav-lang button').forEach(function(btn) {
-        btn.classList.remove('active');
-      });
-      document.querySelectorAll('.lang-switch button[data-lang="' + lang + '"], .mobile-nav-lang button[data-lang="' + lang + '"]').forEach(function(btn) {
-        btn.classList.add('active');
-      });
-      
-      // Update lang-switch container attribute for CSS animation
-      var langSwitch = document.querySelector('.lang-switch');
-      if (langSwitch) langSwitch.setAttribute('data-active', lang);
-      
-      // Update all i18n elements
-      document.querySelectorAll('[data-i18n]').forEach(function(el) {
-        var key = el.getAttribute('data-i18n');
-        if (i18n[lang] && i18n[lang][key]) {
-          el.textContent = i18n[lang][key];
-        }
-      });
-      
-      // Re-render dynamic content WITHOUT resetting carousel position
-      var savedSlide = NewsCarouselState.currentSlide;
-      renderNewsCarousel();
-      goToNewsSlide(savedSlide);
-      renderExperience();
-      renderGallery();
-      renderScenic();
-    }
 
     /* ========== NEWS CAROUSEL STATE & FUNCTIONS ========== */
     var NewsCarouselState = {
@@ -1865,7 +1611,6 @@
       var dotsContainer = document.getElementById('newsCarouselDots');
       if (!carousel || !dotsContainer) return;
       
-      var lang = AppState.currentLang;
       var cardsPerSlide = window.innerWidth < 768 ? 1 : (window.innerWidth <= 1024 ? 2 : 3);
       var totalSlides = Math.ceil(newsData.length / cardsPerSlide);
       NewsCarouselState.totalSlides = totalSlides;
@@ -1884,11 +1629,11 @@
           html += '<div class="news-date-day">' + escapeHtml(item.date.day) + '</div>';
           html += '<div>' + escapeHtml(item.date.month) + '</div>';
           html += '</div>';
-          html += '<div class="news-tag">' + escapeHtml(lang === 'zh' ? item.tagText : item.tag.toUpperCase()) + '</div>';
+          html += '<div class="news-tag">' + escapeHtml(item.tag.toUpperCase()) + '</div>';
           html += '</div>';
           html += '<div class="news-carousel-body">';
-          html += '<h3 class="news-carousel-title">' + escapeHtml(lang === 'zh' ? item.title : item.titleEn) + '</h3>';
-          html += '<p class="news-carousel-text">' + escapeHtml(lang === 'zh' ? item.desc : item.descEn) + '</p>';
+          html += '<h3 class="news-carousel-title">' + escapeHtml(item.titleEn) + '</h3>';
+          html += '<p class="news-carousel-text">' + escapeHtml(item.descEn) + '</p>';
           html += '</div></a>';
         }
         html += '</div>';
@@ -2008,15 +1753,14 @@
 
     function renderExperience() {
       var grid = document.getElementById('expGrid');
-      var lang = AppState.currentLang;
       var html = '';
       
       expData.forEach(function(item) {
         html += '<a href="exp-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
-        html += '<div class="exp-img"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(lang === 'zh' ? item.title : item.titleEn) + '" loading="lazy"></div>';
+        html += '<div class="exp-img"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.titleEn) + '" loading="lazy"></div>';
         html += '<div class="exp-body">';
-        html += '<h4 class="exp-title">' + escapeHtml(lang === 'zh' ? item.title : item.titleEn) + '</h4>';
-        html += '<p class="exp-desc">' + escapeHtml(lang === 'zh' ? item.desc : item.descEn) + '</p>';
+        html += '<h4 class="exp-title">' + escapeHtml(item.titleEn) + '</h4>';
+        html += '<p class="exp-desc">' + escapeHtml(item.descEn) + '</p>';
         html += '</div></a>';
       });
       
@@ -2031,14 +1775,12 @@
         if (!container) { console.error('[renderScenic] ERROR: scenicGrid not found'); return; }
         if (!pagination) { console.error('[renderScenic] ERROR: scenicPagination not found'); return; }
         
-        var lang = AppState.currentLang || 'en';
-        var isZh = lang === 'zh';
+        
         var itemsPerPage = 3;
         var totalPages = Math.ceil(scenicData.length / itemsPerPage);
         var currentPage = AppState.scenicPage || 1;
         
-        console.log('[renderScenic] currentPage =', currentPage, ', totalPages =', totalPages, ', lang =', lang);
-        
+                
         // Calculate start and end indices
         var startIdx = (currentPage - 1) * itemsPerPage;
         var endIdx = Math.min(startIdx + itemsPerPage, scenicData.length);
@@ -2053,11 +1795,11 @@
           html += '<a href="' + item.href + '" class="scenic-card fade-up">';
           html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '\')"></div>';
           html += '<div class="scenic-overlay">';
-          html += '<div class="scenic-tag">' + escapeHtml(isZh ? item.tag : item.tagEn) + '</div>';
-          html += '<h3 class="scenic-name">' + escapeHtml(isZh ? item.name : item.nameEn) + '</h3>';
-          html += '<p class="scenic-sub">' + escapeHtml(isZh ? item.subTitle : item.subTitleEn) + '</p>';
-          html += '<p class="scenic-desc">' + escapeHtml(isZh ? item.desc : item.descEn) + '</p>';
-          html += '<span class="scenic-link">' + escapeHtml(isZh ? '探索更多 →' : 'Explore More →') + '</span>';
+          html += '<div class="scenic-tag">' + escapeHtml(item.tagEn) + '</div>';
+          html += '<h3 class="scenic-name">' + escapeHtml(item.nameEn) + '</h3>';
+          html += '<p class="scenic-sub">' + escapeHtml(item.subTitleEn) + '</p>';
+          html += '<p class="scenic-desc">' + escapeHtml(item.descEn) + '</p>';
+          html += '<span class="scenic-link">' + escapeHtml('Explore More →') + '</span>';
           html += '</div></a>';
         });
         
@@ -2106,14 +1848,13 @@
 
     function renderGallery() {
       var masonry = document.getElementById('galleryMasonry');
-      var lang = AppState.currentLang;
       var html = '';
       
       galleryData.forEach(function(item, index) {
         html += '<div class="gallery-item" data-category="' + escapeHtml(item.cat) + '" onclick="openLightbox(' + index + ')">';
-        html += '<img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(lang === 'zh' ? item.title : item.titleEn) + '" loading="lazy" decoding="async">';
+        html += '<img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.titleEn) + '" loading="lazy" decoding="async">';
         html += '<div class="gallery-overlay">';
-        html += '<span class="gallery-title">' + escapeHtml(lang === 'zh' ? item.title : item.titleEn) + '</span>';
+        html += '<span class="gallery-title">' + escapeHtml(item.titleEn) + '</span>';
         html += '</div></div>';
       });
       
@@ -2301,9 +2042,12 @@
       // Initialize autoplay state
       AppState.heroAutoplay = true;
       
-      // Set initial language
-      switchLang('en');
-      
+      // Render dynamic content
+      renderNewsCarousel();
+      renderExperience();
+      renderGallery();
+      renderScenic();
+
       // Start hero slider
       startHeroSlider();
       
