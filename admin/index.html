@@ -220,13 +220,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   <!-- Settings -->
   <div class="content-section" id="sec-settings">
     <div class="settings-section">
-      <h3>🔑 GitHub API Token</h3>
-      <div class="form-group"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx"><div class="token-hint">用于自动保存修改到 GitHub 仓库。需要 repo 权限。<br>获取: GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens</div></div>
-      <div class="form-group"><label>仓库路径</label><input id="ghRepo" value="WillyYe/visitzhangjiajie.com" placeholder="owner/repo"></div>
-      <div class="form-group"><label>分支</label><input id="ghBranch" value="main"></div>
-      <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
-    </div>
-    <div class="settings-section">
       <h3>🔒 修改管理密码</h3>
       <div class="form-group"><label>新密码</label><input type="password" id="newPwd" placeholder="输入新密码"></div>
       <button class="btn btn-primary" onclick="changePassword()">修改密码</button>
@@ -241,9 +234,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 <div class="toast" id="toast"></div>
 
 <script>
-// ==================== AUTH ====================
+// ==================== CONFIG ====================
 var ADMIN_PWD = 'zhangjiajie2026';
 var AUTH_KEY = 'zjj_admin_auth';
+var GH_TOKEN = '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';
+var GH_REPO = 'WillyYe/visitzhangjiajie.com';
+var GH_BRANCH = 'main';
+
+// ==================== AUTH ====================
 
 function doLogin() {
   var pwd = document.getElementById('loginPwd').value;
@@ -407,9 +405,9 @@ function replaceHeroImage(idx) {
 }
 
 function directHeroUpload(path, base64Content, fileName, idx) {
-  var token = localStorage.getItem('zjj_gh_token') || '';
-  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
-  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  var token = GH_TOKEN;
+  var repo = GH_REPO;
+  var branch = GH_BRANCH;
   if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   showToast('⏳ 正在上传图片...','');
@@ -591,9 +589,9 @@ function deleteHero(i) {
 
 // ==================== HERO GITHUB SYNC ====================
 function saveHeroToGitHub() {
-  var token = localStorage.getItem('zjj_gh_token') || '';
-  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
-  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  var token = GH_TOKEN;
+  var repo = GH_REPO;
+  var branch = GH_BRANCH;
   if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   showToast('⏳ 正在同步 hero.json 到 GitHub...','');
@@ -623,9 +621,9 @@ function saveHeroToGitHub() {
 
 // ==================== GITHUB API SAVE ====================
 function saveAllToGitHub() {
-  var token = localStorage.getItem('zjj_gh_token') || '';
-  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
-  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  var token = GH_TOKEN;
+  var repo = GH_REPO;
+  var branch = GH_BRANCH;
   if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   var files = {
@@ -684,9 +682,9 @@ function triggerUpload(inputId) {
 }
 
 function uploadToGitHub(path, base64Content, fileName, inputId) {
-  var token = localStorage.getItem('zjj_gh_token') || '';
-  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
-  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  var token = GH_TOKEN;
+  var repo = GH_REPO;
+  var branch = GH_BRANCH;
   if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
 
   var previewDiv = document.getElementById('prev_' + inputId);
@@ -726,28 +724,11 @@ function uploadToGitHub(path, base64Content, fileName, inputId) {
 }
 
 // ==================== SETTINGS ====================
-function saveSettings() {
-  localStorage.setItem('zjj_gh_token', document.getElementById('ghToken').value);
-  localStorage.setItem('zjj_gh_repo', document.getElementById('ghRepo').value);
-  localStorage.setItem('zjj_gh_branch', document.getElementById('ghBranch').value);
-  showToast('设置已保存 ✅','success');
-}
-
 function changePassword() {
   var np = document.getElementById('newPwd').value;
   if (!np) { showToast('请输入新密码','error'); return; }
   ADMIN_PWD = np;
   showToast('密码已修改 ✅ 请牢记新密码','success');
-}
-
-// Restore settings
-function restoreSettings() {
-  var t = localStorage.getItem('zjj_gh_token');
-  if (t) document.getElementById('ghToken').value = t;
-  var r = localStorage.getItem('zjj_gh_repo');
-  if (r) document.getElementById('ghRepo').value = r;
-  var b = localStorage.getItem('zjj_gh_branch');
-  if (b) document.getElementById('ghBranch').value = b;
 }
 
 // ==================== INIT ====================
@@ -759,7 +740,6 @@ function initApp() {
     renderExp();
     renderGallery();
     renderHero();
-    restoreSettings();
   }).catch(function(err) {
     showToast('数据加载失败: ' + err.message, 'error');
   });
