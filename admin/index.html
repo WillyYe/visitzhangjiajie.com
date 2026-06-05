@@ -143,6 +143,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   .img-preview img { max-width:120px; max-height:80px; border-radius:6px; object-fit:cover; border:1px solid var(--border); }
   .upload-progress { font-size:11px; color:var(--pink); margin-top:4px; }
 
+  /* Upload Progress Bar */
+  .upload-progress-bar-wrap { margin-top:8px; display:none; }
+  .upload-progress-bar-wrap.active { display:block; }
+  .upload-progress-bar-wrap .pb-info { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .upload-progress-bar-wrap .pb-label { font-size:12px; color:var(--text); font-weight:500; }
+  .upload-progress-bar-wrap .pb-pct { font-size:12px; color:var(--pink); font-weight:600; }
+  .upload-progress-bar-wrap .pb-stage { font-size:11px; color:var(--text-light); }
+  .upload-progress-bar-wrap .pb-track { width:100%; height:6px; background:var(--pink-light); border-radius:3px; overflow:hidden; }
+  .upload-progress-bar-wrap .pb-fill { height:100%; width:0%; background:linear-gradient(90deg, #f48fb1, var(--pink), var(--pink-dark)); border-radius:3px; transition: width 0.4s ease; }
+  .upload-progress-bar-wrap.error .pb-fill { background:linear-gradient(90deg, #ef9a9a, #ef5350); }
+  .upload-progress-bar-wrap.error .pb-pct { color:#ef5350; }
+  .upload-progress-bar-wrap.error .pb-label { color:#ef5350; }
+
 </style>
 </head>
 <body>
@@ -409,7 +422,7 @@ function replaceHeroImage(idx) {
     showToast('🖼 压缩图片中...', '');
     compressImage(file, 1920, 0.85, function(base64, compressedSize) {
       var newSize = (compressedSize / 1024 / 1024).toFixed(1);
-      showToast('压缩后 ' + newSize + 'MB，上传中...', '');
+      showToast('⏳ 压缩后 ' + newSize + 'MB，上传中...', '');
       var cleanName = file.name.replace(/[^a-zA-Z0-9.\\-_]/g, '_');
       var path = 'assets/images/' + cleanName;
       directHeroUpload(path, base64, file.name, idx);
@@ -419,29 +432,52 @@ function replaceHeroImage(idx) {
 }
 
 function directHeroUpload(path, base64Content, fileName, idx) {
-  showToast('⏳ 正在上传图片...','');
+  // Step 1: 检查文件是否存在
+  showToast('🔍 检查仓库中...', '');
 
-  // Check if file exists for sha
   ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
   .then(function(fileInfo) {
-    return ghFetch(path, 'PUT', {
-      content: base64Content,
-      message: 'Replace hero image: ' + fileName,
-      sha: fileInfo ? fileInfo.sha : null
-    });
-  }).then(function(r){
-    if (r.ok) {
-      // Update local data
-      heroData.slides[idx].img = path;
-      renderHero();
-      showToast('图片已替换 ✅ 点击「同步 Hero 到 GitHub」更新网页', 'success');
-    } else {
-      return r.json().then(function(d){
-        var msg = friendlyError(d.message || '');
-        showToast('❌ 替换失败：' + msg, 'error');
-        throw new Error(d.message);
+    // Step 2: 真实上传（使用 XHR 获取进度）
+    showToast('📤 正在上传 ' + fileName + ' ...', '');
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      var payload = JSON.stringify({
+        path: path, method: 'PUT', branch: GH_BRANCH,
+        content: base64Content,
+        message: 'Replace hero image: ' + fileName,
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
       });
-    }
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          var pct = Math.round(e.loaded / e.total * 100);
+          showToast('📤 上传中 ' + pct + '% (' + formatBytes(e.loaded) + ' / ' + formatBytes(e.total) + ')', '');
+        }
+      };
+
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr);
+        } else {
+          reject(new Error((function(){
+            try { var d = JSON.parse(xhr.responseText); return d.message || 'HTTP ' + xhr.status; }
+            catch(e) { return 'HTTP ' + xhr.status; }
+          })()));
+        }
+      };
+
+      xhr.onerror = function() { reject(new Error('NetworkError')); };
+      xhr.ontimeout = function() { reject(new Error('timeout')); };
+
+      xhr.open('POST', GH_WORKER);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.timeout = 60000;
+      xhr.send(payload);
+    });
+  }).then(function() {
+    heroData.slides[idx].img = path;
+    renderHero();
+    showToast('图片已替换 ✅ 点击「同步 Hero 到 GitHub」更新网页', 'success');
   }).catch(function(err){
     var msg = friendlyError(err.message || '');
     showToast('❌ 替换失败：' + msg, 'error');
@@ -667,6 +703,63 @@ function compressImage(file, maxW, quality, callback) {
   img.src = url;
 }
 
+// ==================== PROGRESS BAR ====================
+function showProgressBar(inputId) {
+  var previewDiv = document.getElementById('prev_' + inputId);
+  previewDiv.innerHTML = ''+
+    '<div class="upload-progress-bar-wrap active" id="pb_'+inputId+'">'+
+      '<div class="pb-info">'+
+        '<span class="pb-label">准备上传</span>'+
+        '<span class="pb-pct">0%</span>'+
+      '</div>'+
+      '<div class="pb-track"><div class="pb-fill" id="pbfill_'+inputId+'"></div></div>'+
+      '<div class="pb-stage">等待开始...</div>'+
+    '</div>';
+}
+
+function updateProgressBar(inputId, pct, label, stage) {
+  var wrap = document.getElementById('pb_'+inputId);
+  var fill = document.getElementById('pbfill_'+inputId);
+  if (!wrap || !fill) return;
+  var labelEl = wrap.querySelector('.pb-label');
+  var pctEl = wrap.querySelector('.pb-pct');
+  var stageEl = wrap.querySelector('.pb-stage');
+  fill.style.width = pct + '%';
+  pctEl.textContent = Math.round(pct) + '%';
+  if (label) labelEl.textContent = label;
+  if (stage) stageEl.textContent = stage;
+}
+
+function markProgressError(inputId, label, stage) {
+  var wrap = document.getElementById('pb_'+inputId);
+  var fill = document.getElementById('pbfill_'+inputId);
+  if (!wrap || !fill) return;
+  wrap.classList.add('error');
+  var labelEl = wrap.querySelector('.pb-label');
+  var pctEl = wrap.querySelector('.pb-pct');
+  var stageEl = wrap.querySelector('.pb-stage');
+  labelEl.textContent = label || '上传失败';
+  pctEl.textContent = '✕';
+  fill.style.width = '100%';
+  if (stage) stageEl.textContent = stage;
+}
+
+function animateProgress(inputId, from, to, duration, label, stage, callback) {
+  updateProgressBar(inputId, from, label, stage);
+  var start = Date.now();
+  function tick() {
+    var elapsed = Date.now() - start;
+    var pct = from + (to - from) * Math.min(elapsed / duration, 1);
+    updateProgressBar(inputId, pct, label, stage);
+    if (elapsed < duration) {
+      requestAnimationFrame(tick);
+    } else {
+      if (callback) callback();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
 // ==================== IMAGE UPLOAD ====================
 var pendingUploads = {};
 function triggerUpload(inputId) {
@@ -675,15 +768,17 @@ function triggerUpload(inputId) {
   fi.onchange = function() {
     var file = fi.files[0];
     if (!file) return;
-    var previewDiv = document.getElementById('prev_' + inputId);
     var origSize = (file.size / 1024 / 1024).toFixed(1);
-    previewDiv.innerHTML = '<div class="upload-progress">🖼 原始 ' + origSize + 'MB，压缩中...</div>';
-    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
-      var newSize = (compressedSize / 1024 / 1024).toFixed(1);
-      previewDiv.innerHTML = '<div class="upload-progress">⏳ 压缩后 ' + newSize + 'MB，上传中...</div>';
-      var cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
-      var path = 'assets/images/' + cleanName;
-      uploadToGitHub(path, base64, file.name, inputId);
+    showProgressBar(inputId);
+    animateProgress(inputId, 0, 15, 400, '图片压缩中', '原始 ' + origSize + 'MB → 压缩中...', function(){
+      compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+        var newSize = (compressedSize / 1024 / 1024).toFixed(1);
+        animateProgress(inputId, 15, 30, 200, '压缩完成', origSize + 'MB → ' + newSize + 'MB (压缩 ' + Math.round((1 - compressedSize/file.size)*100) + '%)', function(){
+          var cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
+          var path = 'assets/images/' + cleanName;
+          uploadToGitHub(path, base64, file.name, inputId);
+        });
+      });
     });
   };
   fi.click();
@@ -702,36 +797,82 @@ function friendlyError(errMsg) {
 
 function uploadToGitHub(path, base64Content, fileName, inputId) {
   var previewDiv = document.getElementById('prev_' + inputId);
-  previewDiv.innerHTML = '<div class="upload-progress">⏳ 上传中...</div>';
   var sha = null;
 
-  // First check if file exists (to get sha)
+  // Step 1: 检查文件是否存在
+  animateProgress(inputId, 30, 40, 300, '检查仓库', '查询 ' + path + ' ...');
+
   ghFetch(path, 'GET').then(function(r){
     if (r.ok) return r.json().then(function(d){sha=d.sha;});
-  }).then(function(){
-    return ghFetch(path, 'PUT', {
-      content: base64Content,
-      message: 'Upload image: ' + fileName,
-      sha: sha || null
-    });
-  }).then(function(r){
-    if (r.ok) {
-      document.getElementById(inputId).value = path;
-      previewDiv.innerHTML = '<img src="../' + path + '?t=' + Date.now() + '" alt="preview">';
-      showToast('图片上传成功 ✅', 'success');
-    } else {
-      return r.json().then(function(d){
-        var msg = friendlyError(d.message || '');
-        showToast('❌ 上传失败：' + msg, 'error');
-        previewDiv.innerHTML = '<div class="upload-progress" style="color:#e53935">❌ ' + msg + '</div>';
-        throw new Error(d.message);
+    return null;
+  }).then(function(fileInfo){
+    // Step 2: 真实上传（使用 XHR 获取进度）
+    animateProgress(inputId, 40, 45, 200, '正在上传', '通过 Cloudflare Worker 上传中...', function(){
+      var xhr = new XMLHttpRequest();
+      var payload = JSON.stringify({
+        path: path, method: 'PUT', branch: GH_BRANCH,
+        content: base64Content,
+        message: 'Upload image: ' + fileName,
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
       });
-    }
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          var pct = 45 + (e.loaded / e.total) * 45; // 45% → 90%
+          updateProgressBar(inputId, pct, '正在上传', '已传输 ' + formatBytes(e.loaded) + ' / ' + formatBytes(e.total));
+        }
+      };
+
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Step 3: 完成
+          animateProgress(inputId, 90, 100, 300, '上传成功', '图片已写入 GitHub 仓库', function(){
+            document.getElementById(inputId).value = path;
+            previewDiv.innerHTML = '<img src="../' + path + '?t=' + Date.now() + '" alt="preview">';
+            showToast('图片上传成功 ✅', 'success');
+          });
+        } else {
+          try {
+            var d = JSON.parse(xhr.responseText);
+            var msg = friendlyError(d.message || '服务器返回错误 ' + xhr.status);
+            markProgressError(inputId, '上传失败', msg);
+            showToast('❌ 上传失败：' + msg, 'error');
+          } catch(e) {
+            var msg = friendlyError('服务器返回错误 ' + xhr.status);
+            markProgressError(inputId, '上传失败', msg);
+            showToast('❌ 上传失败：' + msg, 'error');
+          }
+        }
+      };
+
+      xhr.onerror = function() {
+        var msg = friendlyError('NetworkError');
+        markProgressError(inputId, '网络错误', msg);
+        showToast('❌ 上传失败：' + msg, 'error');
+      };
+
+      xhr.ontimeout = function() {
+        var msg = friendlyError('timeout');
+        markProgressError(inputId, '上传超时', msg);
+        showToast('❌ 上传失败：' + msg, 'error');
+      };
+
+      xhr.open('POST', GH_WORKER);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.timeout = 60000; // 60s timeout
+      xhr.send(payload);
+    });
   }).catch(function(err){
     var msg = friendlyError(err.message || '');
+    markProgressError(inputId, '检查失败', msg);
     showToast('❌ 上传失败：' + msg, 'error');
-    previewDiv.innerHTML = '<div class="upload-progress" style="color:#e53935">❌ ' + msg + '</div>';
   });
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
 // ==================== SETTINGS ====================
