@@ -406,14 +406,14 @@ function replaceHeroImage(idx) {
   fi.onchange = function() {
     var file = fi.files[0];
     if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var base64 = e.target.result.split(',')[1];
+    showToast('🖼 压缩图片中...', '');
+    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+      var newSize = (compressedSize / 1024 / 1024).toFixed(1);
+      showToast('压缩后 ' + newSize + 'MB，上传中...', '');
       var cleanName = file.name.replace(/[^a-zA-Z0-9.\\-_]/g, '_');
       var path = 'assets/images/' + cleanName;
       directHeroUpload(path, base64, file.name, idx);
-    };
-    reader.readAsDataURL(file);
+    });
   };
   fi.click();
 }
@@ -639,6 +639,29 @@ function saveAllToGitHub() {
 
 
 
+// ==================== IMAGE COMPRESS ====================
+function compressImage(file, maxW, quality, callback) {
+  var img = new Image();
+  var url = URL.createObjectURL(file);
+  img.onload = function() {
+    URL.revokeObjectURL(url);
+    var w = img.width, h = img.height;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    canvas.toBlob(function(blob) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        callback(e.target.result.split(',')[1], blob.size);
+      };
+      reader.readAsDataURL(blob);
+    }, 'image/jpeg', quality);
+  };
+  img.src = url;
+}
+
 // ==================== IMAGE UPLOAD ====================
 var pendingUploads = {};
 function triggerUpload(inputId) {
@@ -647,14 +670,16 @@ function triggerUpload(inputId) {
   fi.onchange = function() {
     var file = fi.files[0];
     if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var base64 = e.target.result.split(',')[1];
+    var previewDiv = document.getElementById('prev_' + inputId);
+    var origSize = (file.size / 1024 / 1024).toFixed(1);
+    previewDiv.innerHTML = '<div class="upload-progress">🖼 原始 ' + origSize + 'MB，压缩中...</div>';
+    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+      var newSize = (compressedSize / 1024 / 1024).toFixed(1);
+      previewDiv.innerHTML = '<div class="upload-progress">⏳ 压缩后 ' + newSize + 'MB，上传中...</div>';
       var cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
       var path = 'assets/images/' + cleanName;
       uploadToGitHub(path, base64, file.name, inputId);
-    };
-    reader.readAsDataURL(file);
+    });
   };
   fi.click();
 }
