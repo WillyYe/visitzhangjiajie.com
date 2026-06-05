@@ -510,6 +510,7 @@ function imgUploadHtml(currentPath, previewStyle) {
     '<div class="img-upload-wrap">'+
       '<input id="'+modalImgId+'" value="'+esc(currentPath)+'">'+
       '<button type="button" class="img-upload-btn" onclick="triggerUpload(\''+modalImgId+'\')">📁 上传图片</button>'+
+      (currentPath ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350" onclick="document.getElementById(\''+modalImgId+'\').value=\'\';document.getElementById(\'prev_'+modalImgId+'\').innerHTML=\'\'">✕ 清除</button>' : '')+
     '</div>'+
     '<div class="img-preview" id="prev_'+modalImgId+'">'+previewImg+'</div>'+
   '</div>';
@@ -641,7 +642,7 @@ function saveHero() {
   closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
 }
 function deleteHero(i) {
-  if (heroData.slides.length <= 3) { showToast('至少保留 3 张 Hero 图片，不可删除','error'); return; }
+  if (heroData.slides.length < 3) { showToast('至少保留 3 张 Hero 图片，不可删除','error'); return; }
   if (confirm('确定删除 Slide #'+(i+1)+' "'+heroData.slides[i].title+'" 吗？')) {
     heroData.slides.splice(i,1); renderHero(); renderDashboard(); showToast('已删除 ✅ 点击同步按钮更新网页','success');
   }
