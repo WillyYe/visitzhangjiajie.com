@@ -109,6 +109,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   .main { margin-left: 60px; padding: 16px; }
   .modal { width: 95%; }
 }
+
+  /* Image Upload */
+  .img-upload-wrap { display:flex; gap:8px; align-items:center; }
+  .img-upload-wrap input[type="text"] { flex:1; }
+  .img-upload-btn { padding:6px 12px; background:var(--pink-light); color:var(--pink-dark); border:1.5px solid var(--pink); border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap; }
+  .img-upload-btn:hover { background:var(--pink); color:#fff; }
+  .img-preview { margin-top:6px; }
+  .img-preview img { max-width:120px; max-height:80px; border-radius:6px; object-fit:cover; border:1px solid var(--border); }
+  .upload-progress { font-size:11px; color:var(--pink); margin-top:4px; }
+
 </style>
 </head>
 <body>
@@ -345,7 +355,7 @@ function openNewsModal(idx) {
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(n.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(n.descEn)+'</textarea></div>'+
     '<div class="form-group"><label>正文 (HTML)</label><textarea id="fContent" style="min-height:150px">'+esc(n.contentEn||'')+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(n.img)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(n.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(n.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNews()">保存</button></div>');
 }
 
@@ -375,7 +385,7 @@ function openScenicModal(idx) {
     '<div class="form-group"><label>标签</label><input id="fTag" value="'+esc(s.tagEn)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subTitleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(s.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(s.img)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
     '<div class="form-group"><label><input type="checkbox" id="fLarge" '+(s.large?'checked':'')+'> 大图显示</label></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveScenic()">保存</button></div>');
 }
@@ -401,7 +411,7 @@ function openExpModal(idx) {
     '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(e.id)+'"></div>'+
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(e.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(e.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(e.img)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(e.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(e.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">保存</button></div>');
 }
 function saveExp() {
@@ -416,7 +426,7 @@ function openGalleryModal() {
   showModal('新增图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value=""></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic">scenic</option><option value="culture">culture</option><option value="season">season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value=""></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value=""><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveGallery()">保存</button></div>');
 }
 function saveGallery() {
@@ -429,7 +439,7 @@ function editGallery(i) {
   showModal('编辑图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(g.titleEn)+'"></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic" '+(g.cat==='scenic'?'selected':'')+'>scenic</option><option value="culture" '+(g.cat==='culture'?'selected':'')+'>culture</option><option value="season" '+(g.cat==='season'?'selected':'')+'>season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(g.img)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(g.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(g.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="updateGallery('+i+')">保存</button></div>');
 }
 function updateGallery(i) {
@@ -445,7 +455,7 @@ function openHeroModal(idx) {
   showModal(editingIndex>=0?'编辑 Hero Slide':'新增 Hero Slide',
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(s.title)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subtitle)+'"></div>'+
-    '<div class="form-group"><label>图片路径</label><input id="fImg" value="'+esc(s.img)+'"></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveHero()">保存</button></div>');
 }
 function saveHero() {
@@ -492,6 +502,70 @@ function saveAllToGitHub() {
     showToast('已保存到 GitHub！页面将在几分钟内更新 🎉','success');
   }).catch(function(err) {
     showToast('保存失败: '+err.message,'error');
+  });
+}
+
+
+
+// ==================== IMAGE UPLOAD ====================
+var pendingUploads = {};
+function triggerUpload(inputId) {
+  var fi = document.getElementById('fileInput');
+  pendingUploads._targetInput = inputId;
+  fi.onchange = function() {
+    var file = fi.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var base64 = e.target.result.split(',')[1];
+      var cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
+      var path = 'assets/images/' + cleanName;
+      uploadToGitHub(path, base64, file.name, inputId);
+    };
+    reader.readAsDataURL(file);
+  };
+  fi.click();
+}
+
+function uploadToGitHub(path, base64Content, fileName, inputId) {
+  var token = localStorage.getItem('zjj_gh_token') || '';
+  var repo = localStorage.getItem('zjj_gh_repo') || 'WillyYe/visitzhangjiajie.com';
+  var branch = localStorage.getItem('zjj_gh_branch') || 'main';
+  if (!token) { showToast('请先在设置中配置 GitHub Token','error'); return; }
+
+  var previewDiv = document.getElementById('prev_' + inputId);
+  previewDiv.innerHTML = '<div class="upload-progress">⏳ 上传中...</div>';
+
+  // First check if file exists (to get sha)
+  fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
+    headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
+  }).then(function(r){
+    var sha = null;
+    if (r.ok) return r.json().then(function(d){sha=d.sha; return d;});
+    return null;
+  }).then(function(){
+    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
+      method: 'PUT',
+      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: 'Upload image: ' + fileName,
+        content: base64Content,
+        branch: branch,
+        sha: sha || undefined
+      })
+    });
+  }).then(function(r){
+    if (r.ok) {
+      document.getElementById(inputId).value = path;
+      previewDiv.innerHTML = '<img src="../' + path + '?t=' + Date.now() + '" alt="preview">';
+      showToast('图片上传成功 ✅', 'success');
+    } else {
+      r.json().then(function(d){ showToast('上传失败: '+(d.message||'未知错误'),'error'); });
+      previewDiv.innerHTML = '';
+    }
+  }).catch(function(err){
+    showToast('上传失败: '+err.message,'error');
+    previewDiv.innerHTML = '';
   });
 }
 
@@ -549,5 +623,6 @@ function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 // Init on load if already authed
 if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 </script>
+<input type="file" id="fileInput" accept="image/*" style="display:none">
 </body>
 </html>
