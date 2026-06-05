@@ -355,7 +355,7 @@ function openNewsModal(idx) {
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(n.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(n.descEn)+'</textarea></div>'+
     '<div class="form-group"><label>正文 (HTML)</label><textarea id="fContent" style="min-height:150px">'+esc(n.contentEn||'')+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(n.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(n.img)+'" alt="preview"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(n.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(n.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNews()">保存</button></div>');
 }
 
@@ -385,7 +385,7 @@ function openScenicModal(idx) {
     '<div class="form-group"><label>标签</label><input id="fTag" value="'+esc(s.tagEn)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subTitleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(s.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
     '<div class="form-group"><label><input type="checkbox" id="fLarge" '+(s.large?'checked':'')+'> 大图显示</label></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveScenic()">保存</button></div>');
 }
@@ -411,7 +411,7 @@ function openExpModal(idx) {
     '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(e.id)+'"></div>'+
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(e.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(e.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(e.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(e.img)+'" alt="preview"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(e.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(e.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">保存</button></div>');
 }
 function saveExp() {
@@ -426,7 +426,7 @@ function openGalleryModal() {
   showModal('新增图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value=""></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic">scenic</option><option value="culture">culture</option><option value="season">season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value=""><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value=""><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveGallery()">保存</button></div>');
 }
 function saveGallery() {
@@ -439,7 +439,7 @@ function editGallery(i) {
   showModal('编辑图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(g.titleEn)+'"></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic" '+(g.cat==='scenic'?'selected':'')+'>scenic</option><option value="culture" '+(g.cat==='culture'?'selected':'')+'>culture</option><option value="season" '+(g.cat==='season'?'selected':'')+'>season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(g.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(g.img)+'" alt="preview"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(g.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(g.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="updateGallery('+i+')">保存</button></div>');
 }
 function updateGallery(i) {
@@ -455,7 +455,7 @@ function openHeroModal(idx) {
   showModal(editingIndex>=0?'编辑 Hero Slide':'新增 Hero Slide',
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(s.title)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subtitle)+'"></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload('fImg')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
+    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveHero()">保存</button></div>');
 }
 function saveHero() {
