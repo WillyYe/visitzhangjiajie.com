@@ -486,6 +486,7 @@ function directHeroUpload(path, base64Content, fileName, idx) {
 
 // ==================== MODALS ====================
 var editingIndex = -1;
+var modalImgId = 'fImg_modal'; // 统一图片输入框 ID
 
 function showModal(title, bodyHtml) {
   document.getElementById('modalContent').innerHTML = '<h3>'+title+'</h3>'+bodyHtml;
@@ -497,6 +498,20 @@ function closeModal() {
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
+
+// 生成 Modal 图片上传 HTML 片段
+function imgUploadHtml(currentPath, previewStyle) {
+  var ps = previewStyle || '';
+  var previewSrc = currentPath ? ('../' + currentPath + '?t=' + Date.now()) : '';
+  var previewImg = currentPath ? '<img src="'+previewSrc+'" alt="preview" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display=\'none\'">' : '';
+  return '<div class="form-group"><label>图片路径</label>'+
+    '<div class="img-upload-wrap">'+
+      '<input id="'+modalImgId+'" value="'+esc(currentPath)+'">'+
+      '<button type="button" class="img-upload-btn" onclick="triggerUpload(\''+modalImgId+'\')">📁 上传图片</button>'+
+    '</div>'+
+    '<div class="img-preview" id="prev_'+modalImgId+'">'+previewImg+'</div>'+
+  '</div>';
+}
 
 // --- News Modal ---
 function openNewsModal(idx) {
@@ -510,7 +525,7 @@ function openNewsModal(idx) {
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(n.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(n.descEn)+'</textarea></div>'+
     '<div class="form-group"><label>正文 (HTML)</label><textarea id="fContent" style="min-height:150px">'+esc(n.contentEn||'')+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(n.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(n.img)+'" alt="preview"></div></div>'+
+    imgUploadHtml(n.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNews()">保存</button></div>');
 }
 
@@ -521,7 +536,7 @@ function saveNews() {
     titleEn: document.getElementById('fTitle').value,
     descEn: document.getElementById('fDesc').value,
     contentEn: document.getElementById('fContent').value,
-    img: document.getElementById('fImg').value
+    img: document.getElementById(modalImgId).value
   };
   if (editingIndex >= 0) newsData[editingIndex] = obj; else newsData.push(obj);
   closeModal(); renderNews(); renderDashboard();
@@ -540,7 +555,7 @@ function openScenicModal(idx) {
     '<div class="form-group"><label>标签</label><input id="fTag" value="'+esc(s.tagEn)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subTitleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(s.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview"></div></div>'+
+    imgUploadHtml(s.img)+
     '<div class="form-group"><label><input type="checkbox" id="fLarge" '+(s.large?'checked':'')+'> 大图显示</label></div>'+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveScenic()">保存</button></div>');
 }
@@ -548,7 +563,7 @@ function openScenicModal(idx) {
 function saveScenic() {
   var id = document.getElementById('fId').value;
   var obj = {
-    id: id, href: 'scenic-detail.html?id='+id, img: document.getElementById('fImg').value,
+    id: id, href: 'scenic-detail.html?id='+id,     img: document.getElementById(modalImgId).value,
     large: document.getElementById('fLarge').checked, tagEn: document.getElementById('fTag').value,
     nameEn: document.getElementById('fName').value, subTitleEn: document.getElementById('fSub').value,
     descEn: document.getElementById('fDesc').value
@@ -566,11 +581,11 @@ function openExpModal(idx) {
     '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(e.id)+'"></div>'+
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(e.titleEn)+'"></div>'+
     '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(e.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(e.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(e.img)+'" alt="preview"></div></div>'+
+    imgUploadHtml(e.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">保存</button></div>');
 }
 function saveExp() {
-  var obj = {id:document.getElementById('fId').value,titleEn:document.getElementById('fTitle').value,descEn:document.getElementById('fDesc').value,img:document.getElementById('fImg').value};
+  var obj = {id:document.getElementById('fId').value,titleEn:document.getElementById('fTitle').value,descEn:document.getElementById('fDesc').value,img:document.getElementById(modalImgId).value};
   if (editingIndex >= 0) expData[editingIndex] = obj; else expData.push(obj);
   closeModal(); renderExp(); renderDashboard(); showToast('体验已保存 ✅','success');
 }
@@ -581,11 +596,11 @@ function openGalleryModal() {
   showModal('新增图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value=""></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic">scenic</option><option value="culture">culture</option><option value="season">season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value=""><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"></div></div>'+
+    imgUploadHtml('')+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveGallery()">保存</button></div>');
 }
 function saveGallery() {
-  galleryData.push({img:document.getElementById('fImg').value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value});
+  galleryData.push({img:document.getElementById(modalImgId).value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value});
   closeModal(); renderGallery(); renderDashboard(); showToast('图片已添加 ✅','success');
 }
 function editGallery(i) {
@@ -594,11 +609,11 @@ function editGallery(i) {
   showModal('编辑图片',
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(g.titleEn)+'"></div>'+
     '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic" '+(g.cat==='scenic'?'selected':'')+'>scenic</option><option value="culture" '+(g.cat==='culture'?'selected':'')+'>culture</option><option value="season" '+(g.cat==='season'?'selected':'')+'>season</option></select></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(g.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(g.img)+'" alt="preview"></div></div>'+
+    imgUploadHtml(g.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="updateGallery('+i+')">保存</button></div>');
 }
 function updateGallery(i) {
-  galleryData[i] = {img:document.getElementById('fImg').value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value};
+  galleryData[i] = {img:document.getElementById(modalImgId).value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value};
   closeModal(); renderGallery(); showToast('已更新 ✅','success');
 }
 function deleteGallery(i) { if(confirm('确定删除此图片吗？')){galleryData.splice(i,1); renderGallery(); renderDashboard(); showToast('已删除','success');} }
@@ -613,13 +628,13 @@ function openHeroModal(idx) {
   showModal(titleText,
     '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(s.title)+'"></div>'+
     '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subtitle)+'"></div>'+
-    '<div class="form-group"><label>图片路径</label><div class="img-upload-wrap"><input id="fImg" value="'+esc(s.img)+'"><button type="button" class="img-upload-btn" onclick="triggerUpload(\'fImg\')">📁 上传图片</button></div><div class="img-preview" id="prev_fImg"><img src="../'+esc(s.img)+'" alt="preview" style="max-width:200px;max-height:120px"></div></div>'+
+    imgUploadHtml(s.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveHero()">保存</button></div>');
 }
 function saveHero() {
   var count = heroData.slides.length;
   if (editingIndex < 0 && count >= 6) { showToast('已达上限 6 张！','error'); return; }
-  var obj = {img:document.getElementById('fImg').value,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
+  var obj = {img:document.getElementById(modalImgId).value,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
   if (editingIndex >= 0) heroData.slides[editingIndex] = obj; else heroData.slides.push(obj);
   closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
 }
