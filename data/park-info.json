@@ -1,0 +1,389 @@
+{
+  "park": {
+    "name": {
+      "zh": "张家界国家森林公园",
+      "en": "Zhangjiajie National Forest Park"
+    },
+    "location": {
+      "zh": "湖南省张家界市武陵源区",
+      "en": "Wulingyuan District, Zhangjiajie City, Hunan Province, China"
+    },
+    "coordinates": {
+      "latitude": 29.3167,
+      "longitude": 110.4833
+    },
+    "area": {
+      "hectares": 4810,
+      "square_km": 48.1,
+      "description": {
+        "zh": "4810公顷（48.1平方公里）",
+        "en": "4,810 hectares (48.1 km²)"
+      }
+    },
+    "elevation": {
+      "min_m": 400,
+      "max_m": 1334,
+      "description": {
+        "zh": "谷底约400米，主峰1334米",
+        "en": "Valley floor ~400m, highest peak 1,334m"
+      }
+    },
+    "established": 1982,
+    "honors": [
+      {
+        "year": 1982,
+        "title": {
+          "zh": "中国第一个国家森林公园",
+          "en": "China's First National Forest Park"
+        }
+      },
+      {
+        "year": 1992,
+        "title": {
+          "zh": "联合国教科文组织世界自然遗产",
+          "en": "UNESCO World Heritage Site"
+        }
+      },
+      {
+        "year": 2004,
+        "title": {
+          "zh": "全球首批世界地质公园",
+          "en": "UNESCO Global Geopark"
+        }
+      },
+      {
+        "year": 2007,
+        "title": {
+          "zh": "国家5A级旅游景区",
+          "en": "5A National Tourist Attraction"
+        }
+      }
+    ],
+    "geology": {
+      "formation_age": "380 million years",
+      "rock_type": {
+        "zh": "石英砂岩",
+        "en": "Quartz Sandstone"
+      },
+      "feature": {
+        "zh": "砂岩峰林地貌",
+        "en": "Sandstone Pillar Landform"
+      },
+      "peaks_count": 3000,
+      "streams_count": 800,
+      "description": {
+        "zh": "形成于3.8亿年前，经长期风化侵蚀形成3000多根石英砂岩柱，是世界罕见的砂岩峰林地貌",
+        "en": "Formed 380 million years ago, over 3,000 quartz sandstone pillars created by long-term weathering and erosion — a rare sandstone pinnacle landform globally"
+      }
+    },
+    "ecology": {
+      "forest_coverage": {
+        "city_percent": 70.98,
+        "core_percent": 85.28
+      },
+      "species_count": 4000,
+      "protected_species": 81,
+      "description": {
+        "zh": "森林覆盖率85.28%，拥有4000多种动植物，其中国家保护物种81种，被誉为天然氧吧",
+        "en": "Forest coverage 85.28%, 4,000+ plant and animal species, 81 protected species — known as a natural oxygen bar"
+      }
+    },
+    "climate": {
+      "type": {
+        "zh": "亚热带季风气候",
+        "en": "Subtropical monsoon climate"
+      },
+      "best_season": {
+        "zh": "春季（4-5月）和秋季（9-11月）",
+        "en": "Spring (Apr-May) and Autumn (Sep-Nov)"
+      }
+    },
+    "avatar_connection": {
+      "description": {
+        "zh": "电影《阿凡达》中潘多拉星球哈利路亚山的灵感来源地",
+        "en": "Inspiration for the Hallelujah Mountains in Avatar's Pandora"
+      },
+      "location": {
+        "zh": "袁家界景区",
+        "en": "Yuanjiajie Scenic Area"
+      },
+      "year": 2009
+    }
+  },
+  "attractions": [
+    {
+      "id": "yuanjiajie",
+      "name": {
+        "zh": "袁家界",
+        "en": "Yuanjiajie"
+      },
+      "elevation_m": 1074,
+      "highlights": [
+        {
+          "name": {
+            "zh": "哈利路亚山",
+            "en": "Hallelujah Mountain"
+          },
+          "description": {
+            "zh": "海拔1080米，《阿凡达》悬浮山的原型",
+            "en": "1,080m elevation, prototype for Avatar's floating mountains"
+          }
+        },
+        {
+          "name": {
+            "zh": "天下第一桥",
+            "en": "First Bridge Under Heaven"
+          },
+          "description": {
+            "zh": "天然石拱连接两峰，架于谷底357米上方",
+            "en": "Natural stone arch connecting two peaks, 357m above valley floor"
+          }
+        },
+        {
+          "name": {
+            "zh": "迷魂台",
+            "en": "Lost Souls Platform"
+          },
+          "description": {
+            "zh": "360度峰林全景，日出最佳观赏点",
+            "en": "360° panoramic view of pillar forest, best sunrise spot"
+          }
+        }
+      ],
+      "description": {
+        "zh": "《阿凡达》取景地核心景区，以奇峰怪石和云海著称",
+        "en": "Core Avatar filming location, famous for peculiar peaks and sea of clouds"
+      }
+    },
+    {
+      "id": "tianzi",
+      "name": {
+        "zh": "天子山",
+        "en": "Tianzi Mountain"
+      },
+      "elevation_m": 1262,
+      "highlights": [
+        {
+          "name": {
+            "zh": "御笔峰",
+            "en": "Imperial Brush Peak"
+          },
+          "description": {
+            "zh": "张家界的标志性景观，数百米高的石峰如倒置的御笔",
+            "en": "Iconic landmark, hundred-meter peaks like inverted imperial brushes"
+          }
+        },
+        {
+          "name": {
+            "zh": "仙女散花",
+            "en": "Fairy Scattering Flowers"
+          },
+          "description": {
+            "zh": "石峰形似仙女手持花篮，与御笔峰遥相呼应",
+            "en": "Peak resembling a fairy holding a flower basket"
+          }
+        },
+        {
+          "name": {
+            "zh": "西海峰林",
+            "en": "West Sea Pinnacles"
+          },
+          "description": {
+            "zh": "峰林最密集区域，云海奇观最佳观赏地",
+            "en": "Densest pillar forest area, best sea of clouds viewing"
+          }
+        }
+      ],
+      "description": {
+        "zh": "以14世纪土家族起义领袖命名，云海、日出、冬雪三绝",
+        "en": "Named after a 14th-century Tujia leader, famous for sea of clouds, sunrise, and winter snow"
+      }
+    },
+    {
+      "id": "golden_whip",
+      "name": {
+        "zh": "金鞭溪",
+        "en": "Golden Whip Stream"
+      },
+      "length_km": 7.5,
+      "highlights": [
+        {
+          "name": {
+            "zh": "金鞭岩",
+            "en": "Golden Whip Rock"
+          },
+          "description": {
+            "zh": "溪边标志性巨石，高约380米",
+            "en": "Iconic 380m tall rock by the stream"
+          }
+        },
+        {
+          "name": {
+            "zh": "紫草潭",
+            "en": "Purple Grass Pool"
+          },
+          "description": {
+            "zh": "溪水清澈见底，倒映奇峰",
+            "en": "Crystal clear water reflecting peculiar peaks"
+          }
+        },
+        {
+          "name": {
+            "zh": "千里相会",
+            "en": "Thousand Miles Meeting"
+          },
+          "description": {
+            "zh": "两座石峰相对而立，如恋人相会",
+            "en": "Two peaks facing each other like lovers meeting"
+          }
+        }
+      ],
+      "description": {
+        "zh": "7.5公里清澈溪谷，86版《西游记》取景地，常有野生猕猴出没",
+        "en": "7.5km crystal-clear valley, 1986 Journey to the West filming location, wild macaques often seen"
+      }
+    },
+    {
+      "id": "huangshi",
+      "name": {
+        "zh": "黄石寨",
+        "en": "Huangshi Village"
+      },
+      "elevation_m": 1080,
+      "highlights": [
+        {
+          "name": {
+            "zh": "六奇阁",
+            "en": "Six Wonders Pavilion"
+          },
+          "description": {
+            "zh": "山顶观景阁，可赏六奇景观",
+            "en": "Peak viewing pavilion for six wonders"
+          }
+        },
+        {
+          "name": {
+            "zh": "摘星台",
+            "en": "Star-Picking Platform"
+          },
+          "description": {
+            "zh": "三面悬崖的观景台，360度全景",
+            "en": "Three-sided cliff viewing platform with 360° panorama"
+          }
+        }
+      ],
+      "description": {
+        "zh": "素有'不到黄石寨，枉来张家界'之说，最大空中观景平台",
+        "en": "'No Huangshi, no Zhangjiajie' — largest sky viewing platform"
+      }
+    },
+    {
+      "id": "yangjiajie",
+      "name": {
+        "zh": "杨家界",
+        "en": "Yangjiajie"
+      },
+      "area_km2": 40,
+      "highlights": [
+        {
+          "name": {
+            "zh": "天然长城",
+            "en": "Natural Great Wall"
+          },
+          "description": {
+            "zh": "峰墙地貌，如长城蜿蜒",
+            "en": "Peak wall landform resembling the Great Wall"
+          }
+        }
+      ],
+      "description": {
+        "zh": "游客最少的区域，适合探险，峰墙地貌独特",
+        "en": "Least visited area, great for adventurers, unique peak wall geology"
+      }
+    },
+    {
+      "id": "ten_mile",
+      "name": {
+        "zh": "十里画廊",
+        "en": "Ten-Mile Gallery"
+      },
+      "length_km": 5.2,
+      "highlights": [
+        {
+          "name": {
+            "zh": "采药老人",
+            "en": "Herb Gatherer"
+          },
+          "description": {
+            "zh": "石峰形似背负药篓的老人",
+            "en": "Peak resembling an old man with a herb basket"
+          }
+        },
+        {
+          "name": {
+            "zh": "三姐妹峰",
+            "en": "Three Sisters Peak"
+          },
+          "description": {
+            "zh": "三座相连石峰如三姐妹并肩",
+            "en": "Three connected peaks like sisters standing together"
+          }
+        }
+      ],
+      "description": {
+        "zh": "5.2公里峡谷步道，两岸奇峰林立，可乘观光小火车",
+        "en": "5.2km canyon walkway with peculiar peaks, tourist train available"
+      }
+    }
+  ],
+  "facilities": {
+    "bailong_elevator": {
+      "name": {
+        "zh": "百龙天梯",
+        "en": "Bailong Elevator"
+      },
+      "height_m": 326,
+      "duration_seconds": 88,
+      "description": {
+        "zh": "世界最高、最快、载重最大的户外电梯，三项吉尼斯世界纪录",
+        "en": "World's tallest, fastest, highest-capacity outdoor elevator — 3 Guinness World Records"
+      }
+    },
+    "cableways": [
+      {
+        "name": {
+          "zh": "天子山索道",
+          "en": "Tianzi Mountain Cableway"
+        },
+        "length_m": 2084,
+        "height_diff_m": 692
+      },
+      {
+        "name": {
+          "zh": "黄石寨索道",
+          "en": "Huangshi Village Cableway"
+        }
+      },
+      {
+        "name": {
+          "zh": "杨家界索道",
+          "en": "Yangjiajie Cableway"
+        }
+      }
+    ]
+  },
+  "tips": {
+    "best_time": {
+      "zh": "雨后次日清晨（6:00-7:00），云海概率最高",
+      "en": "Early morning after rain (6:00-7:00) for highest chance of sea of clouds"
+    },
+    "recommended_duration": {
+      "zh": "最少2天，3天最佳",
+      "en": "Minimum 2 days, 3 days ideal"
+    },
+    "ticket_validity": {
+      "zh": "首次入园起连续4天有效",
+      "en": "Valid for 4 consecutive days from first entry"
+    }
+  }
+}

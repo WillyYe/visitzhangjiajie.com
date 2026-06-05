@@ -1,0 +1,55 @@
+{
+  "news": [
+    {
+      "id": 1,
+      "date": "2026-05-15",
+      "type": "announce",
+      "type_label": {
+        "zh": "公告",
+        "en": "ANNOUNCE"
+      },
+      "title": {
+        "zh": "2026旺季开放时间调整",
+        "en": "2026 Peak Season Hours Adjustment"
+      },
+      "summary": {
+        "zh": "5月1日起，公园开放时间调整为6:30-18:30，请合理安排行程。",
+        "en": "From May 1st, park hours adjust to 6:30-18:30. Please plan your visit accordingly."
+      }
+    },
+    {
+      "id": 2,
+      "date": "2026-05-08",
+      "type": "event",
+      "type_label": {
+        "zh": "活动",
+        "en": "EVENT"
+      },
+      "title": {
+        "zh": "第十届张家界国际森林文化节",
+        "en": "10th Zhangjiajie International Forest Cultural Festival"
+      },
+      "summary": {
+        "zh": "为期一个月的森林文化节，包含摄影大赛、民俗表演和生态教育等活动。",
+        "en": "The festival runs for one month, featuring photo contests, folk performances, and eco-education."
+      }
+    },
+    {
+      "id": 3,
+      "date": "2026-05-01",
+      "type": "notice",
+      "type_label": {
+        "zh": "通知",
+        "en": "NOTICE"
+      },
+      "title": {
+        "zh": "天子山索道恢复运营",
+        "en": "Tianzishan Cableway Resumes Operations"
+      },
+      "summary": {
+        "zh": "经过一周维护，天子山索道于5月1日正式恢复运营。",
+        "en": "After a week of maintenance, the Tianzishan Cableway officially resumed operations on May 1st."
+      }
+    }
+  ]
+}

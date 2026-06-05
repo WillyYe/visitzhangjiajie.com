@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Experience Detail | Zhangjiajie National Forest Park</title>
+  <meta name="description" id="metaDesc" content="Explore Zhangjiajie National Forest Park experiences." />
+  <meta name="theme-color" content="#1a4a30" />
+  
+  <!-- Preconnect for Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+      color: #1a1a1a;
+      background: #fff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    
+    /* ========== COLOR VARIABLES ========== */
+    :root {
+      --green-dark: #0d2b1e;
+      --green-mid: #1a4a30;
+      --green-light: #2d6a4f;
+      --green-accent: #52b788;
+      --gold: #b5882a;
+      --gold-light: #d4a843;
+      --cream: #f7f3ee;
+      --cream-dark: #e8e4de;
+      --text-dark: #1a1a1a;
+      --text-mid: #4a4a4a;
+      --text-light: #888;
+      --white: #fff;
+    }
+    
+    /* ========== HEADER ========== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--green-dark);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--white);
+    }
+    .header-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header-logo-text {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .lang-switch {
+      display: flex;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .lang-switch button {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      transition: background 0.2s, color 0.2s;
+    }
+    .lang-switch button.active {
+      background: var(--gold);
+      color: var(--white);
+    }
+    
+    /* ========== HERO ========== */
+    .hero {
+      height: 60vh;
+      min-height: 400px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      text-align: center;
+      margin-top: 64px;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 24px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .hero-subtitle {
+      font-size: clamp(14px, 2vw, 18px);
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* ========== CONTENT ========== */
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green-mid);
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--green-dark);
+    }
+    
+    /* ========== GALLERY ========== */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .gallery-item {
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover {
+      transform: scale(1.03);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-item:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    
+    /* ========== INFO CARDS ========== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .info-card {
+      background: var(--cream);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.25s;
+    }
+    .info-card:hover {
+      transform: translateY(-4px);
+    }
+    .info-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: var(--text-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--green-dark);
+    }
+    
+    /* ========== SECTION ========== */
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--cream-dark);
+    }
+    .section p {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 16px;
+    }
+    
+    /* ========== TIPS ========== */
+    .tip-box {
+      background: linear-gradient(135deg, #f0faf4, #e8f5ec);
+      border-left: 4px solid var(--green-accent);
+      padding: 24px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+    }
+    .tip-box h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tip-box ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+    .tip-box li {
+      font-size: 14px;
+      color: var(--text-mid);
+      margin-bottom: 8px;
+    }
+    
+    /* ========== CTA ========== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: var(--white);
+      padding: 48px;
+      border-radius: 16px;
+      text-align: center;
+      margin-top: 48px;
+    }
+    .cta-section h3 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .cta-section p {
+      opacity: 0.85;
+      margin-bottom: 24px;
+      color: var(--white);
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--gold);
+      color: var(--white);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+    
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--cream);
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    .footer a {
+      color: var(--green-mid);
+    }
+    
+    /* ========== LANGUAGE TOGGLE ========== */
+    [lang="zh"] .en-content { display: none; }
+    [lang="en"] .zh-content { display: none; }
+    
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .gallery-item:first-child {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-section { padding: 32px 24px; }
+    }
+    @media (max-width: 480px) {
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+      .gallery-item:first-child {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body lang="en">
+  
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-icon">🏔️</div>
+      <div class="header-logo-text en-content">Zhangjiajie Park</div>
+      <div class="header-logo-text zh-content">张家界国家森林公园</div>
+    </a>
+    <div class="lang-switch">
+      <button onclick="switchLang('zh')" data-lang="zh">中文</button>
+      <button onclick="switchLang('en')" class="active" data-lang="en">EN</button>
+    </div>
+  </header>
+  
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge en-content" id="heroBadgeEn"></div>
+      <div class="hero-badge zh-content" id="heroBadgeZh"></div>
+      <h1 class="hero-title en-content" id="heroTitleEn"></h1>
+      <h1 class="hero-title zh-content" id="heroTitleZh"></h1>
+      <p class="hero-subtitle en-content" id="heroSubtitleEn"></p>
+      <p class="hero-subtitle zh-content" id="heroSubtitleZh"></p>
+    </div>
+  </section>
+  
+  <!-- CONTENT -->
+  <section class="content-section">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span class="en-content">Back to Park</span>
+      <span class="zh-content">返回首页</span>
+    </a>
+    
+    <!-- Gallery -->
+    <div class="gallery" id="gallerySection">
+      <!-- Images will be rendered by JS -->
+    </div>
+    
+    <!-- Info Cards -->
+    <div class="info-grid" id="infoGrid">
+      <!-- Info cards will be rendered by JS -->
+    </div>
+    
+    <!-- Description -->
+    <div class="section">
+      <h2 class="section-title en-content" id="descTitleEn"></h2>
+      <h2 class="section-title zh-content" id="descTitleZh"></h2>
+      <div id="descContent">
+        <!-- Description will be rendered by JS -->
+      </div>
+    </div>
+    
+    <!-- Highlights -->
+    <div class="section">
+      <h2 class="section-title en-content" id="highlightsTitleEn"></h2>
+      <h2 class="section-title zh-content" id="highlightsTitleZh"></h2>
+      <div id="highlightsContent">
+        <!-- Highlights will be rendered by JS -->
+      </div>
+    </div>
+    
+    <!-- Tips -->
+    <div class="tip-box">
+      <h4 id="tipsTitle"></h4>
+      <ul class="en-content" id="tipsListEn"></ul>
+      <ul class="zh-content" id="tipsListZh"></ul>
+    </div>
+    
+    <!-- CTA -->
+    <div class="cta-section">
+      <h3 class="en-content">Ready to Experience?</h3>
+      <h3 class="zh-content">准备好体验了吗？</h3>
+      <p class="en-content">Start your Zhangjiajie adventure today</p>
+      <p class="zh-content">立即开启您的张家界之旅</p>
+      <a href="index.html" class="cta-btn en-content">
+        <span>🌲</span> Back to Park
+      </a>
+      <a href="index.html" class="cta-btn zh-content">
+        <span>🌲</span> 返回首页
+      </a>
+    </div>
+  </section>
+  
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>
+      <span class="en-content">© 2024 Zhangjiajie National Forest Park · World Natural Heritage</span>
+      <span class="zh-content">© 2024 张家界国家森林公园 · 世界自然遗产</span>
+    </p>
+  </footer>
+  
+  <script defer>
+    // ========== EXPERIENCE DATA ==========
+    var allExpData = [
+      {
+        id: 'hiking',
+        images: ['assets/images/exp-hiking.jpg', 'assets/images/gal-stream.jpg', 'assets/images/gal-spring.jpg'],
+        badge: 'Adventure',
+        badgeZh: '探险',
+        title: 'Hiking Adventure',
+        titleZh: '徒步探险',
+        subtitle: 'Trek through Jinbian Stream',
+        subtitleZh: '穿越金鞭溪',
+        desc: '<p>Zhangjiajie offers some of the most spectacular hiking trails in China. The most famous route is along Jinbian Stream (金鞭溪), a 7.5km path that winds through towering sandstone peaks and pristine forests.</p><p>The trail is relatively flat and suitable for hikers of all levels. Along the way, you\'ll pass by crystal-clear streams, ancient trees, and numerous scenic spots like the Oriole Singing in the Willows and the Golden Whip Rock.</p><p>For more advanced hikers, the route from Huangshijia to Tianzi Mountain offers challenging climbs with rewarding panoramic views.</p>',
+        descZh: '<p>张家界拥有中国最壮观的徒步路线之一。最著名的路线是金鞭溪，一条7.5公里的小径蜿蜒穿过高耸的砂岩峰林和原始森林。</p><p>这条路线相对平坦，适合各个水平的徒步者。沿途您会经过清澈的溪流、古树和众多景点，如莺歌燕舞和金鞭岩。</p><p>对于更有经验的徒步者，从黄石寨到天子山的路线提供了具有挑战性的攀登和无与伦比的全景视野。</p>',
+        info: [
+          { icon: '📏', label: 'Length', labelZh: '长度', value: '7.5km' },
+          { icon: '⏱️', label: 'Duration', labelZh: '时长', value: '2-3 hrs' },
+          { icon: '⚡', label: 'Difficulty', labelZh: '难度', value: 'Easy-Moderate' },
+          { icon: '🌲', label: 'Forest', labelZh: '森林', value: '95% Coverage' }
+        ],
+        highlights: [
+          { icon: '🏞️', name: 'Jinbian Stream', nameZh: '金鞭溪', desc: 'The most scenic hiking trail', descZh: '最美丽的徒步路线' },
+          { icon: '🌉', name: 'First Bridge', nameZh: '天下第一桥', desc: 'Natural stone bridge', descZh: '天然石桥' },
+          { icon: '🏔️', name: 'Tianzi Mountain', nameZh: '天子山', desc: 'Panoramic summit views', descZh: '山顶全景' }
+        ],
+        tips: [
+          'Wear comfortable hiking shoes with good grip',
+          'Bring plenty of water and snacks',
+          'Start early morning to avoid crowds',
+          'Check weather forecast before departure'
+        ],
+        tipsZh: [
+          '穿舒适的防滑登山鞋',
+          '带足够的水和零食',
+          '建议早晨出发避开人群',
+          '出发前查看天气预报'
+        ]
+      },
+      {
+        id: 'photography',
+        images: ['assets/images/exp-photo.jpg', 'assets/images/gal-yuanjiajie.jpg', 'assets/images/gal-clouds.jpg'],
+        badge: 'Photography',
+        badgeZh: '摄影',
+        title: 'Photography Tour',
+        titleZh: '摄影之旅',
+        subtitle: 'Capture nature\'s masterpieces',
+        subtitleZh: '捕捉大自然的鬼斧神工',
+        desc: '<p>Zhangjiajie is a paradise for photographers. The park\'s unique quartz sandstone pillars, sea of clouds, and changing seasons offer endless opportunities for stunning shots.</p><p>Best photography spots include Yuanjiajie (for the Avatar mountains), Tianzi Mountain (for sunrise and sea of clouds), and the Golden Whip Stream (for forest and stream scenes).</p><p>Professional photography tours are available, with local guides who know the best vantage points and timing for that perfect shot.</p>',
+        descZh: '<p>张家界是摄影师的天堂。公园独特的石英砂岩柱、云海和四季变化为令人惊叹的拍摄提供了无穷的机会。</p><p>最佳摄影点包括袁家界（阿凡达山）、天子山（日出和云海）和金鞭溪（森林和溪流场景）。</p><p>提供专业摄影之旅，当地导游知道最佳拍摄角度和时机，帮您拍出完美照片。</p>',
+        info: [
+          { icon: '📷', label: 'Best Time', labelZh: '最佳时间', value: 'Sunrise/Sunset' },
+          { icon: '🌅', label: 'Season', labelZh: '季节', value: 'Apr-Oct' },
+          { icon: '🎒', label: 'Gear', labelZh: '装备', value: 'Tripod+Wide' },
+          { icon: '👥', label: 'Tour', labelZh: '导览', value: 'Available' }
+        ],
+        highlights: [
+          { icon: '🌄', name: 'Sea of Clouds', nameZh: '云海', desc: 'Most photogenic natural phenomenon', descZh: '最上镜的自然现象' },
+          { icon: '🌉', name: 'Avatar Peaks', nameZh: '阿凡达山峰', desc: 'Iconic Hallelujah Mountains', descZh: '标志性的哈利路亚山' },
+          { icon: '🍂', name: 'Autumn Colors', nameZh: '秋色', desc: 'Vibrant fall foliage', descZh: '鲜艳的秋叶' }
+        ],
+        tips: [
+          'Bring a tripod for sunrise/sunset shots',
+          'Wide-angle lens is essential for landscapes',
+          'Visit during "golden hour" (1 hour after sunrise/before sunset)',
+          'Consider hiring a local photography guide'
+        ],
+        tipsZh: [
+          '带三脚架拍摄日出/日落',
+          '广角镜头对风景摄影至关重要',
+          '在"黄金时段"（日出后1小时/日落前1小时）拍摄',
+          '考虑聘请当地摄影导游'
+        ]
+      },
+      {
+        id: 'eco',
+        images: ['assets/images/exp-eco.jpg', 'assets/images/gal-spring.jpg', 'assets/images/gal-autumn.jpg'],
+        badge: 'Education',
+        badgeZh: '研学',
+        title: 'Eco Education',
+        titleZh: '生态研学',
+        subtitle: 'Learn about geological wonders',
+        subtitleZh: '了解地质奇观',
+        desc: '<p>Zhangjiajie National Forest Park is not only a scenic wonder but also an open-air classroom for geology, ecology, and biodiversity. The park\'s quartz sandstone pillars were formed over 380 million years.</p><p>Educational programs cover topics like: formation of sandstone peaks, subtropical forest ecosystems, Tujia and Miao ethnic cultures, and conservation efforts. Perfect for school groups and nature enthusiasts.</p><p>Guided eco-tours explain the unique geological history and the rich biodiversity of the region, including many endemic species.</p>',
+        descZh: '<p>张家界国家森林公园不仅是风景奇观，也是地质、生态和生物多样性的露天课堂。公园的石英砂岩柱形成于3.8亿年前。</p><p>教育项目涵盖的主题包括：砂岩峰林的形成、亚热带森林生态系统、土家族和苗族文化以及保护工作。非常适合学校团体和自然爱好者。</p><p>生态导览会解释独特的地质历史和该地区丰富的生物多样性，包括许多特有物种。</p>',
+        info: [
+          { icon: '🏫', label: 'Program', labelZh: '项目', value: 'Available' },
+          { icon: '👨‍🏫', label: 'Guide', labelZh: '导游', value: 'Expert' },
+          { icon: '🌿', label: 'Species', labelZh: '物种', value: '3,000+' },
+          { icon: '📚', label: 'Topics', labelZh: '主题', value: 'Geology+Eco' }
+        ],
+        highlights: [
+          { icon: '🪨', name: 'Geology', nameZh: '地质学', desc: '380-million-year history', descZh: '3.8亿年历史' },
+          { icon: '🌳', name: 'Biodiversity', nameZh: '生物多样性', desc: '3,000+ plant species', descZh: '3000+植物物种' },
+          { icon: '👥', name: 'Culture', nameZh: '文化', desc: 'Tujia & Miao heritage', descZh: '土家 and 苗族遗产' }
+        ],
+        tips: [
+          'Book educational tours in advance',
+          'Suitable for students aged 10 and above',
+          'Wear comfortable walking shoes',
+          'Bring notebook and camera for记录'
+        ],
+        tipsZh: [
+          '提前预订教育之旅',
+          '适合10岁及以上学生',
+          '穿舒适的步行鞋',
+          '带上笔记本和相机做记录'
+        ]
+      },
+      {
+        id: 'stargazing',
+        images: ['assets/images/exp-stargaze.jpg', 'assets/images/gal-sunrise.jpg', 'assets/images/gal-winter.jpg'],
+        badge: 'Stargazing',
+        badgeZh: '观星',
+        title: 'Sea of Clouds & Stargazing',
+        titleZh: '云海星空',
+        subtitle: 'Witness sunrise and starry skies',
+        subtitleZh: '观赏日出与满天繁星',
+        desc: '<p>Zhangjiajie offers breathtaking experiences of both sea of clouds and stargazing. The sea of clouds phenomenon occurs when moist air condenses into a thick layer of cloud that fills the valleys between peaks.</p><p>Best spots for cloud sea viewing are Tianzi Mountain and Yangjiajie. For stargazing, the remote locations away from city lights provide crystal-clear night skies perfect for astrophotography.</p><p>Many visitors choose to stay overnight on the mountain to catch both sunset and sunrise, when the clouds are most dramatic.</p>',
+        descZh: '<p>张家界提供云海和观星的令人叹为观止的体验。当潮湿的空气凝结成厚厚的云层填满峰谷之间时，就会出现云海现象。</p><p>观云海的最佳地点是天子山和杨家界。对于观星，远离城市灯光的偏远地点提供了清澈的夜空，非常适合天文摄影。</p><p>许多游客选择在山上过夜，以捕捉日落和日出，那时云层最为壮观。</p>',
+        info: [
+          { icon: '🌅', label: 'Sunrise', labelZh: '日出', value: '6:00-7:00' },
+          { icon: '🌃', label: 'Stargazing', labelZh: '观星', value: 'After 20:00' },
+          { icon: '🏔️', label: 'Best Spot', labelZh: '最佳地点', value: 'Tianzi Mtn' },
+          { icon: '🏨', label: 'Stay', labelZh: '住宿', value: 'Mountain Inn' }
+        ],
+        highlights: [
+          { icon: '🌊', name: 'Sea of Clouds', nameZh: '云海', desc: 'Spectacular cloud formations', descZh: '壮观的云层形态' },
+          { icon: '⭐', name: 'Starry Sky', nameZh: '星空', desc: 'Milky Way visible', descZh: '可见银河' },
+          { icon: '🌄', name: 'Sunrise', nameZh: '日出', desc: 'Golden hour magic', descZh: '黄金时段魔法' }
+        ],
+        tips: [
+          'Check weather - clear skies are best for stargazing',
+          'Bring warm clothes (mountain temperatures drop at night)',
+          'Stay at mountain accommodation for convenience',
+          'Use red light flashlight to preserve night vision'
+        ],
+        tipsZh: [
+          '查看天气 - 晴朗夜空最适合观星',
+          '带保暖衣物（山上夜间温度下降）',
+          '住山上住宿更方便',
+          '用红光手电筒保护夜视能力'
+        ]
+      }
+    ];
+    
+    // ========== APP STATE ==========
+    var AppState = {
+      currentLang: 'en'
+    };
+    
+    // ========== GET EXPERIENCE ID FROM URL ==========
+    function getExpId() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'hiking';
+    }
+    
+    // ========== GET CURRENT EXPERIENCE DATA ==========
+    function getCurrentExp() {
+      var id = getExpId();
+      for (var i = 0; i < allExpData.length; i++) {
+        if (allExpData[i].id === id) {
+          return { data: allExpData[i], index: i };
+        }
+      }
+      return { data: allExpData[0], index: 0 };
+    }
+    
+    // ========== SWITCH LANGUAGE ==========
+    function switchLang(lang) {
+      AppState.currentLang = lang;
+      document.body.lang = lang;
+      
+      // Update header buttons
+      document.querySelectorAll('.lang-switch button').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      document.querySelector('.lang-switch button[data-lang="' + lang + '"]').classList.add('active');
+    }
+    
+    // ========== RENDER HERO ==========
+    function renderHero() {
+      var exp = getCurrentExp().data;
+      
+      // Set hero background image
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + exp.images[0] + '\')';
+      
+      // Set badge
+      document.getElementById('heroBadgeEn').textContent = exp.badge;
+      document.getElementById('heroBadgeZh').textContent = exp.badgeZh;
+      
+      // Set title
+      document.getElementById('heroTitleEn').textContent = exp.title;
+      document.getElementById('heroTitleZh').textContent = exp.titleZh;
+      
+      // Set subtitle
+      document.getElementById('heroSubtitleEn').textContent = exp.subtitle;
+      document.getElementById('heroSubtitleZh').textContent = exp.subtitleZh;
+      
+      // Update page title
+      document.title = exp.title + ' | Zhangjiajie Park';
+    }
+    
+    // ========== RENDER GALLERY ==========
+    function renderGallery() {
+      var exp = getCurrentExp().data;
+      var container = document.getElementById('gallerySection');
+      var html = '';
+      
+      exp.images.forEach(function(img, index) {
+        html += '<div class="gallery-item">';
+        html += '<img src="' + img + '" alt="' + exp.title + ' - Image ' + (index + 1) + '" loading="lazy" decoding="async">';
+        html += '</div>';
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // ========== RENDER INFO CARDS ==========
+    function renderInfoCards() {
+      var exp = getCurrentExp().data;
+      var container = document.getElementById('infoGrid');
+      var html = '';
+      
+      exp.info.forEach(function(item) {
+        html += '<div class="info-card">';
+        html += '<div class="info-icon">' + item.icon + '</div>';
+        html += '<div class="info-label en-content">' + item.label + '</div>';
+        html += '<div class="info-label zh-content">' + item.labelZh + '</div>';
+        html += '<div class="info-value">' + item.value + '</div>';
+        html += '</div>';
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // ========== RENDER DESCRIPTION ==========
+    function renderDescription() {
+      var exp = getCurrentExp().data;
+      
+      document.getElementById('descTitleEn').textContent = 'About ' + exp.title;
+      document.getElementById('descTitleZh').textContent = '关于 ' + exp.titleZh;
+      document.getElementById('descContent').innerHTML = '<div class="en-content">' + exp.desc + '</div><div class="zh-content">' + exp.descZh + '</div>';
+    }
+    
+    // ========== RENDER HIGHLIGHTS ==========
+    function renderHighlights() {
+      var exp = getCurrentExp().data;
+      var container = document.getElementById('highlightsContent');
+      
+      document.getElementById('highlightsTitleEn').textContent = 'Highlights';
+      document.getElementById('highlightsTitleZh').textContent = '亮点';
+      
+      var html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 20px;">';
+      exp.highlights.forEach(function(item) {
+        html += '<div style="background: var(--cream); padding: 20px; border-radius: 12px;">';
+        html += '<div style="font-size: 32px; margin-bottom: 12px;">' + item.icon + '</div>';
+        html += '<h4 class="en-content" style="font-size: 16px; font-weight: 600; color: var(--green-dark); margin-bottom: 8px;">' + item.name + '</h4>';
+        html += '<h4 class="zh-content" style="font-size: 16px; font-weight: 600; color: var(--green-dark); margin-bottom: 8px;">' + item.nameZh + '</h4>';
+        html += '<p class="en-content" style="font-size: 14px; color: var(--text-mid);">' + item.desc + '</p>';
+        html += '<p class="zh-content" style="font-size: 14px; color: var(--text-mid);">' + item.descZh + '</p>';
+        html += '</div>';
+      });
+      html += '</div>';
+      
+      container.innerHTML = html;
+    }
+    
+    // ========== RENDER TIPS ==========
+    function renderTips() {
+      var exp = getCurrentExp().data;
+      var isZh = AppState.currentLang === 'zh';
+      
+      document.getElementById('tipsTitle').innerHTML = (isZh ? '💡 实用贴士' : '💡 Travel Tips');
+      
+      var tipsEnHtml = '';
+      exp.tips.forEach(function(tip) {
+        tipsEnHtml += '<li>' + tip + '</li>';
+      });
+      document.getElementById('tipsListEn').innerHTML = tipsEnHtml;
+      
+      var tipsZhHtml = '';
+      exp.tipsZh.forEach(function(tip) {
+        tipsZhHtml += '<li>' + tip + '</li>';
+      });
+      document.getElementById('tipsListZh').innerHTML = tipsZhHtml;
+    }
+    
+    // ========== INITIALIZE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      renderHero();
+      renderGallery();
+      renderInfoCards();
+      renderDescription();
+      renderHighlights();
+      renderTips();
+    });
+  </script>
+</body>
+</html>

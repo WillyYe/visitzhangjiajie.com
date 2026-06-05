@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Here - Zhangjiajie National Forest Park</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark: #1b4332;
+      --green-mid: #2d6a4f;
+      --green-light: #52b788;
+      --green-pale: #d8f3dc;
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --text-secondary: #555;
+      --text-muted: #888;
+      --border: #e5e7eb;
+      --card-bg: #fafafa;
+      --accent: #2d6a4f;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .page-header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .page-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .page-header p {
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: white; }
+
+    /* Map Section */
+    .map-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    #map {
+      width: 100%;
+      height: 480px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      z-index: 1;
+    }
+    .map-hint {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    /* GPS Coordinates Table */
+    .gps-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 1.5rem;
+    }
+    .gps-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--green-dark);
+    }
+    .gps-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .gps-table th, .gps-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .gps-table th {
+      background: var(--green-pale);
+      font-weight: 600;
+      color: var(--green-dark);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .gps-table tr:last-child td { border-bottom: none; }
+    .gps-coord {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      cursor: pointer;
+      position: relative;
+    }
+    .gps-coord:hover { text-decoration: underline; }
+    .gps-coord .copy-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: -apple-system, sans-serif;
+      margin-left: 4px;
+    }
+    .chinese-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Transport Cards */
+    .transport-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 1.5rem;
+    }
+    .transport-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--green-dark);
+    }
+    .transport-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .transport-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: box-shadow 0.2s;
+    }
+    .transport-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .transport-card .icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .transport-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .transport-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .transport-card .price {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 2px 8px;
+      background: var(--green-pale);
+      color: var(--green-dark);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .show-driver-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 6px 12px;
+      background: var(--green-mid);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .show-driver-btn:hover { background: var(--green-dark); }
+
+    /* Show Your Driver Overlay */
+    .driver-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .driver-overlay.active { display: flex; }
+    .driver-overlay .chinese-text {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+    .driver-overlay .pinyin-text {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    .driver-overlay .close-btn {
+      padding: 12px 32px;
+      background: var(--green-mid);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .driver-overlay .close-btn:hover { background: var(--green-dark); }
+    .driver-overlay .hint {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Download Section */
+    .download-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 2rem;
+    }
+    .download-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--green-dark);
+    }
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .download-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .download-card:hover { border-color: var(--green-mid); }
+    .download-card .dl-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .download-card .dl-text {
+      font-size: 0.85rem;
+    }
+    .download-card .dl-text strong {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      #map { height: 320px; }
+      .page-header h1 { font-size: 1.35rem; }
+      .driver-overlay .chinese-text { font-size: 1.8rem; }
+      .gps-table { font-size: 0.8rem; }
+      .gps-table th, .gps-table td { padding: 0.5rem 0.6rem; }
+    }
+
+    /* Leaflet popup customization */
+    .leaflet-popup-content-wrapper {
+      border-radius: 10px !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    .leaflet-popup-content {
+      margin: 12px 16px !important;
+      line-height: 1.5 !important;
+    }
+    .popup-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    .popup-detail {
+      font-size: 0.82rem;
+      color: #555;
+    }
+    .popup-chinese {
+      font-size: 0.85rem;
+      color: #1b4332;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .popup-gps {
+      font-family: 'SF Mono', monospace;
+      font-size: 0.78rem;
+      color: #2d6a4f;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Getting Here</h1>
+    <p>How to reach Zhangjiajie National Forest Park</p>
+    <a href="../" class="back-link">&larr; Back to Home</a>
+  </div>
+
+  <!-- Interactive Map -->
+  <div class="map-section">
+    <div id="map"></div>
+    <p class="map-hint">Click markers for details &middot; Scroll to zoom &middot; Drag to pan</p>
+  </div>
+
+  <!-- GPS Coordinates -->
+  <div class="gps-section">
+    <h2>Key GPS Coordinates</h2>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem;">Click coordinates to copy &middot; Paste into any navigation app</p>
+    <table class="gps-table">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Coordinates</th>
+          <th>Show Driver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            Zhangjiajie Airport (DYG)<br>
+            <span class="chinese-name">张家界荷花机场</span>
+          </td>
+          <td>
+            <span class="gps-coord" onclick="copyCoord(this)" title="Click to copy">29.0978, 110.4477<span class="copy-hint">[copy]</span></span>
+          </td>
+          <td><button class="show-driver-btn" onclick="showDriver('张家界荷花机场','Zhangjiajie Hehua Airport')">Show Driver</button></td>
+        </tr>
+        <tr>
+          <td>
+            Zhangjiajie Railway Station<br>
+            <span class="chinese-name">张家界火车站</span>
+          </td>
+          <td>
+            <span class="gps-coord" onclick="copyCoord(this)" title="Click to copy">29.1372, 110.4777<span class="copy-hint">[copy]</span></span>
+          </td>
+          <td><button class="show-driver-btn" onclick="showDriver('张家界火车站','Zhangjiajie Railway Station')">Show Driver</button></td>
+        </tr>
+        <tr>
+          <td>
+            Zhangjiajie West Station (HSR)<br>
+            <span class="chinese-name">张家界西站（高铁）</span>
+          </td>
+          <td>
+            <span class="gps-coord" onclick="copyCoord(this)" title="Click to copy">29.1867, 110.4194<span class="copy-hint">[copy]</span></span>
+          </td>
+          <td><button class="show-driver-btn" onclick="showDriver('张家界西站','Zhangjiajie West Station (High-Speed Rail)')">Show Driver</button></td>
+        </tr>
+        <tr>
+          <td>
+            Park Entrance (Ticket Station)<br>
+            <span class="chinese-name">张家界国家森林公园门票站</span>
+          </td>
+          <td>
+            <span class="gps-coord" onclick="copyCoord(this)" title="Click to copy">29.3256, 110.4348<span class="copy-hint">[copy]</span></span>
+          </td>
+          <td><button class="show-driver-btn" onclick="showDriver('张家界国家森林公园门票站','Zhangjiajie National Forest Park Ticket Station')">Show Driver</button></td>
+        </tr>
+        <tr>
+          <td>
+            Wulingyuan Entrance<br>
+            <span class="chinese-name">武陵源门票站</span>
+          </td>
+          <td>
+            <span class="gps-coord" onclick="copyCoord(this)" title="Click to copy">29.3167, 110.5500<span class="copy-hint">[copy]</span></span>
+          </td>
+          <td><button class="show-driver-btn" onclick="showDriver('武陵源门票站','Wulingyuan Entrance')">Show Driver</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Transport Details -->
+  <div class="transport-section">
+    <h2>Transportation Details</h2>
+    <div class="transport-grid">
+
+      <div class="transport-card">
+        <div class="icon">&#9992;</div>
+        <h3>By Plane</h3>
+        <p>
+          <strong>Zhangjiajie Hehua Airport (DYG)</strong><br>
+          35km to park entrance (~45 min by taxi).<br>
+          Flights from Beijing, Shanghai, Guangzhou, Shenzhen, Chengdu, and other major cities.
+        </p>
+        <span class="price">Taxi: &yen;100-150</span>
+        <span class="price">Shuttle: &yen;30</span>
+        <br>
+        <button class="show-driver-btn" onclick="showDriver('张家界国家森林公园','Zhangjiajie National Forest Park')">Show Driver</button>
+      </div>
+
+      <div class="transport-card">
+        <div class="icon">&#128644;</div>
+        <h3>By High-Speed Train</h3>
+        <p>
+          <strong>Zhangjiajie West Station</strong> (high-speed rail)<br>
+          20km to park entrance (~30 min by taxi).<br>
+          Direct trains from Changsha (2.5h), Guangzhou (5h), Beijing (8h).
+        </p>
+        <span class="price">Taxi: &yen;60-80</span>
+        <br>
+        <button class="show-driver-btn" onclick="showDriver('张家界国家森林公园','Zhangjiajie National Forest Park')">Show Driver</button>
+      </div>
+
+      <div class="transport-card">
+        <div class="icon">&#128652;</div>
+        <h3>By Bus</h3>
+        <p>
+          <strong>Zhangjiajie Bus Station</strong><br>
+          Direct buses to the park run every 10-20 minutes.<br>
+          Duration: ~40 minutes. Show the driver: &ldquo;国家森林公园&rdquo;
+        </p>
+        <span class="price">Bus: &yen;15</span>
+        <br>
+        <button class="show-driver-btn" onclick="showDriver('国家森林公园','National Forest Park')">Show Driver</button>
+      </div>
+
+      <div class="transport-card">
+        <div class="icon">&#128663;</div>
+        <h3>By Car / Taxi</h3>
+        <p>
+          Navigate to the park ticket station.<br>
+          Parking available at the entrance (~&yen;20/day).<br>
+          GPS: 29.3256, 110.4348
+        </p>
+        <span class="price">Parking: &yen;20/day</span>
+        <br>
+        <button class="show-driver-btn" onclick="showDriver('张家界国家森林公园门票站','Park Ticket Station')">Show Driver</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Download Section -->
+  <div class="download-section">
+    <h2>Offline Resources</h2>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem;">Download maps for offline use &mdash; internet access may be limited in the park</p>
+    <div class="download-grid">
+      <a class="download-card" href="https://www.openstreetmap.org/export/embed.html?bbox=110.3%2C29.2%2C110.6%2C29.45&layer=mapnik" target="_blank" rel="noopener">
+        <span class="dl-icon">&#127758;</span>
+        <span class="dl-text"><strong>OpenStreetMap</strong>View & save area map</span>
+      </a>
+      <a class="download-card" href="https://maps.me/" target="_blank" rel="noopener">
+        <span class="dl-icon">&#128241;</span>
+        <span class="dl-text"><strong>Maps.me</strong>Free offline maps app</span>
+      </a>
+      <a class="download-card" href="https://www.osmand.net/" target="_blank" rel="noopener">
+        <span class="dl-icon">&#128506;</span>
+        <span class="dl-text"><strong>OsmAnd</strong>Offline navigation app</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Show Your Driver Overlay -->
+  <div class="driver-overlay" id="driverOverlay">
+    <div style="margin-bottom:1rem;font-size:0.85rem;color:var(--text-muted);">Show this to your driver:</div>
+    <div class="chinese-text" id="driverChinese"></div>
+    <div class="pinyin-text" id="driverPinyin"></div>
+    <button class="close-btn" onclick="closeDriver()">Done</button>
+    <div class="hint">Tap "Done" when finished</div>
+  </div>
+
+  <script>
+    // ====== Leaflet Map ======
+    var map = L.map('map', {
+      center: [29.25, 110.47],
+      zoom: 11,
+      scrollWheelZoom: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Custom green marker icon
+    var greenIcon = L.divIcon({
+      className: '',
+      html: '<div style="background:#2d6a4f;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:12px;color:white;font-weight:bold;">P</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    var airportIcon = L.divIcon({
+      className: '',
+      html: '<div style="background:#e07b39;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:14px;">&#9992;</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    var trainIcon = L.divIcon({
+      className: '',
+      html: '<div style="background:#3b82f6;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:14px;">&#128644;</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    var entranceIcon = L.divIcon({
+      className: '',
+      html: '<div style="background:#dc2626;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:12px;color:white;font-weight:bold;">E</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    // Markers
+    L.marker([29.0978, 110.4477], { icon: airportIcon })
+      .addTo(map)
+      .bindPopup(
+        '<div class="popup-title">Zhangjiajie Hehua Airport (DYG)</div>' +
+        '<div class="popup-chinese">张家界荷花机场</div>' +
+        '<div class="popup-detail">35km to park (~45 min by taxi)</div>' +
+        '<div class="popup-detail">Taxi: &yen;100-150 | Shuttle: &yen;30</div>' +
+        '<div class="popup-gps">29.0978, 110.4477</div>'
+      );
+
+    L.marker([29.1372, 110.4777], { icon: trainIcon })
+      .addTo(map)
+      .bindPopup(
+        '<div class="popup-title">Zhangjiajie Railway Station</div>' +
+        '<div class="popup-chinese">张家界火车站</div>' +
+        '<div class="popup-detail">20km to park (~30 min by taxi)</div>' +
+        '<div class="popup-detail">Taxi: &yen;60-80</div>' +
+        '<div class="popup-gps">29.1372, 110.4777</div>'
+      );
+
+    L.marker([29.1867, 110.4194], { icon: trainIcon })
+      .addTo(map)
+      .bindPopup(
+        '<div class="popup-title">Zhangjiajie West Station (HSR)</div>' +
+        '<div class="popup-chinese">张家界西站（高铁）</div>' +
+        '<div class="popup-detail">20km to park (~30 min by taxi)</div>' +
+        '<div class="popup-detail">Taxi: &yen;60-80</div>' +
+        '<div class="popup-gps">29.1867, 110.4194</div>'
+      );
+
+    L.marker([29.3256, 110.4348], { icon: entranceIcon })
+      .addTo(map)
+      .bindPopup(
+        '<div class="popup-title">Park Entrance (Ticket Station)</div>' +
+        '<div class="popup-chinese">张家界国家森林公园门票站</div>' +
+        '<div class="popup-detail">Main entrance, ticket office & parking</div>' +
+        '<div class="popup-gps">29.3256, 110.4348</div>'
+      );
+
+    L.marker([29.3167, 110.5500], { icon: entranceIcon })
+      .addTo(map)
+      .bindPopup(
+        '<div class="popup-title">Wulingyuan Entrance</div>' +
+        '<div class="popup-chinese">武陵源门票站</div>' +
+        '<div class="popup-detail">Alternative entrance from Wulingyuan town</div>' +
+        '<div class="popup-gps">29.3167, 110.5500</div>'
+      );
+
+    // Park area outline (approximate)
+    var parkArea = L.polygon([
+      [29.35, 110.40], [29.38, 110.46], [29.36, 110.52],
+      [29.32, 110.56], [29.28, 110.54], [29.26, 110.48],
+      [29.27, 110.42], [29.30, 110.38]
+    ], {
+      color: '#2d6a4f',
+      fillColor: '#d8f3dc',
+      fillOpacity: 0.25,
+      weight: 2,
+      dashArray: '6 4'
+    }).addTo(map);
+
+    parkArea.bindPopup(
+      '<div class="popup-title">Zhangjiajie National Forest Park</div>' +
+      '<div class="popup-chinese">张家界国家森林公园</div>' +
+      '<div class="popup-detail">Approx. park boundary</div>'
+    );
+
+    // Route lines (airport/station to park)
+    var routeStyle = { color: '#2d6a4f', weight: 3, opacity: 0.6, dashArray: '8 6' };
+
+    L.polyline([[29.0978, 110.4477], [29.3256, 110.4348]], routeStyle).addTo(map);
+    L.polyline([[29.1372, 110.4777], [29.3256, 110.4348]], routeStyle).addTo(map);
+    L.polyline([[29.1867, 110.4194], [29.3256, 110.4348]], routeStyle).addTo(map);
+
+    // ====== Copy Coordinates ======
+    function copyCoord(el) {
+      var text = el.textContent.replace('[copy]', '').trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() {
+          var hint = el.querySelector('.copy-hint');
+          var orig = hint.textContent;
+          hint.textContent = '[copied!]';
+          setTimeout(function() { hint.textContent = orig; }, 1500);
+        });
+      } else {
+        // Fallback
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        var hint = el.querySelector('.copy-hint');
+        hint.textContent = '[copied!]';
+        setTimeout(function() { hint.textContent = '[copy]'; }, 1500);
+      }
+    }
+
+    // ====== Show Your Driver ======
+    function showDriver(chinese, english) {
+      document.getElementById('driverChinese').textContent = chinese;
+      document.getElementById('driverPinyin').textContent = english;
+      document.getElementById('driverOverlay').classList.add('active');
+    }
+
+    function closeDriver() {
+      document.getElementById('driverOverlay').classList.remove('active');
+    }
+
+    // Close on ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDriver();
+    });
+  </script>
+
+</body>
+</html>

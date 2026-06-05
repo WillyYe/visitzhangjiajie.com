@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tianzi Mountain · Sunrise & Cloud Sea | Zhangjiajie National Forest Park</title>
+  <meta name="description" content="Explore Tianzi Mountain - at 1,262m, the premier sunrise and sea-of-clouds viewing spot in Zhangjiajie. Known as "Expanded Bonsai, Miniature Fairyland" with breathtaking panoramic views." />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter','Noto Sans SC',sans-serif;color:#1a1a1a;background:#fff;-webkit-font-smoothing:antialiased}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#0d2b1e;color:#fff;border-radius:8px;font-size:14px;transition:background .2s}
+    .back-btn:hover{background:#1a4a30}
+    .detail-hero{height:60vh;min-height:400px;background:url('../assets/images/tianzishan.jpg') center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;position:relative;overflow:hidden}
+    .detail-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23fff' stroke-width='0.5' opacity='0.1'/%3E%3Ccircle cx='50' cy='50' r='50' fill='none' stroke='%23fff' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");}
+    .detail-hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:3px;margin-bottom:12px;text-shadow:0 2px 20px rgba(0,0,0,0.3)}
+    .detail-hero p{font-size:16px;opacity:0.85;max-width:600px;line-height:1.7}
+    .detail-hero .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:20px;font-size:12px;margin-bottom:20px;letter-spacing:2px}
+    .container{max-width:960px;margin:0 auto;padding:60px 24px}
+    .lang-toggle{display:flex;gap:8px;margin-bottom:40px}
+    .lang-btn{padding:8px 16px;border-radius:20px;font-size:13px;background:#f0f0f0;border:none;cursor:pointer;transition:all .2s}
+    .lang-btn.active{background:#0d2b1e;color:#fff}
+    .section{margin-bottom:48px}
+    .section h2{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:600;color:#0d2b1e;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #e0dbd4}
+    .section p{font-size:15px;color:#4a4a4a;line-height:1.9;margin-bottom:16px}
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0}
+    .info-card{background:#f7f3ee;padding:20px;border-radius:12px;text-align:center}
+    .info-card .info-icon{font-size:28px;margin-bottom:8px}
+    .info-card .info-label{font-size:12px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+    .info-card .info-value{font-size:16px;font-weight:500;color:#0d2b1e}
+    .viewpoint-list{list-style:none;margin:20px 0}
+    .viewpoint-list li{padding:20px 0;border-bottom:1px solid #e0dbd4;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+    .viewpoint-list li:last-child{border-bottom:none}
+    .viewpoint-num{width:48px;height:48px;background:#0d2b1e;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600}
+    .viewpoint-info h4{font-size:16px;font-weight:600;color:#0d2b1e;margin-bottom:4px}
+    .viewpoint-info p{font-size:13px;color:#4a4a4a;line-height:1.6}
+    .sunrise-tip{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:12px;padding:24px;margin:24px 0;text-align:center}
+    .sunrise-tip h4{font-size:16px;font-weight:600;color:#b5882a;margin-bottom:8px}
+    .sunrise-tip p{font-size:14px;color:#5a4a3a;margin-bottom:0}
+    .tip-box{background:#f0faf4;border-left:4px solid #2d6a4f;padding:20px;border-radius:0 12px 12px 0;margin:24px 0}
+    .tip-box h4{font-size:14px;font-weight:600;color:#2d6a4f;margin-bottom:8px}
+    .tip-box ul{margin:12px 0 0;padding-left:20px}
+    .tip-box li{font-size:14px;color:#4a4a4a;margin-bottom:6px}
+    .cta-section{background:linear-gradient(135deg,#0d2b1e,#1a4a30);color:#fff;padding:48px;border-radius:16px;text-align:center;margin-top:48px}
+    .cta-section h3{font-family:'Noto Serif SC',serif;font-size:22px;margin-bottom:12px}
+    .cta-section p{opacity:0.85;margin-bottom:24px}
+    .cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#b5882a;color:#fff;border-radius:8px;font-size:15px;font-weight:500;transition:background .2s,transform .2s}
+    .cta-btn:hover{background:#d4a843;transform:translateY(-2px)}
+    [lang="zh"] .en-content{display:none}
+    [lang="en"] .zh-content{display:none}
+    .footer{padding:40px 24px;text-align:center;background:#f7f3ee;font-size:13px;color:#888}
+    .footer a{color:#2d6a4f}
+  </style>
+</head>
+<body lang="en">
+  <div class="container" style="padding-top:40px">
+    <a href="index.html" class="back-btn" data-i18n="back">← Back to Park</a>
+  </div>
+
+  <div class="detail-hero">
+    <div>
+      <div class="hero-badge">🌅 Sunrise Viewpoint</div>
+      <h1 class="en-content">Tianzi Mountain</h1>
+      <h1 class="zh-content">天子山</h1>
+      <p class="en-content">At 1,262m, the king of all viewpoints in Zhangjiajie. Witness spectacular sunrises, sea of clouds, and panoramic pillar landscapes.</p>
+      <p class="zh-content">海拔1262米，张家界众山之巅。观赏壮丽日出、云海翻涌，俯瞰万千石峰。</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="switchDetailLang('en')">English</button>
+      <button class="lang-btn" onclick="switchDetailLang('zh')">中文</button>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">About Tianzi Mountain</h2>
+      <h2 class="zh-content">景区简介</h2>
+      <p class="en-content">Tianzi Mountain (Emperor Mountain) is named after Xiang DaKun, a legendary leader of local Tujia ethnic minorities who led an uprising during the early Ming Dynasty and proclaimed himself "Heavenly Son" (Tianzi). At 1,262 meters above sea level, it stands as the highest peak in the Wulingyuan scenic area and commands sweeping panoramic views of the surrounding pillar landscape.</p>
+      <p class="zh-content">天子山因明代土家族农民起义领袖向大坤自称"天子"而得名。海拔1262米，是武陵源景区最高峰，可俯瞰周围壮观的石峰景观。</p>
+      <p class="en-content">The mountain is famous for its saying: "Expanded Bonsai, Miniature Fairyland" (扩大的盆景，缩小的仙境) - referring to how the pillar formations below resemble miniature landscapes viewed from above. The area encompasses the famous Imperial Brush Peak (御笔峰) and General's Hall (将军岩), among other iconic formations.</p>
+      <p class="zh-content">景区以"扩大的盆景，缩小的仙境"著称——从山顶俯瞰，下方石峰如微缩景观。天子山包含著名的御笔峰、将军岩等标志性景观。</p>
+    </div>
+
+    <div class="sunrise-tip">
+      <h4 class="en-content">🌄 Best Time for Sunrise Viewing: 5:30 - 7:00 AM</h4>
+      <h4 class="zh-content">🌄 日出观赏最佳时间：清晨 5:30 - 7:00</h4>
+      <p class="en-content">Arrive early to secure a prime viewing spot. The cableway opens at 6:30 AM during peak season.</p>
+      <p class="zh-content">建议提前到达以抢占最佳观赏位置。旺季索道早上6:30开放。</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">🏔️</div>
+        <div class="info-label en-content">Elevation</div>
+        <div class="info-label zh-content">海拔</div>
+        <div class="info-value">1,262m</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🔄</div>
+        <div class="info-label en-content">Circuit</div>
+        <div class="info-label zh-content">环山游线</div>
+        <div class="info-value">45 km</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🚡</div>
+        <div class="info-label en-content">Cableway</div>
+        <div class="info-label zh-content">索道</div>
+        <div class="info-value en-content">Available</div>
+        <div class="info-value zh-content">已开放</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">⏱️</div>
+        <div class="info-label en-content">Best Season</div>
+        <div class="info-label zh-content">最佳季节</div>
+        <div class="info-value en-content">Apr - Oct</div>
+        <div class="info-value zh-content">4-10月</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">Top Viewpoints</h2>
+      <h2 class="zh-content">主要观景点</h2>
+      <ul class="viewpoint-list">
+        <li>
+          <div class="viewpoint-num">1</div>
+          <div class="viewpoint-info">
+            <h4 class="en-content">Imperial Brush Peak (御笔峰)</h4>
+            <h4 class="zh-content">御笔峰</h4>
+            <p class="en-content">A cluster of six 400-meter tall pillars resembling ancient writing brushes. This is Tianzi Mountain's most iconic formation and a symbol of Wulingyuan.</p>
+            <p class="zh-content">六座高400米的石柱群，形似古代毛笔，是天子山的标志性景观，也是武陵源的象征。</p>
+          </div>
+        </li>
+        <li>
+          <div class="viewpoint-num">2</div>
+          <div class="viewpoint-info">
+            <h4 class="en-content">General's Rock (将军岩)</h4>
+            <h4 class="zh-content">将军岩</h4>
+            <p class="en-content">A rock formation resembling a general in military uniform. Legend says this is the petrified General Xiang who protects the mountain.</p>
+            <p class="zh-content">形似身着军装的将军的岩石。传说这是化为岩石守护此山的向大坤将军。</p>
+          </div>
+        </li>
+        <li>
+          <div class="viewpoint-num">3</div>
+          <div class="viewpoint-info">
+            <h4 class="en-content">He Long Park (贺龙公园)</h4>
+            <h4 class="zh-content">贺龙公园</h4>
+            <p class="en-content">A memorial park dedicated to Marshal He Long with a bronze statue. Offers excellent views and cultural significance.</p>
+            <p class="zh-content">为纪念贺龙元帅而建的公园，园内有贺龙铜像，景色优美且具文化意义。</p>
+          </div>
+        </li>
+        <li>
+          <div class="viewpoint-num">4</div>
+          <div class="viewpoint-info">
+            <h4 class="en-content">Skyward Peak (云青岩)</h4>
+            <h4 class="zh-content">云青岩</h4>
+            <p class="en-content">Named for the clouds that often envelop this peak, creating ethereal sea-of-clouds views that stretch to the horizon.</p>
+            <p class="zh-content">因常有云雾缭绕此峰而得名，可欣赏延伸到天际的壮观云海。</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tip-box">
+      <h4 class="en-content">💡 Travel Tips</h4>
+      <h4 class="zh-content">💡 游览贴士</h4>
+      <ul class="en-content">
+        <li><strong>Sunrise:</strong> Arrive by 5:30 AM at the latest during summer; cableway opens at 6:30</li>
+        <li><strong>Cableway:</strong> Take the Tianzi Mountain Cableway from Wulingyuan (40 RMB one-way)</li>
+        <li><strong>Weather:</strong> Check the weather forecast - cloudy days offer the best sea-of-clouds views</li>
+        <li><strong>Clothing:</strong> Bring a light jacket even in summer - the summit can be cool</li>
+        <li><strong>Alternative:</strong> Hikers can climb from Yangjiajie (3-4 hours)</li>
+      </ul>
+      <ul class="zh-content">
+        <li><strong>日出：</strong>夏季最迟5:30前到达，索道6:30开放</li>
+        <li><strong>索道：</strong>从武陵源乘坐天子山索道上山（单程40元）</li>
+        <li><strong>天气：</strong>查看天气预报——多云天最适合观赏云海</li>
+        <li><strong>衣物：</strong>即使夏季也建议带薄外套，山顶较凉爽</li>
+        <li><strong>徒步：</strong>也可从杨家界徒步上山（需3-4小时）</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">Getting to Tianzi Mountain</h2>
+      <h2 class="zh-content">交通方式</h2>
+      <p class="en-content">The most convenient way to reach Tianzi Mountain is via the Tianzi Mountain Cableway from Wulingyuan Direction. The 45-minute cableway ride offers stunning aerial views of the pillar landscape. Alternatively, hikers can trek from Yangjiajie, a challenging 3-4 hour climb through pristine forest.</p>
+      <p class="zh-content">前往天子山最便捷的方式是从武陵源方向乘坐天子山索道。45分钟的索道之旅可欣赏壮观的空中石峰景观。也可从杨家界徒步登山，穿越原始森林约需3-4小时。</p>
+    </div>
+
+    <div class="cta-section">
+      <h3 class="en-content">Witness the Magnificent Sunrise</h3>
+      <h3 class="zh-content">见证壮丽日出</h3>
+      <p class="en-content">Plan your visit to Tianzi Mountain today.</p>
+      <p class="zh-content">现在规划您的天子山之旅。</p>
+      <a href="index.html" class="cta-btn en-content">← Back to Park Homepage</a>
+      <a href="index.html" class="cta-btn zh-content">← 返回公园首页</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 Zhangjiajie National Forest Park | 张家界国家森林公园</p>
+    <p><a href="index.html" data-i18n="footer_home">Home</a> · <a href="yuanjiajie.html" data-i18n="footer_yuan">Yuanjiajie</a> · <a href="jinbianxi.html" data-i18n="footer_jinbian">Golden Whip Stream</a></p>
+  </footer>
+
+  <script defer>
+    function switchDetailLang(lang) {
+      document.body.lang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.remove('active');
+        if(btn.textContent.toLowerCase().includes(lang === 'en' ? 'english' : '中文')) {
+          btn.classList.add('active');
+        }
+      });
+      document.querySelectorAll('.en-content, .zh-content').forEach(function(el){
+        if(lang === 'en') {
+          el.style.display = el.classList.contains('en-content') ? '' : 'none';
+        } else {
+          el.style.display = el.classList.contains('zh-content') ? '' : 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

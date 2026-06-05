@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">News Detail | Zhangjiajie National Forest Park</title>
+  <meta name="description" id="metaDesc" content="Latest news from Zhangjiajie National Forest Park." />
+  <meta name="theme-color" content="#1a4a30" />
+
+  <!-- Preconnect for Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+      color: #1a1a1a;
+      background: #fff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ========== COLOR VARIABLES ========== */
+    :root {
+      --green-dark: #0d2b1e;
+      --green-mid: #1a4a30;
+      --green-light: #2d6a4f;
+      --green-accent: #52b788;
+      --gold: #b5882a;
+      --gold-light: #d4a843;
+      --cream: #f7f3ee;
+      --cream-dark: #e8e4de;
+      --text-dark: #1a1a1a;
+      --text-mid: #4a4a4a;
+      --text-light: #888;
+      --white: #fff;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--green-dark);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--white);
+    }
+    .header-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header-logo-text {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .lang-switch {
+      display: flex;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .lang-switch button {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      transition: background 0.2s, color 0.2s;
+    }
+    .lang-switch button.active {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      height: 50vh;
+      min-height: 320px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      text-align: center;
+      margin-top: 64px;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 24px;
+      max-width: 800px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(24px, 4vw, 40px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+      line-height: 1.3;
+    }
+    .hero-date {
+      font-size: 14px;
+      opacity: 0.85;
+      letter-spacing: 1px;
+    }
+
+    /* ========== CONTENT ========== */
+    .content-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green-mid);
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--green-dark);
+    }
+
+    /* ========== NEWS META ========== */
+    .news-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .news-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .news-tag.overview { background: #e8f5e9; color: #2e7d32; }
+    .news-tag.honor    { background: #fff8e1; color: #f57f17; }
+    .news-tag.geo      { background: #e3f2fd; color: #1565c0; }
+    .news-tag.eco      { background: #f3e5f5; color: #6a1b9a; }
+    .news-tag.avatar   { background: #e0f7fa; color: #00838f; }
+    .news-date-text {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    /* ========== NEWS BODY ========== */
+    .news-body {
+      font-size: 16px;
+      line-height: 1.9;
+      color: var(--text-mid);
+    }
+    .news-body p {
+      margin-bottom: 20px;
+    }
+    .news-body p:last-child {
+      margin-bottom: 0;
+    }
+    .news-body strong {
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+
+    /* ========== NEWS IMAGE ========== */
+    .news-featured-img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* ========== RELATED NEWS ========== */
+    .related-section {
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid var(--cream-dark);
+    }
+    .related-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 24px;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .related-card {
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
+    .related-img {
+      height: 140px;
+      background-size: cover;
+      background-position: center;
+    }
+    .related-body {
+      padding: 14px 16px 18px;
+    }
+    .related-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .related-card-date {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--cream);
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    .footer a {
+      color: var(--green-mid);
+    }
+
+    /* ========== LANGUAGE TOGGLE ========== */
+    [lang="zh"] .en-content { display: none; }
+    [lang="en"] .zh-content { display: none; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .related-grid { grid-template-columns: 1fr; }
+      .news-featured-img { height: 200px; }
+      .hero { height: 40vh; min-height: 260px; }
+    }
+  </style>
+</head>
+<body lang="en">
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-icon">🏔️</div>
+      <div class="header-logo-text en-content">Zhangjiajie Park</div>
+      <div class="header-logo-text zh-content">张家界国家森林公园</div>
+    </a>
+    <div class="lang-switch">
+      <button onclick="switchLang('zh')" data-lang="zh">中文</button>
+      <button onclick="switchLang('en')" class="active" data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge" id="heroBadge"></div>
+      <h1 class="hero-title en-content" id="heroTitleEn"></h1>
+      <h1 class="hero-title zh-content" id="heroTitleZh"></h1>
+      <p class="hero-date" id="heroDate"></p>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="content-section">
+    <a href="index.html#news" class="back-link">
+      <span>←</span>
+      <span class="en-content">Back to News</span>
+      <span class="zh-content">返回资讯</span>
+    </a>
+
+    <!-- News Meta -->
+    <div class="news-meta" id="newsMeta">
+      <span class="news-tag" id="newsTag"></span>
+      <span class="news-date-text" id="newsDateText"></span>
+    </div>
+
+    <!-- Featured Image -->
+    <img class="news-featured-img" id="newsFeaturedImg" src="" alt="" />
+
+    <!-- News Body -->
+    <div class="news-body" id="newsBody"></div>
+
+    <!-- Related News -->
+    <div class="related-section">
+      <h3 class="related-title en-content">Related News</h3>
+      <h3 class="related-title zh-content">相关资讯</h3>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>
+      <span class="en-content">© 2024 Zhangjiajie National Forest Park · World Natural Heritage</span>
+      <span class="zh-content">© 2024 张家界国家森林公园 · 世界自然遗产</span>
+    </p>
+  </footer>
+
+  <script defer>
+    // ========== NEWS DATA (同步自 index.html) ==========
+    var newsData = [
+      {
+        date: { day: '13', month: 'MAY', year: '2026' },
+        tag: 'overview',
+        tagText: '基本概况',
+        title: '张家界国家森林公园概况',
+        titleEn: 'Zhangjiajie at a Glance',
+        desc: '位于湖南张家界武陵源，总面积4810公顷，海拔400-1334米，1982年经国务院批准建立为中国首个国家森林公园。',
+        descEn: 'Located in Wulingyuan, Zhangjiajie, Hunan — 4,810 hectares, elevation 400–1,334m, established in 1982 as China\'s first national forest park.',
+        content: '<p>张家界国家森林公园位于湖南省张家界市武陵源区，是中国第一个国家森林公园，也是世界自然遗产、世界地质公园、国家5A级旅游景区。</p><p>公园总面积4810公顷，海拔在400至1334米之间。这里拥有世界上独一无二的石英砂岩峰林地貌，3000余座奇峰拔地而起，形态各异，被誉为"扩大的盆景，缩小的仙境"。</p><p>公园内森林覆盖率高达85.28%，记录有4000余种动植物，其中81种受国家级保护。主要景点包括袁家界、天子山、金鞭溪、黄石寨等，是电影《阿凡达》中"哈利路亚山"的灵感来源地。</p>',
+        contentEn: '<p>Zhangjiajie National Forest Park is located in Wulingyuan District, Zhangjiajie City, Hunan Province. It is China\'s first national forest park, as well as a World Natural Heritage site, World Geopark, and National 5A Tourist Attraction.</p><p>The park covers a total area of 4,810 hectares, with elevations ranging from 400 to 1,334 meters. It features the world\'s unique quartz sandstone pillar formations, with over 3,000 peaks rising abruptly in various shapes, earning it the reputation of "enlarged bonsai, miniature fairyland."</p><p>The forest coverage rate reaches 85.28%, with over 4,000 species of flora and fauna recorded, including 81 nationally protected species. Major attractions include Yuanjiajie, Tianzi Mountain, Jinbian Stream, and Huangshijia. It is the inspiration for the "Hallelujah Mountains" in the movie Avatar.</p>',
+        img: 'assets/images/news-park.jpg'
+      },
+      {
+        date: { day: '11', month: 'MAY', year: '2026' },
+        tag: 'honor',
+        tagText: '荣誉称号',
+        title: '世界级认证与荣誉',
+        titleEn: 'World-Class Recognition',
+        desc: '中国首个国家森林公园（1982）、世界自然遗产（1992）、世界地质公园（2004）、国家5A级景区（2007），四重荣誉加持。',
+        descEn: 'China\'s first national forest park (1982), World Natural Heritage (1992), World Geopark (2004), National 5A scenic spot (2007) — four prestigious designations.',
+        content: '<p>张家界国家森林公园自建立以来，先后获得多项世界级和国家级荣誉认证，成为中国乃至世界自然保护地中的佼佼者。</p><p><strong>1982年</strong> — 经国务院批准，成为中国第一个国家森林公园，开启了中国森林公园建设的新篇章。</p><p><strong>1992年</strong> — 被联合国教科文组织列入《世界自然遗产名录》，以其独特的石英砂岩峰林地貌获得国际认可。</p><p><strong>2004年</strong> — 被联合国教科文组织评为世界地质公园，肯定了其在地质科学研究和保护方面的重要价值。</p><p><strong>2007年</strong> — 被评为国家5A级旅游景区，标志着其旅游服务和管理水平达到国内最高标准。</p>',
+        contentEn: '<p>Since its establishment, Zhangjiajie National Forest Park has received multiple world-class and national honors, becoming a standout among natural protected areas in China and worldwide.</p><p><strong>1982</strong> — Approved by the State Council as China\'s first national forest park, opening a new chapter in China\'s forest park development.</p><p><strong>1992</strong> — Listed in the UNESCO World Natural Heritage名录 for its unique quartz sandstone pillar formations.</p><p><strong>2004</strong> — Designated as a UNESCO Global Geopark, recognizing its significant value in geological research and conservation.</p><p><strong>2007</strong> — Rated as a National 5A Tourist Attraction, marking its tourism service and management at the highest domestic standard.</p>',
+        img: 'assets/images/news-festival.jpg'
+      },
+      {
+        date: { day: '10', month: 'MAY', year: '2026' },
+        tag: 'geo',
+        tagText: '地质奇观',
+        title: '3.8亿年石英砂岩峰林地貌',
+        titleEn: '380 Million Years of Geological Heritage',
+        desc: '拥有3.8亿年历史的石英砂岩峰林地貌，分布着3000余座奇峰与800余条溪流，被誉为"缩小的仙境"。',
+        descEn: '380-million-year-old quartz sandstone pillar formations with 3,000+ peaks and 800+ streams — a paradise in miniature.',
+        content: '<p>张家界的地质奇观形成于约3.8亿年前的泥盆纪时期。当时这里是一片汪洋大海，经过漫长的地质演变，沉积了厚达500多米的石英砂岩。</p><p>在随后的亿万年里，地壳运动使岩层抬升，而流水侵蚀、风化作用则像雕刻师一样，将这片砂岩雕琢成今天看到的奇峰异石。这里的石柱高度从几十米到数百米不等，形态各异，有的如剑指苍穹，有的似人似物。</p><p>公园内分布着800多条溪流，它们穿梭于峰林之间，为这片神奇的土地增添了灵动的气息。金鞭溪、索溪峪等溪流两岸，奇峰倒映，美不胜收。</p>',
+        contentEn: '<p>Zhangjiajie\'s geological wonders formed approximately 380 million years ago during the Devonian period. At that time, this area was covered by a vast ocean. Through long geological evolution, over 500 meters of quartz sandstone were deposited.</p><p>Over the subsequent hundreds of millions of years, crustal movements lifted the rock layers, while water erosion and weathering acted like sculptors, carving the sandstone into the strange peaks and rocks we see today. The stone pillars here range from tens to hundreds of meters in height, with various shapes — some like swords pointing to the sky, others resembling people or objects.</p><p>The park contains over 800 streams that wind through the pillar forests, adding vitality to this magical land. Along streams like Jinbian Stream and Suoxiyu, peaks are reflected in the water, creating breathtaking scenery.</p>',
+        img: 'assets/images/news-cableway.jpg'
+      },
+      {
+        date: { day: '07', month: 'MAY', year: '2026' },
+        tag: 'eco',
+        tagText: '生态数据',
+        title: '森林覆盖率85.28%的天然氧吧',
+        titleEn: '85.28% Forest Coverage — A Natural Oxygen Bar',
+        desc: '园区森林覆盖率高达85.28%，记录有4000余种动植物，其中81种受国家级保护，是真正的生态宝库。',
+        descEn: 'With 85.28% forest coverage, 4,000+ species of flora and fauna, and 81 nationally protected species, the park is a true ecological treasure.',
+        content: '<p>张家界国家森林公园是中国中部地区最重要的生态屏障之一，拥有极为丰富的生物多样性。</p><p>公园内的森林覆盖率高达85.28%，主要植被类型包括亚热带常绿阔叶林、针阔混交林和山顶矮林等。这里是众多珍稀濒危物种的栖息地，记录有高等植物3000余种，脊椎动物400余种。</p><p>其中，受国家级保护的珍稀植物包括珙桐、银杏、伯乐树等；珍稀动物包括大鲵（娃娃鱼）、猕猴、红腹锦鸡等。公园还是许多鸟类的重要迁徙通道和越冬地。</p><p>每年，公园产生大量负氧离子，空气清新，被誉为"天然氧吧"，是养生度假的理想之地。</p>',
+        contentEn: '<p>Zhangjiajie National Forest Park is one of the most important ecological barriers in central China, with extremely rich biodiversity.</p><p>The park\'s forest coverage rate reaches 85.28%, with main vegetation types including subtropical evergreen broad-leaved forests, mixed coniferous and broad-leaved forests, and dwarf forests at mountain tops. It is a habitat for many rare and endangered species, with over 3,000 species of higher plants and over 400 species of vertebrates recorded.</p><p>Nationally protected rare plants include dove tree (Davidia involucrata), ginkgo, and Bretschneidera sinensis. Rare animals include Chinese giant salamander, macaque, and golden pheasant. The park is also an important migration corridor and wintering ground for many bird species.</p><p>The park generates abundant negative oxygen ions year-round, with fresh air that has earned it the nickname "natural oxygen bar" — an ideal place for wellness and vacation.</p>',
+        img: 'assets/images/news-cableway.jpg'
+      },
+      {
+        date: { day: '05', month: 'MAY', year: '2026' },
+        tag: 'avatar',
+        tagText: '阿凡达关联',
+        title: '哈利路亚山的灵感之源',
+        titleEn: 'Where Avatar\'s Floating Mountains Came From',
+        desc: '袁家界景区被认为是电影《阿凡达》中"哈利路亚山"的灵感来源地，中美地质学家共同认可这一自然奇观的独特价值。',
+        descEn: 'Yuanjiajie is widely recognized by Chinese and American geologists as the inspiration for the floating Hallelujah Mountains in Avatar.',
+        content: '<p>2009年，詹姆斯·卡梅隆导演的电影《阿凡达》在全球上映，片中潘多拉星球上悬浮的"哈利路亚山"令观众叹为观止。而这些神奇山峰的灵感，正是来源于张家界国家森林公园的袁家界景区。</p><p>袁家界的"南天一柱"（现更名为"哈利路亚山"）是这一灵感的核心来源。这座石柱高1074米，垂直而立，顶部植被茂密，云雾缭绕时确实给人一种悬浮在空中的错觉。</p><p>中美地质学家共同认可这一自然奇观的独特价值。2010年，张家界正式将"南天一柱"更名为"哈利路亚山"，并设立了阿凡达主题游览线路，吸引了全球无数影迷和游客前来朝圣。</p>',
+        contentEn: '<p>In 2009, James Cameron\'s film Avatar was released worldwide, and the floating "Hallelujah Mountains" on the planet Pandora amazed audiences. The inspiration for these magical peaks came from the Yuanjiajie scenic area in Zhangjiajie National Forest Park.</p><p>The "Pillar of Southern Heaven" (now renamed "Hallelujah Mountain") in Yuanjiajie is the core source of this inspiration. This stone pillar stands 1,074 meters tall, rising vertically with lush vegetation on top. When surrounded by clouds and mist, it truly gives the illusion of floating in mid-air.</p><p>Chinese and American geologists jointly recognize the unique value of this natural wonder. In 2010, Zhangjiajie officially renamed the "Pillar of Southern Heaven" to "Hallelujah Mountain" and established an Avatar-themed tour route, attracting countless fans and tourists from around the world.</p>',
+        img: 'assets/images/news-cableway.jpg'
+      }
+    ];
+
+    // ========== APP STATE ==========
+    var AppState = {
+      currentLang: 'en'
+    };
+
+    // ========== GET NEWS INDEX FROM URL ==========
+    function getNewsIndex() {
+      var params = new URLSearchParams(window.location.search);
+      var id = parseInt(params.get('id'), 10);
+      if (isNaN(id) || id < 0 || id >= newsData.length) {
+        return 0;
+      }
+      return id;
+    }
+
+    // ========== GET CURRENT NEWS DATA ==========
+    function getCurrentNews() {
+      var index = getNewsIndex();
+      return { data: newsData[index], index: index };
+    }
+
+    // ========== SWITCH LANGUAGE ==========
+    function switchLang(lang) {
+      AppState.currentLang = lang;
+      document.body.lang = lang;
+
+      // Update header buttons
+      document.querySelectorAll('.lang-switch button').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      document.querySelector('.lang-switch button[data-lang="' + lang + '"]').classList.add('active');
+
+      // Re-render content
+      renderNewsDetail();
+      renderRelatedNews();
+    }
+
+    // ========== RENDER NEWS DETAIL ==========
+    function renderNewsDetail() {
+      var news = getCurrentNews().data;
+      var isZh = AppState.currentLang === 'zh';
+
+      // Hero background
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + news.img + '\')';
+
+      // Hero badge
+      document.getElementById('heroBadge').textContent = isZh ? news.tagText : news.tag.toUpperCase();
+
+      // Hero title
+      document.getElementById('heroTitleEn').textContent = news.titleEn;
+      document.getElementById('heroTitleZh').textContent = news.title;
+
+      // Hero date
+      var dateStr = news.date.day + ' ' + news.date.month + ' ' + news.date.year;
+      document.getElementById('heroDate').textContent = dateStr;
+
+      // News tag
+      var tagEl = document.getElementById('newsTag');
+      tagEl.textContent = isZh ? news.tagText : news.tag.toUpperCase();
+      tagEl.className = 'news-tag ' + news.tag;
+
+      // News date text
+      document.getElementById('newsDateText').textContent = dateStr;
+
+      // Featured image
+      var imgEl = document.getElementById('newsFeaturedImg');
+      imgEl.src = news.img;
+      imgEl.alt = isZh ? news.title : news.titleEn;
+
+      // News body
+      var bodyHtml = '<div class="en-content">' + (news.contentEn || news.descEn) + '</div>';
+      bodyHtml += '<div class="zh-content">' + (news.content || news.desc) + '</div>';
+      document.getElementById('newsBody').innerHTML = bodyHtml;
+
+      // Page title
+      document.title = (isZh ? news.title : news.titleEn) + ' | Zhangjiajie Park';
+    }
+
+    // ========== RENDER RELATED NEWS ==========
+    function renderRelatedNews() {
+      var current = getCurrentNews();
+      var currentIndex = current.index;
+      var isZh = AppState.currentLang === 'zh';
+      var container = document.getElementById('relatedGrid');
+      var html = '';
+
+      // Show up to 3 related news (excluding current)
+      var count = 0;
+      for (var i = 0; i < newsData.length && count < 3; i++) {
+        if (i === currentIndex) continue;
+        var item = newsData[i];
+        html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
+        html += '<div class="related-img" style="background-image: url(\'' + item.img + '\')"></div>';
+        html += '<div class="related-body">';
+        html += '<h4 class="related-card-title">' + (isZh ? item.title : item.titleEn) + '</h4>';
+        html += '<p class="related-card-date">' + item.date.day + ' ' + item.date.month + ' ' + item.date.year + '</p>';
+        html += '</div></a>';
+        count++;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ========== INITIALIZE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNewsDetail();
+      renderRelatedNews();
+    });
+  </script>
+</body>
+</html>

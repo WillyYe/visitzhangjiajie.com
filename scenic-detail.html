@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Scenic Detail | Zhangjiajie National Forest Park</title>
+  <meta name="description" id="metaDesc" content="Explore Zhangjiajie National Forest Park scenic spots." />
+  <meta name="theme-color" content="#1a4a30" />
+  
+  <!-- Preconnect for Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto Sans+SC:wght@400;500&family=Noto Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+      color: #1a1a1a;
+      background: #fff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ========== COLOR VARIABLES ========== */
+    :root {
+      --green-dark: #0d2b1e;
+      --green-mid: #1a4a30;
+      --green-light: #2d6a4f;
+      --green-accent: #52b788;
+      --gold: #b5882a;
+      --gold-light: #d4a843;
+      --cream: #f7f3ee;
+      --cream-dark: #e8e4de;
+      --text-dark: #1a1a1a;
+      --text-mid: #4a4a4a;
+      --text-light: #888;
+      --white: #fff;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--green-dark);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--white);
+    }
+    .header-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header-logo-text {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .lang-switch {
+      display: flex;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .lang-switch button {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      transition: background 0.2s, color 0.2s;
+    }
+    .lang-switch button.active {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    /* ========== HERO SLIDER ========== */
+    .hero-slider {
+      position: relative;
+      height: 70vh;
+      min-height: 500px;
+      overflow: hidden;
+      background: var(--green-dark);
+    }
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    .hero-slide.active { opacity: 1; }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--white);
+      padding: 0 24px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 700;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .hero-subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      opacity: 0.9;
+      margin-bottom: 16px;
+    }
+    .hero-desc {
+      font-size: 15px;
+      opacity: 0.8;
+      max-width: 600px;
+      line-height: 1.8;
+    }
+
+    /* ========== NAVIGATION ARROWS ========== */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      color: var(--white);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .nav-arrow:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .nav-arrow.prev { left: 32px; }
+    .nav-arrow.next { right: 32px; }
+    .nav-arrow.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .nav-arrow.disabled:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* ========== SCENIC NAVIGATION (between scenic spots) ========== */
+    .scenic-nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1001;
+      width: 60px;
+      height: 80px;
+      border-radius: 12px;
+      background: rgba(13, 43, 30, 0.9);
+      backdrop-filter: blur(8px);
+      color: var(--white);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .scenic-nav-arrow:hover {
+      background: var(--gold);
+      transform: translateY(-50%) scale(1.05);
+    }
+    .scenic-prev { left: 20px; }
+    .scenic-next { right: 20px; }
+    .scenic-nav-arrow.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .scenic-nav-arrow.disabled:hover {
+      background: rgba(13, 43, 30, 0.9);
+      transform: translateY(-50%);
+    }
+    .scenic-nav-arrow span {
+      font-size: 28px;
+    }
+
+    /* ========== SLIDER INDICATOR ========== */
+    .slider-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+    }
+    .indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .indicator-dot.active {
+      background: var(--gold);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    /* ========== CONTENT ========== */
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .lang-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+    .lang-btn {
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      background: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background: var(--green-dark);
+      color: var(--white);
+    }
+
+    /* ========== INFO CARDS ========== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .info-card {
+      background: var(--cream);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.25s;
+    }
+    .info-card:hover {
+      transform: translateY(-4px);
+    }
+    .info-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: var(--text-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--green-dark);
+    }
+
+    /* ========== ATTRACTIONS ========== */
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--cream-dark);
+    }
+    .section p {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 16px;
+    }
+    .attraction-list {
+      list-style: none;
+      margin: 20px 0;
+    }
+    .attraction-list li {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--cream-dark);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .attraction-list li:last-child {
+      border-bottom: none;
+    }
+    .attraction-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--green-light), var(--green-accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .attraction-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 4px;
+    }
+    .attraction-info p {
+      font-size: 13px;
+      color: var(--text-mid);
+      margin-bottom: 0;
+    }
+
+    /* ========== TIPS ========== */
+    .tip-box {
+      background: linear-gradient(135deg, #f0faf4, #e8f5ec);
+      border-left: 4px solid var(--green-accent);
+      padding: 24px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+    }
+    .tip-box h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tip-box ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+    .tip-box li {
+      font-size: 14px;
+      color: var(--text-mid);
+      margin-bottom: 8px;
+    }
+
+    /* ========== CTA ========== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: var(--white);
+      padding: 48px;
+      border-radius: 16px;
+      text-align: center;
+      margin-top: 48px;
+    }
+    .cta-section h3 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .cta-section p {
+      opacity: 0.85;
+      margin-bottom: 24px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--gold);
+      color: var(--white);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    /* ========== BACK LINK ========== */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green-mid);
+      font-size: 14px;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--green-dark);
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--cream);
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    .footer a {
+      color: var(--green-mid);
+    }
+
+    /* ========== LANGUAGE TOGGLE ========== */
+    [lang="zh"] .en-content { display: none; }
+    [lang="en"] .zh-content { display: none; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .nav-arrow {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      .nav-arrow.prev { left: 12px; }
+      .nav-arrow.next { right: 12px; }
+      .scenic-nav-arrow {
+        width: 44px;
+        height: 60px;
+        font-size: 20px;
+      }
+      .scenic-prev { left: 8px; }
+      .scenic-next { right: 8px; }
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-section { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body lang="en">
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-icon">🏔️</div>
+      <div class="header-logo-text en-content">Zhangjiajie Park</div>
+      <div class="header-logo-text zh-content">张家界国家森林公园</div>
+    </a>
+    <div class="lang-switch">
+      <button onclick="switchLang('zh')" data-lang="zh">中文</button>
+      <button onclick="switchLang('en')" class="active" data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <!-- SCENIC NAVIGATION ARROWS (between scenic spots) -->
+  <button class="scenic-nav-arrow scenic-prev" onclick="prevScenic()" id="scenicPrevBtn" title="Previous Scenic">
+    <span>❮</span>
+  </button>
+  <button class="scenic-nav-arrow scenic-next" onclick="nextScenic()" id="scenicNextBtn" title="Next Scenic">
+    <span>❯</span>
+  </button>
+
+  <!-- HERO SLIDER -->
+  <section class="hero-slider" id="heroSlider">
+    <!-- Slides will be rendered by JS -->
+    
+    <!-- Image Navigation Arrows -->
+    <button class="nav-arrow prev" onclick="prevSlide()" id="prevBtn">←</button>
+    <button class="nav-arrow next" onclick="nextSlide()" id="nextBtn">→</button>
+    
+    <!-- Slider Indicator -->
+    <div class="slider-indicator" id="sliderIndicator">
+      <!-- Dots will be rendered by JS -->
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="content-section">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span class="en-content">Back to Park</span>
+      <span class="zh-content">返回首页</span>
+    </a>
+
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="switchLang('en')">English</button>
+      <button class="lang-btn" onclick="switchLang('zh')">中文</button>
+    </div>
+
+    <!-- Dynamic Content -->
+    <div id="scenicContent">
+      <!-- Content will be rendered by JS -->
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h3 class="en-content">Ready to Explore?</h3>
+      <h3 class="zh-content">准备好探索了吗？</h3>
+      <p class="en-content">Plan your perfect Zhangjiajie adventure today</p>
+      <p class="zh-content">立即规划您的张家界之旅</p>
+      <a href="index.html" class="cta-btn en-content">
+        <span>🌲</span> Back to Park
+      </a>
+      <a href="index.html" class="cta-btn zh-content">
+        <span>🌲</span> 返回首页
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>
+      <span class="en-content">© 2024 Zhangjiajie National Forest Park · World Natural Heritage</span>
+      <span class="zh-content">© 2024 张家界国家森林公园 · 世界自然遗产</span>
+    </p>
+  </footer>
+
+  <script defer>
+    // ========== SCENIC DATA ==========
+    var allScenicData = [
+      {
+        id: 'yuanjiajie',
+        images: ['assets/images/yuanjiajie.jpg', 'assets/images/gal-yuanjiajie.jpg', 'assets/images/gal-sunrise.jpg'],
+        tag: 'UNESCO World Heritage',
+        tagZh: 'UNESCO 世界遗产',
+        name: '袁家界',
+        nameZh: 'Yuanjiajie',
+        subTitle: 'Avatar Filming Site',
+        subTitleZh: '阿凡达取景地',
+        desc: 'Yuanjiajie is a naturally formed platform in the northern part of Zhangjiajie National Forest Park. It gained worldwide fame when director James Cameron used the iconic "Southern Sky Pillar" as inspiration for the floating Hallelujah Mountains in Avatar.',
+        descZh: '袁家界是位于张家界国家森林公园北部的一座天然平台。2009年电影《阿凡达》导演詹姆斯·卡梅隆以标志性的"南天一柱"为灵感创造了电影中悬浮的哈里路亚山，使这里闻名于世。',
+        info: [
+          { icon: '🏔️', label: 'Elevation', labelZh: '海拔', value: '1,074m' },
+          { icon: '📍', label: 'Area', labelZh: '面积', value: '1,200 ha' },
+          { icon: '⏱️', label: 'Best Time', labelZh: '最佳时间', value: 'Apr-Oct' },
+          { icon: '🎫', label: 'Ticket', labelZh: '门票', value: 'Included' }
+        ],
+        attractions: [
+          { icon: '🗿', name: 'Southern Sky Pillar', nameZh: '南天一柱', desc: 'The iconic 1,072m quartz sandstone pillar that inspired Avatar', descZh: '高1072米的标志性石英砂岩柱，阿凡达的灵感来源' },
+          { icon: '🌉', name: 'First Bridge Under Heaven', nameZh: '天下第一桥', desc: 'Natural stone bridge between two peaks', descZh: '两峰之间自然形成的石桥' },
+          { icon: '⛩️', name: 'Palace of Heavenly King', nameZh: '天王庙', desc: 'Ancient temple with stunning views', descZh: '古老寺庙，景色宜人' }
+        ],
+        tips: [
+          'Take the Bailong Elevator (world\'s tallest outdoor elevator) to save climbing time',
+          'Visit early morning to avoid crowds and see the sea of clouds',
+          'Wear comfortable hiking shoes as there are many stairs'
+        ],
+        tipsZh: [
+          '乘坐百龙电梯（世界最高的户外电梯）节省攀爬时间',
+          '建议早上去，避开人群，有机会看到云海',
+          '穿舒适的登山鞋，景区台阶较多'
+        ]
+      },
+      {
+        id: 'tianzishan',
+        images: ['assets/images/tianzishan.jpg', 'assets/images/gal-sunrise.jpg', 'assets/images/gal-clouds.jpg'],
+        tag: 'Imperial Brush',
+        tagZh: '天子御笔',
+        name: '天子山',
+        nameZh: 'Tianzi Mountain',
+        subTitle: 'Miniature Fairyland',
+        subTitleZh: '缩小的仙境',
+        desc: 'Tianzi Mountain is named after the legendary Tujia leader Xiang Liu who fought against the heavens. It offers the best panoramic views of Zhangjiajie\'s pillar formations and is famous for its sea of clouds and sunrises.',
+        descZh: '天子山因传说中与天帝作战的土家族英雄向王天子而得名。站在山顶可以欣赏到张家界最壮观的石柱峰林全景，以云海和日出闻名。',
+        info: [
+          { icon: '🏔️', label: 'Elevation', labelZh: '海拔', value: '1,262m' },
+          { icon: '📍', label: 'Location', labelZh: '位置', value: 'North Area' },
+          { icon: '⏱️', label: 'Best Time', labelZh: '最佳时间', value: 'Sunrise' },
+          { icon: '🎫', label: 'Ticket', labelZh: '门票', value: 'Included' }
+        ],
+        attractions: [
+          { icon: '🌅', name: 'Sunrise Platform', nameZh: '日出观景台', desc: 'Best spot to watch sunrise over the sea of clouds', descZh: '观赏云海日出的最佳地点' },
+          { icon: '👑', name: 'Imperial Hat', nameZh: '天子帽', desc: 'Famous peak resembling an emperor\'s hat', descZh: '形似皇帝帽子的标志性山峰' },
+          { icon: '🌊', name: 'Sea of Clouds', nameZh: '云海', desc: 'Magnificent cloud sea views', descZh: '壮观的云海景观' }
+        ],
+        tips: [
+          'Stay at the mountain accommodation for the best sunrise experience',
+          'The cable car provides easy access to the summit',
+          'Bring warm clothes even in summer for early morning visits'
+        ],
+        tipsZh: [
+          '如果想看日出，建议住在山上',
+          '乘坐缆车可以轻松到达山顶',
+          '即使夏天，早上去也要带保暖衣物'
+        ]
+      },
+      {
+        id: 'jinbianxi',
+        images: ['assets/images/jinbianxi.jpg', 'assets/images/gal-stream.jpg', 'assets/images/jinbianxi.jpg'],
+        tag: 'Natural Oxygen Bar',
+        tagZh: '天然氧吧',
+        name: '金鞭溪',
+        nameZh: 'Jinbian Stream',
+        subTitle: '7.5km Hiking Paradise',
+        subTitleZh: '7.5公里徒步胜境',
+        desc: 'Jinbian Stream is a 7.5km pristine waterway winding through towering sandstone peaks. Known as the "Soul of Zhangjiajie" for its peaceful atmosphere and natural beauty.',
+        descZh: '金鞭溪是一条全长7.5公里的原生态溪流，穿行于高耸的砂岩峰林之间。因其宁静的氛围和自然之美，被誉为"张家界之魂"。',
+        info: [
+          { icon: '📏', label: 'Length', labelZh: '长度', value: '7.5km' },
+          { icon: '💧', label: 'Water', labelZh: '水质', value: 'Crystal Clear' },
+          { icon: '🌲', label: 'Forest', labelZh: '森林', value: '95% Coverage' },
+          { icon: '⏱️', label: 'Duration', labelZh: '时长', value: '2-3 hrs' }
+        ],
+        attractions: [
+          { icon: '🏞️', name: 'Ginkgo Ancient Tree', nameZh: '古银杏', desc: '800-year-old ginkgo tree by the stream', descZh: '溪边800年古银杏' },
+          { icon: '🗿', name: 'Three Sisters Peak', nameZh: '三姐妹峰', desc: 'Three peaks standing together', descZh: '三座山峰并立' },
+          { icon: '🦋', name: 'Butterfly Valley', nameZh: '蝴蝶谷', desc: 'Home to many butterfly species', descZh: '众多蝴蝶物种栖息地' }
+        ],
+        tips: [
+          'Start early morning to enjoy the mist and cool air',
+          'Bring water and snacks for the hike',
+          'The path is relatively flat, suitable for all ages'
+        ],
+        tipsZh: [
+          '建议早上去，可以享受晨雾和清凉空气',
+          '带上水和零食以备徒步之需',
+          '路线相对平坦，适合各年龄段'
+        ]
+      },
+      {
+        id: 'huangshijia',
+        images: ['assets/images/gal-yuanjiajie.jpg', 'assets/images/gal-clouds.jpg', 'assets/images/gal-sunrise.jpg'],
+        tag: 'Tujia Culture',
+        tagZh: '土家风情',
+        name: '黄石寨',
+        nameZh: 'Huangshijia',
+        subTitle: 'Essential Zhangjiajie',
+        subTitleZh: '不上黄石寨，枉到张家界',
+        desc: 'Known as "The Eyes of Zhangjiajie", Huangshijia is the largest aerial viewing platform in the park. It offers 360-degree panoramic views of the pillar formations.',
+        descZh: '黄石寨被誉为"张家界之眼"，是公园内最大的凌空观景台。站在这里可以360度全景欣赏石柱峰林。',
+        info: [
+          { icon: '🏔️', label: 'Elevation', labelZh: '海拔', value: '1,200m' },
+          { icon: '👁️', label: 'Views', labelZh: '视野', value: '360° Panoramic' },
+          { icon: '⏱️', label: 'Visit', labelZh: '游览', value: '2-3 hrs' },
+          { icon: '🎫', label: 'Access', labelZh: '交通', value: 'Cable Car' }
+        ],
+        attractions: [
+          { icon: '🌅', name: 'Five Famous Peaks', nameZh: '五指峰', desc: 'Five peaks resembling five fingers', descZh: '五座山峰形似五指' },
+          { icon: '🎭', name: 'Needle Eye Rock', nameZh: '穿针岩', desc: 'Rock with a hole through it', descZh: '中间有洞的奇石' },
+          { icon: '🌳', name: 'Ancient Pine Grove', nameZh: '古松林', desc: 'Century-old pines', descZh: '百年古松' }
+        ],
+        tips: [
+          'Take the cable car up, hike down for different perspectives',
+          'Morning visits offer the best lighting for photos',
+          'The loop trail takes about 2 hours'
+        ],
+        tipsZh: [
+          '建议乘缆车上山，步行下山欣赏不同景色',
+          '早晨拍照光线最好',
+          '环线游览约需2小时'
+        ]
+      },
+      {
+        id: 'silkongqiao',
+        images: ['assets/images/gal-clouds.jpg', 'assets/images/gal-yuanjiajie.jpg', 'assets/images/gal-sunrise.jpg'],
+        tag: 'First Bridge Under Heaven',
+        tagZh: '天下第一桥',
+        name: '天下第一桥',
+        nameZh: 'First Bridge Under Heaven',
+        subTitle: 'Natural Stone Bridge',
+        subTitleZh: '天然石桥奇观',
+        desc: 'The natural stone bridge formed between two towering quartz sandstone peaks stands 387 meters above the valley floor - a geological wonder.',
+        descZh: '两座高耸的石英砂岩峰之间自然形成的石桥，距谷底高约387米——这是大自然的鬼斧神工。',
+        info: [
+          { icon: '🌉', label: 'Height', labelZh: '高度', value: '387m' },
+          { icon: '📏', label: 'Span', labelZh: '跨度', value: '3m wide' },
+          { icon: '🗿', label: 'Type', labelZh: '类型', value: 'Natural' },
+          { icon: '🎫', label: 'Location', labelZh: '位置', value: 'Yuanjiajie' }
+        ],
+        attractions: [
+          { icon: '📸', name: 'Photo Point', nameZh: '最佳摄影点', desc: 'Classic photo opportunity', descZh: '经典拍照点' },
+          { icon: '🌁', name: 'Cloud Bridge', nameZh: '云桥', desc: 'Bridges through clouds', descZh: '穿云而过' },
+          { icon: '🦅', name: 'Eagle Nest', nameZh: '鹰巢', desc: 'Eagles often seen here', descZh: '老鹰常在此盘旋' }
+        ],
+        tips: [
+          'Part of the Yuanjiajie circuit, combine with other attractions',
+          'Watch your step on the narrow bridge',
+          'Best visited in morning for clear views'
+        ],
+        tipsZh: [
+          '属于袁家界环线，可以和其他景点一起游览',
+          '桥面较窄，注意安全',
+          '上午去视野最清晰'
+        ]
+      },
+      {
+        id: 'yongding',
+        images: ['assets/images/gal-culture.jpg', 'assets/images/gal-village.jpg', 'assets/images/gal-culture.jpg'],
+        tag: 'Tujia Ancient Town',
+        tagZh: '土家古镇',
+        name: '永定古城',
+        nameZh: 'Yongding Ancient Town',
+        subTitle: 'Tujia Cultural Center',
+        subTitleZh: '土家族文化中心',
+        desc: 'A well-preserved Tujia ancient town where you can experience authentic Tujia culture, architecture, and traditional customs.',
+        descZh: '保存完好的土家古镇，可以体验正宗的土家族传统文化、建筑风格和民俗风情。',
+        info: [
+          { icon: '🏛️', label: 'History', labelZh: '历史', value: '1,000+ years' },
+          { icon: '🎭', label: 'Culture', labelZh: '文化', value: 'Tujia' },
+          { icon: '🏘️', label: 'Architecture', labelZh: '建筑', value: 'Traditional' },
+          { icon: '🎪', label: 'Events', labelZh: '活动', value: 'Year-round' }
+        ],
+        attractions: [
+          { icon: '🏠', name: 'Diaojia Houses', nameZh: '吊脚楼', desc: 'Traditional stilted houses', descZh: '传统干栏式建筑' },
+          { icon: '🎭', name: 'Tujia Brocade', nameZh: '土家锦', desc: 'Traditional textile art', descZh: '传统织锦艺术' },
+          { icon: '🥘', name: 'Local Cuisine', nameZh: '当地美食', desc: 'Authentic Tujia dishes', descZh: '正宗土家菜肴' }
+        ],
+        tips: [
+          'Visit during festivals for special cultural performances',
+          'Try the local Tujia cuisine - very spicy and flavorful',
+          'Best experienced in the evening when traditional shows start'
+        ],
+        tipsZh: [
+          '节日期间有特别文化表演',
+          '一定要尝尝当地土家菜 - 非常辣但很美味',
+          '晚上传统表演开始时体验最佳'
+        ]
+      },
+      {
+        id: 'shadao',
+        images: ['assets/images/gal-sunrise.jpg', 'assets/images/gal-autumn.jpg', 'assets/images/gal-spring.jpg'],
+        tag: 'Classic Route',
+        tagZh: '精华路线',
+        name: '沙刀沟',
+        nameZh: 'Shadao Valley',
+        subTitle: "Adventurer's Paradise",
+        subTitleZh: '探险者的天堂',
+        desc: 'A dramatic valley with unique landscapes, perfect for adventurous travelers seeking wilderness experiences and off-the-beaten-path scenery.',
+        descZh: '沟壑纵横，景观独特，是喜欢探险的游客必去之地，充满原始森林的神秘感。',
+        info: [
+          { icon: '🗺️', label: 'Length', labelZh: '长度', value: '5km' },
+          { icon: '⚠️', label: 'Difficulty', labelZh: '难度', value: 'Moderate' },
+          { icon: '🌿', label: 'Terrain', labelZh: '地形', value: 'Varied' },
+          { icon: '🦅', label: 'Wildlife', labelZh: '野生动物', value: 'Rich' }
+        ],
+        attractions: [
+          { icon: '🏞️', name: 'Hidden Valley', nameZh: '隐秘山谷', desc: 'Secluded scenic spots', descZh: '隐秘的景点' },
+          { icon: '💧', name: 'Waterfall Trail', nameZh: '瀑布小径', desc: 'Multiple waterfalls', descZh: '多处瀑布' },
+          { icon: '🌲', name: 'Primeval Forest', nameZh: '原始森林', desc: 'Undisturbed nature', descZh: '未受打扰的自然' }
+        ],
+        tips: [
+          'Bring hiking gear and navigation tools',
+          'Go with a local guide for safety',
+          'Start early to maximize daylight hours'
+        ],
+        tipsZh: [
+          '带好徒步装备和导航工具',
+          '建议请当地导游确保安全',
+          '早点出发以获得更多日光时间'
+        ]
+      },
+      {
+        id: 'shuangshiyoupu',
+        images: ['assets/images/gal-spring.jpg', 'assets/images/gal-autumn.jpg', 'assets/images/gal-winter.jpg'],
+        tag: 'Scenic Gallery',
+        tagZh: '山水画廊',
+        name: '双壁映秀',
+        nameZh: 'Twin Peaks',
+        subTitle: 'Facing Peaks',
+        subTitleZh: '两峰对峙奇观',
+        desc: 'Two towering stone peaks facing each other, forming a unique natural gateway. This spot offers perfect photo opportunities.',
+        descZh: '两座笔直的石峰相对而立，形成独特的门户景观，是拍照留念的绝佳地点。',
+        info: [
+          { icon: '📸', label: 'Photo Spot', labelZh: '摄影点', value: 'Best' },
+          { icon: '🗿', label: 'Formation', labelZh: '形成', value: 'Natural' },
+          { icon: '👥', label: 'Crowds', labelZh: '人流', value: 'Moderate' },
+          { icon: '🎫', label: 'Access', labelZh: '交通', value: 'Easy' }
+        ],
+        attractions: [
+          { icon: '📷', name: 'Classic Vista', nameZh: '经典观景点', desc: 'Most photographed spot', descZh: '拍照最多的地方' },
+          { icon: '🌅', name: 'Golden Hour', nameZh: '黄金时段', desc: 'Best light at sunset', descZh: '日落时光线最美' },
+          { icon: '🎨', name: 'Four Seasons', nameZh: '四季变换', desc: 'Different beauty each season', descZh: '每个季节都有不同的美' }
+        ],
+        tips: [
+          'Come during golden hour for the best photos',
+          'The nearby tea house offers great views while resting',
+          'Consider a professional photo service for memories'
+        ],
+        tipsZh: [
+          '黄金时段拍照效果最好',
+          '附近的茶馆可以休息赏景',
+          '可以考虑专业摄影服务留下美好回忆'
+        ]
+      },
+      {
+        id: 'wulongkarst',
+        images: ['assets/images/gal-autumn.jpg', 'assets/images/gal-spring.jpg', 'assets/images/gal-sunrise.jpg'],
+        tag: 'Karst Landscape',
+        tagZh: '喀斯特地貌',
+        name: '武隆溶洞',
+        nameZh: 'Wulong Karst Caves',
+        subTitle: 'Underground Wonderland',
+        subTitleZh: '地下奇幻世界',
+        desc: 'A typical karst cave system featuring diverse stalactites, stalagmites and stone formations. The underground wonderland is breathtaking.',
+        descZh: '典型的喀斯特溶洞景观，洞内石笋、石柱、石花形态万千，地下世界的奇观令人叹为观止。',
+        info: [
+          { icon: '🕳️', label: 'Cave Length', labelZh: '洞穴长度', value: '3km' },
+          { icon: '🌡️', label: 'Temperature', labelZh: '温度', value: '15-18°C' },
+          { icon: '💧', label: 'Underground Lake', labelZh: '地下湖', value: 'Present' },
+          { icon: '🦇', label: 'Wildlife', labelZh: '生物', value: 'Bats' }
+        ],
+        attractions: [
+          { icon: '🗺️', name: 'Three Natural Bridges', nameZh: '天生三桥', desc: 'Three natural karst bridges', descZh: '三座天然喀斯特石桥' },
+          { icon: '🏔️', name: 'Houpeng Dome', nameZh: '后坪冲蚀', desc: 'Erosion formations', descZh: '冲蚀地貌' },
+          { icon: '⚫', name: 'Qianzhai Cave', nameZh: '千尺洞穴', desc: 'Deep underground cave', descZh: '深邃的地下洞穴' }
+        ],
+        tips: [
+          'Wear warm clothes - the cave is always cold',
+          'Book a local guide for the best experience',
+          'Camera flash brings out the cave formations'
+        ],
+        tipsZh: [
+          '穿暖和的衣服 - 洞内常年低温',
+          '请当地导游讲解体验更好',
+          '闪光灯可以照亮洞穴构造'
+        ]
+      },
+      {
+        id: 'tianpingshan',
+        images: ['assets/images/gal-winter.jpg', 'assets/images/gal-autumn.jpg', 'assets/images/gal-sunrise.jpg'],
+        tag: 'Sunrise & Sea of Clouds',
+        tagZh: '云海日出',
+        name: '天平山',
+        nameZh: 'Tianping Mountain',
+        subTitle: 'Best Sunrise Viewpoint',
+        subTitleZh: '观日出最佳点',
+        desc: 'At 1,200 meters elevation, Tianping Mountain is one of the best spots for sunrise views and sea of clouds in Zhangjiajie.',
+        descZh: '天平山海拔1200米，是观赏日出、俯瞰云海的最佳地点之一，视野开阔壮美。',
+        info: [
+          { icon: '🏔️', label: 'Elevation', labelZh: '海拔', value: '1,200m' },
+          { icon: '🌅', label: 'Best For', labelZh: '最佳', value: 'Sunrise' },
+          { icon: '🌊', label: 'Sea of Clouds', labelZh: '云海', value: 'Frequent' },
+          { icon: '🏕️', label: 'Camping', labelZh: '露营', value: 'Available' }
+        ],
+        attractions: [
+          { icon: '🌄', name: 'Sunrise Platform', nameZh: '日出观景台', desc: 'The main sunrise viewing spot', descZh: '主要日出观赏点' },
+          { icon: '⛺', name: 'Stargazing', nameZh: '观星', desc: 'Clear night skies', descZh: '晴朗夜空' },
+          { icon: '🌲', name: 'Forest Trail', nameZh: '森林小道', desc: 'Scenic hiking path', descZh: '风景优美的徒步道' }
+        ],
+        tips: [
+          'Stay overnight for the sunrise - camping available',
+          'Check weather forecast before visiting',
+          'Bring a tripod for long exposure sunrise shots'
+        ],
+        tipsZh: [
+          '如果想看日出可以住一晚，露营也可以',
+          '出发前查看天气预报',
+          '带三脚架拍长曝光日出'
+        ]
+      }
+    ];
+
+    // ========== APP STATE ==========
+    var AppState = {
+      currentLang: 'en',
+      currentSlide: 0
+    };
+
+    // ========== GET SCENIC ID FROM URL ==========
+    function getScenicId() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'yuanjiajie';
+    }
+
+    // ========== GET CURRENT SCENIC DATA ==========
+    function getCurrentScenic() {
+      var id = getScenicId();
+      for (var i = 0; i < allScenicData.length; i++) {
+        if (allScenicData[i].id === id) {
+          return { data: allScenicData[i], index: i };
+        }
+      }
+      return { data: allScenicData[0], index: 0 };
+    }
+
+    // ========== SWITCH LANGUAGE ==========
+    function switchLang(lang) {
+      AppState.currentLang = lang;
+      document.body.lang = lang;
+      
+      // Update header buttons
+      document.querySelectorAll('.lang-switch button').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      document.querySelector('.lang-switch button[data-lang="' + lang + '"]').classList.add('active');
+      
+      // Update page buttons
+      document.querySelectorAll('.lang-toggle .lang-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      document.querySelector('.lang-toggle .lang-btn[onclick="switchLang(\'' + lang + '\')"]').classList.add('active');
+      
+      // Re-render content
+      renderScenicContent();
+    }
+
+    // ========== RENDER HERO SLIDER ==========
+    function renderHeroSlider() {
+      var scenic = getCurrentScenic().data;
+      var slider = document.getElementById('heroSlider');
+      var slidesHtml = '';
+      
+      scenic.images.forEach(function(img, index) {
+        slidesHtml += '<div class="hero-slide' + (index === 0 ? ' active' : '') + '">';
+        slidesHtml += '<div class="hero-bg" style="background-image: url(\'' + img + '\')"></div>';
+        slidesHtml += '<div class="hero-overlay"></div>';
+        slidesHtml += '<div class="hero-content">';
+        slidesHtml += '<div class="hero-badge">' + scenic.tag + '</div>';
+        slidesHtml += '<h1 class="hero-title en-content">' + scenic.name + '</h1>';
+        slidesHtml += '<h1 class="hero-title zh-content">' + scenic.nameZh + '</h1>';
+        slidesHtml += '<p class="hero-subtitle en-content">' + scenic.subTitle + '</p>';
+        slidesHtml += '<p class="hero-subtitle zh-content">' + scenic.subTitleZh + '</p>';
+        slidesHtml += '<p class="hero-desc en-content">' + scenic.desc.substring(0, 150) + '...</p>';
+        slidesHtml += '<p class="hero-desc zh-content">' + scenic.descZh.substring(0, 100) + '...</p>';
+        slidesHtml += '</div></div>';
+      });
+      
+      // Insert slides before navigation arrows
+      var prevBtn = document.getElementById('prevBtn');
+      prevBtn.insertAdjacentHTML('beforebegin', slidesHtml);
+      
+      // Update page title and meta
+      document.title = scenic.name + ' | Zhangjiajie Park';
+      
+      // Render indicator dots
+      renderSliderIndicator();
+      updateNavButtons();
+    }
+
+    // ========== RENDER SLIDER INDICATOR ==========
+    function renderSliderIndicator() {
+      var scenic = getCurrentScenic().data;
+      var indicator = document.getElementById('sliderIndicator');
+      var dotsHtml = '';
+      
+      scenic.images.forEach(function(img, index) {
+        dotsHtml += '<button class="indicator-dot' + (index === 0 ? ' active' : '') + '" onclick="goToSlide(' + index + ')"></button>';
+      });
+      
+      indicator.innerHTML = dotsHtml;
+    }
+
+    // ========== SLIDE NAVIGATION ==========
+    function goToSlide(index) {
+      var slides = document.querySelectorAll('.hero-slide');
+      var dots = document.querySelectorAll('.indicator-dot');
+      var scenic = getCurrentScenic().data;
+      
+      // Bounds check
+      if (index < 0 || index >= slides.length) return;
+      
+      // Update active states
+      slides[AppState.currentSlide].classList.remove('active');
+      dots[AppState.currentSlide].classList.remove('active');
+      
+      AppState.currentSlide = index;
+      
+      slides[AppState.currentSlide].classList.add('active');
+      dots[AppState.currentSlide].classList.add('active');
+      
+      updateNavButtons();
+    }
+
+    function prevSlide() {
+      var slides = document.querySelectorAll('.hero-slide');
+      goToSlide(AppState.currentSlide - 1);
+    }
+
+    function nextSlide() {
+      var slides = document.querySelectorAll('.hero-slide');
+      goToSlide(AppState.currentSlide + 1);
+    }
+
+    function updateNavButtons() {
+      var slides = document.querySelectorAll('.hero-slide');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+      
+      prevBtn.classList.toggle('disabled', AppState.currentSlide === 0);
+      nextBtn.classList.toggle('disabled', AppState.currentSlide === slides.length - 1);
+      
+      // Update scenic navigation buttons
+      var currentScenicInfo = getCurrentScenic();
+      var scenicPrevBtn = document.getElementById('scenicPrevBtn');
+      var scenicNextBtn = document.getElementById('scenicNextBtn');
+      
+      scenicPrevBtn.classList.toggle('disabled', currentScenicInfo.index === 0);
+      scenicNextBtn.classList.toggle('disabled', currentScenicInfo.index === allScenicData.length - 1);
+    }
+
+    // ========== SCENIC NAVIGATION (between different scenic spots) ==========
+    function prevScenic() {
+      var currentScenicInfo = getCurrentScenic();
+      if (currentScenicInfo.index > 0) {
+        var prevScenicId = allScenicData[currentScenicInfo.index - 1].id;
+        window.location.href = 'scenic-detail.html?id=' + prevScenicId;
+      }
+    }
+
+    function nextScenic() {
+      var currentScenicInfo = getCurrentScenic();
+      if (currentScenicInfo.index < allScenicData.length - 1) {
+        var nextScenicId = allScenicData[currentScenicInfo.index + 1].id;
+        window.location.href = 'scenic-detail.html?id=' + nextScenicId;
+      }
+    }
+
+    // ========== RENDER SCENIC CONTENT ==========
+    function renderScenicContent() {
+      var scenic = getCurrentScenic().data;
+      var isZh = AppState.currentLang === 'zh';
+      var container = document.getElementById('scenicContent');
+      
+      // Info cards
+      var infoHtml = '<div class="info-grid">';
+      scenic.info.forEach(function(item) {
+        infoHtml += '<div class="info-card">';
+        infoHtml += '<div class="info-icon">' + item.icon + '</div>';
+        infoHtml += '<div class="info-label en-content">' + item.label + '</div>';
+        infoHtml += '<div class="info-label zh-content">' + item.labelZh + '</div>';
+        infoHtml += '<div class="info-value">' + item.value + '</div>';
+        infoHtml += '</div>';
+      });
+      infoHtml += '</div>';
+      
+      // Description
+      var descHtml = '<div class="section">';
+      descHtml += '<h2 class="section-title en-content">About ' + scenic.name + '</h2>';
+      descHtml += '<h2 class="section-title zh-content">关于 ' + scenic.nameZh + '</h2>';
+      descHtml += '<p class="en-content">' + scenic.desc + '</p>';
+      descHtml += '<p class="zh-content">' + scenic.descZh + '</p>';
+      descHtml += '</div>';
+      
+      // Attractions
+      var attractionsHtml = '<div class="section">';
+      attractionsHtml += '<h2 class="section-title en-content">Key Attractions</h2>';
+      attractionsHtml += '<h2 class="section-title zh-content">主要景点</h2>';
+      attractionsHtml += '<ul class="attraction-list">';
+      scenic.attractions.forEach(function(attr) {
+        attractionsHtml += '<li>';
+        attractionsHtml += '<div class="attraction-icon">' + attr.icon + '</div>';
+        attractionsHtml += '<div class="attraction-info">';
+        attractionsHtml += '<h4 class="en-content">' + attr.name + '</h4>';
+        attractionsHtml += '<h4 class="zh-content">' + attr.nameZh + '</h4>';
+        attractionsHtml += '<p class="en-content">' + attr.desc + '</p>';
+        attractionsHtml += '<p class="zh-content">' + attr.descZh + '</p>';
+        attractionsHtml += '</div></li>';
+      });
+      attractionsHtml += '</ul></div>';
+      
+      // Tips
+      var tipsHtml = '<div class="tip-box">';
+      tipsHtml += '<h4>' + (isZh ? '💡 游览贴士' : '💡 Travel Tips') + '</h4>';
+      tipsHtml += '<ul>';
+      scenic.tips.forEach(function(tip) {
+        tipsHtml += '<li class="en-content">' + tip + '</li>';
+      });
+      scenic.tipsZh.forEach(function(tip) {
+        tipsHtml += '<li class="zh-content">' + tip + '</li>';
+      });
+      tipsHtml += '</ul></div>';
+      
+      container.innerHTML = infoHtml + descHtml + attractionsHtml + tipsHtml;
+    }
+
+    // ========== INITIALIZE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      renderHeroSlider();
+      renderScenicContent();
+    });
+  </script>
+</body>
+</html>

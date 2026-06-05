@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yuanjiajie · Avatar Hallelujah Mountain | Zhangjiajie National Forest Park</title>
+  <meta name="description" content="Explore Yuanjiajie - the real-world inspiration for Avatar's Hallelujah Mountain. Learn about the quartz sandstone pillars, "Southern Sky Pillar", and classic attractions like First Bridge Under Heaven." />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter','Noto Sans SC',sans-serif;color:#1a1a1a;background:#fff;-webkit-font-smoothing:antialiased}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--green-dark,#0d2b1e);color:#fff;border-radius:8px;font-size:14px;transition:background .2s}
+    .back-btn:hover{background:#1a4a30}
+    .detail-hero{height:60vh;min-height:400px;background:url('../assets/images/yuanjiajie.jpg') center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;position:relative;overflow:hidden}
+    .detail-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23fff' opacity='0.03' x='0' y='20' width='20' height='80'/%3E%3Crect fill='%23fff' opacity='0.03' x='30' y='10' width='15' height='90'/%3E%3Crect fill='%23fff' opacity='0.03' x='55' y='25' width='25' height='75'/%3E%3Crect fill='%23fff' opacity='0.03' x='85' y='5' width='15' height='95'/%3E%3C/svg%3E");background-size:100px}
+    .detail-hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:3px;margin-bottom:12px;text-shadow:0 2px 20px rgba(0,0,0,0.3)}
+    .detail-hero p{font-size:16px;opacity:0.85;max-width:600px;line-height:1.7}
+    .detail-hero .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:20px;font-size:12px;margin-bottom:20px;letter-spacing:2px}
+    .container{max-width:960px;margin:0 auto;padding:60px 24px}
+    .lang-toggle{display:flex;gap:8px;margin-bottom:40px}
+    .lang-btn{padding:8px 16px;border-radius:20px;font-size:13px;background:#f0f0f0;border:none;cursor:pointer;transition:all .2s}
+    .lang-btn.active{background:#0d2b1e;color:#fff}
+    .section{margin-bottom:48px}
+    .section h2{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:600;color:#0d2b1e;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #e0dbd4}
+    .section p{font-size:15px;color:#4a4a4a;line-height:1.9;margin-bottom:16px}
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0}
+    .info-card{background:#f7f3ee;padding:20px;border-radius:12px;text-align:center}
+    .info-card .info-icon{font-size:28px;margin-bottom:8px}
+    .info-card .info-label{font-size:12px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+    .info-card .info-value{font-size:16px;font-weight:500;color:#0d2b1e}
+    .attraction-list{list-style:none;margin:20px 0}
+    .attraction-list li{padding:16px 0;border-bottom:1px solid #e0dbd4;display:flex;gap:16px;align-items:flex-start}
+    .attraction-list li:last-child{border-bottom:none}
+    .attraction-icon{width:48px;height:48px;background:#f0faf4;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .attraction-info h4{font-size:16px;font-weight:600;color:#0d2b1e;margin-bottom:4px}
+    .attraction-info p{font-size:13px;color:#4a4a4a;line-height:1.6}
+    .tip-box{background:#f0faf4;border-left:4px solid #2d6a4f;padding:20px;border-radius:0 12px 12px 0;margin:24px 0}
+    .tip-box h4{font-size:14px;font-weight:600;color:#2d6a4f;margin-bottom:8px}
+    .tip-box p{font-size:14px;color:#4a4a4a;margin-bottom:0}
+    .tip-box ul{margin:12px 0 0;padding-left:20px}
+    .tip-box li{font-size:14px;color:#4a4a4a;margin-bottom:6px}
+    .cta-section{background:linear-gradient(135deg,#0d2b1e,#1a4a30);color:#fff;padding:48px;border-radius:16px;text-align:center;margin-top:48px}
+    .cta-section h3{font-family:'Noto Serif SC',serif;font-size:22px;margin-bottom:12px}
+    .cta-section p{opacity:0.85;margin-bottom:24px}
+    .cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#b5882a;color:#fff;border-radius:8px;font-size:15px;font-weight:500;transition:background .2s,transform .2s}
+    .cta-btn:hover{background:#d4a843;transform:translateY(-2px)}
+    [lang="zh"] .en-content{display:none}
+    [lang="en"] .zh-content{display:none}
+    .footer{padding:40px 24px;text-align:center;background:#f7f3ee;font-size:13px;color:#888}
+    .footer a{color:#2d6a4f}
+  </style>
+</head>
+<body lang="en">
+  <div class="container" style="padding-top:40px">
+    <a href="index.html" class="back-btn" data-i18n="back">← Back to Park</a>
+  </div>
+
+  <div class="detail-hero">
+    <div>
+      <div class="hero-badge">⭐ UNESCO World Heritage</div>
+      <h1 class="en-content">Yuanjiajie · Avatar Hallelujah Mountain</h1>
+      <h1 class="zh-content">袁家界 · 阿凡达取景地</h1>
+      <p class="en-content">The real-world inspiration for Pandora's floating mountains in Avatar. Discover mist-wrapped quartz pillars that defy imagination.</p>
+      <p class="zh-content">电影《阿凡达》中潘多拉星球悬浮山的原型。探索云雾缭绕、宛如仙境的石英砂岩奇峰。</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="switchDetailLang('en')">English</button>
+      <button class="lang-btn" onclick="switchDetailLang('zh')">中文</button>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">About Yuanjiajie</h2>
+      <h2 class="zh-content">景区简介</h2>
+      <p class="en-content">Yuanjiajie is a naturally formed platform located in the northern part of Zhangjiajie National Forest Park. Covering approximately 1,200 hectares at an average elevation of 1,074 meters, it sits among the most spectacular quartz sandstone pillar formations in the world. The area was named after the legendary story of Yuanjia, a leader of a peasant uprising during the late Ming Dynasty.</p>
+      <p class="zh-content">袁家界是位于张家界国家森林公园北部的一座天然平台。面积约1200公顷，平均海拔1074米，拥有世界上最壮观的石英砂岩峰林地貌之一。景区因明代农民起义领袖袁家而得名。</p>
+      <p class="en-content">Yuanjiajie gained worldwide fame when director James Cameron visited the area and used the iconic "Southern Sky Pillar" (Nan Tian Yi Zhu) as the inspiration for the floating Hallelujah Mountains in his 2009 film Avatar. Today, this remarkable geological formation draws visitors from around the globe.</p>
+      <p class="zh-content">袁家界因2009年电影《阿凡达》导演詹姆斯·卡梅隆来访，以标志性的"南天一柱"为灵感创造了电影中悬浮的哈里路亚山而闻名于世。如今，这处独特的地质奇观吸引着来自世界各地的游客。</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">🏔️</div>
+        <div class="info-label en-content">Elevation</div>
+        <div class="info-label zh-content">海拔</div>
+        <div class="info-value">1,074m</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <div class="info-label en-content">Area</div>
+        <div class="info-label zh-content">面积</div>
+        <div class="info-value">1,200 ha</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">⏱️</div>
+        <div class="info-label en-content">Best Visit Time</div>
+        <div class="info-label zh-content">最佳游览时间</div>
+        <div class="info-value en-content">4-10 months</div>
+        <div class="info-value zh-content">4-10月</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">⭐</div>
+        <div class="info-label en-content">Rating</div>
+        <div class="info-label zh-content">评分</div>
+        <div class="info-value">★★★★★</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">Must-See Attractions</h2>
+      <h2 class="zh-content">必游景点</h2>
+      <ul class="attraction-list">
+        <li>
+          <div class="attraction-icon">🌟</div>
+          <div class="attraction-info">
+            <h4 class="en-content">First Bridge Under Heaven (天下第一桥)</h4>
+            <h4 class="zh-content">天下第一桥</h4>
+            <p class="en-content">A natural stone arch bridge spanning 357 meters between two peaks. Standing 400 meters above the valley floor, it's one of the most spectacular natural bridges in the world.</p>
+            <p class="zh-content">两峰之间跨度357米的天然石桥，距谷底400米，是世界上最壮观的天然石桥之一。</p>
+          </div>
+        </li>
+        <li>
+          <div class="attraction-icon">🎭</div>
+          <div class="attraction-info">
+            <h4 class="en-content">Soul Challenging Platform (迷魂台)</h4>
+            <h4 class="zh-content">迷魂台</h4>
+            <p class="en-content">A dramatic viewing platform offering panoramic views of thousands of stone pillars. The mesmerizing scenery is said to captivate visitors' souls.</p>
+            <p class="zh-content">提供千峰全景的观景平台，壮观的景色据说能令人"着迷"。</p>
+          </div>
+        </li>
+        <li>
+          <div class="attraction-icon">🌳</div>
+          <div class="attraction-info">
+            <h4 class="en-content">Back Garden (后花园)</h4>
+            <h4 class="zh-content">后花园</h4>
+            <p class="en-content">A hidden valley filled with exotic plants and secluded paths. Perfect for nature lovers seeking tranquility away from crowds.</p>
+            <p class="zh-content">遍布奇花异草和幽静小径的隐秘山谷，是亲近自然的理想之地。</p>
+          </div>
+        </li>
+        <li>
+          <div class="attraction-icon">🏔️</div>
+          <div class="attraction-info">
+            <h4 class="en-content">Avatar Hallelujah Mountain (乾坤柱)</h4>
+            <h4 class="zh-content">乾坤柱（南天一柱）</h4>
+            <p class="en-content">The iconic 1,089-meter pillar that inspired Avatar's floating mountains. Look up to witness nature's architectural masterpiece.</p>
+            <p class="zh-content">高1089米的标志性石柱，阿凡达悬浮山的灵感来源。仰望这座自然的建筑杰作。</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tip-box">
+      <h4 class="en-content">💡 Travel Tips</h4>
+      <h4 class="zh-content">💡 游览贴士</h4>
+      <ul class="en-content">
+        <li>Take the Bailong Elevator (百龙天梯) for stunning aerial views - the world's highest outdoor elevator at 326 meters</li>
+        <li>Visit early morning (6:30-8:00) to avoid crowds and catch the sea of clouds</li>
+        <li>Wear comfortable hiking shoes as there are many stairs</li>
+        <li>The area is often shrouded in mist - bring a rain jacket even on sunny days</li>
+      </ul>
+      <ul class="zh-content">
+        <li>乘坐百龙天梯（世界最高户外电梯，高326米）欣赏壮丽空中景观</li>
+        <li>建议早起到达（6:30-8:00），可避开人流并观赏云海</li>
+        <li>穿着舒适的登山鞋，景区内台阶较多</li>
+        <li>山区常云雾缭绕，即使晴天也建议带雨具</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="en-content">How to Get Here</h2>
+      <h2 class="zh-content">交通方式</h2>
+      <p class="en-content">The most popular route to Yuanjiajie is via the Bailong Elevator (百龙天梯) from Wulingyuan Entrance. This 326-meter glass elevator ascends the cliff face in just 1 minute, offering breathtaking views of the pillar formations below.</p>
+      <p class="zh-content">前往袁家界最便捷的方式是从武陵源入口乘坐百龙天梯。这座326米的玻璃电梯仅需1分钟即可攀升悬崖，沿途欣赏下方壮观的石柱群。</p>
+    </div>
+
+    <div class="cta-section">
+      <h3 class="en-content">Ready to Explore Yuanjiajie?</h3>
+      <h3 class="zh-content">准备好探索袁家界了吗？</h3>
+      <p class="en-content">Plan your visit to this unforgettable natural wonder.</p>
+      <p class="zh-content">规划您的袁家界之旅，探索这片难忘的自然奇观。</p>
+      <a href="index.html" class="cta-btn en-content">← Back to Park Homepage</a>
+      <a href="index.html" class="cta-btn zh-content">← 返回公园首页</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 Zhangjiajie National Forest Park | 张家界国家森林公园</p>
+    <p><a href="index.html" data-i18n="footer_home">Home</a> · <a href="jinbianxi.html" data-i18n="footer_jinbian">Golden Whip Stream</a> · <a href="tianzishan.html" data-i18n="footer_tianzi">Tianzi Mountain</a></p>
+  </footer>
+
+  <script defer>
+    function switchDetailLang(lang) {
+      document.body.lang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.remove('active');
+        if(btn.textContent.toLowerCase().includes(lang === 'en' ? 'english' : '中文')) {
+          btn.classList.add('active');
+        }
+      });
+      document.querySelectorAll('.en-content, .zh-content').forEach(function(el){
+        if(lang === 'en') {
+          el.style.display = el.classList.contains('en-content') ? '' : 'none';
+        } else {
+          el.style.display = el.classList.contains('zh-content') ? '' : 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
