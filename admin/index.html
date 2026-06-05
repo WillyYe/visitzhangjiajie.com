@@ -112,6 +112,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .hero-card .hero-actions .btn-delete { color: #ef5350; border-color: #ef5350; }
 .hero-card .hero-actions .btn-delete:hover { background: #ffebee; }
 .hero-card .hero-actions .btn-delete:disabled { color: #ccc; border-color: #ddd; cursor: not-allowed; background: #f5f5f5; }
+.hero-card .hero-actions .btn-edit { color: #2196f3; border-color: #2196f3; }
+.hero-card .hero-actions .btn-edit:hover { background: #e3f2fd; }
 .hero-limit-hint { font-size: 12px; color: var(--text-light); margin-top: 8px; }
 .hero-add-card { display: flex; align-items: center; justify-content: center; min-height: 340px; border: 2px dashed var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; color: var(--text-light); font-size: 14px; flex-direction: column; gap: 8px; }
 .hero-add-card:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-light); }
@@ -377,10 +379,11 @@ function renderHero() {
 
   // Existing cards
   heroData.slides.forEach(function(s, i) {
+    var hasImg = s.img && s.img.trim();
     h += '<div class="hero-card">' +
       '<div class="hero-img-wrap">' +
-        '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' +
-        '<div class="hero-img-placeholder" style="display:none"><span style="font-size:14px;text-align:center;line-height:1.4">图片未上传<br><span style="font-size:11px;color:#aaa">点击下方「替换图片」上传</span></span></div>' +
+        (hasImg ? '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' : '') +
+        '<div class="hero-img-placeholder" style="' + (hasImg ? 'display:none' : 'display:flex') + '"><span style="font-size:14px;text-align:center;line-height:1.4">图片未上传<br><span style="font-size:11px;color:#aaa">点击下方「替换图片」上传</span></span></div>' +
       '</div>' +
       '<div class="hero-body">' +
         '<div class="hero-idx">Slide #' + (i+1) + '</div>' +
@@ -388,8 +391,9 @@ function renderHero() {
         '<div class="hero-subtitle">' + esc(s.subtitle || '(未设置副标题)') + '</div>' +
       '</div>' +
       '<div class="hero-actions">' +
+        '<button class="btn-edit" onclick="openHeroModal('+i+')">✏️ 编辑</button>' +
         '<button class="btn-replace" onclick="replaceHeroImage('+i+')">🔄 替换图片</button>' +
-        '<button class="btn-delete" onclick="deleteHero('+i+')" ' + (count < 3 ? 'disabled title="至少保留 3 张"' : '') + '>🗑️ 删除</button>' +
+        '<button class="btn-delete" onclick="deleteHero('+i+')" ' + (count <= 3 ? 'disabled title="至少保留 3 张"' : '') + '>🗑️ 删除</button>' +
       '</div>' +
     '</div>';
   });
@@ -413,7 +417,6 @@ function renderHero() {
 
 // ==================== HERO IMAGE REPLACE ====================
 function replaceHeroImage(idx) {
-  editingIndex = idx;
   var fi = document.getElementById('fileInput');
   pendingUploads._targetInput = null; // direct replace, no modal input
   fi.onchange = function() {
@@ -428,6 +431,7 @@ function replaceHeroImage(idx) {
       directHeroUpload(path, base64, file.name, idx);
     });
   };
+  fi.value = '';
   fi.click();
 }
 
@@ -621,7 +625,7 @@ function updateGallery(i) {
 }
 function deleteGallery(i) { if(confirm('确定删除此图片吗？')){galleryData.splice(i,1); renderGallery(); renderDashboard(); showToast('已删除','success');} }
 
-// --- Hero Modal (only for adding new) ---
+// --- Hero Modal (add or edit) ---
 function openHeroModal(idx) {
   // If called from "add card", idx is undefined → new slide
   // If called from edit (legacy), idx is the slide index
@@ -637,13 +641,15 @@ function openHeroModal(idx) {
 function saveHero() {
   var count = heroData.slides.length;
   if (editingIndex < 0 && count >= 6) { showToast('已达上限 6 张！','error'); return; }
-  var obj = {img:document.getElementById(modalImgId).value,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
+  var imgPath = document.getElementById(modalImgId).value.trim();
+  if (!imgPath) { showToast('请上传或填写图片路径','error'); return; }
+  var obj = {img:imgPath,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
   if (editingIndex >= 0) heroData.slides[editingIndex] = obj; else heroData.slides.push(obj);
   closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
 }
 function deleteHero(i) {
-  if (heroData.slides.length < 3) { showToast('至少保留 3 张 Hero 图片，不可删除','error'); return; }
-  if (confirm('确定删除 Slide #'+(i+1)+' "'+heroData.slides[i].title+'" 吗？')) {
+  if (heroData.slides.length <= 3) { showToast('至少保留 3 张 Hero 图片，不可删除','error'); return; }
+  if (confirm('确定删除 Slide #'+(i+1)+' "'+esc(heroData.slides[i].title)+'" 吗？')) {
     heroData.slides.splice(i,1); renderHero(); renderDashboard(); showToast('已删除 ✅ 点击同步按钮更新网页','success');
   }
 }
@@ -654,11 +660,11 @@ function saveHeroToGitHub() {
   var content = JSON.stringify(heroData, null, 2);
   var path = 'data/hero.json';
 
-  ghFetch(path, 'GET').then(function(r){return r.json()}).then(function(fileInfo) {
+  ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
     return ghFetch(path, 'PUT', {
-      content: btoa(unescape(encodeURIComponent(content))),
+      content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
       message: 'Admin: Update hero.json',
-      sha: fileInfo.sha
+      sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
     });
   }).then(function(r){
     if (r.ok) { showToast('Hero 已同步到 GitHub！页面将在几分钟内更新 🎉','success'); }
@@ -680,11 +686,11 @@ function saveAllToGitHub() {
 
   showToast('正在保存到 GitHub...','');
   var promises = Object.keys(files).map(function(path) {
-    return ghFetch(path, 'GET').then(function(r){return r.json()}).then(function(fileInfo) {
+    return ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
       return ghFetch(path, 'PUT', {
-        content: btoa(unescape(encodeURIComponent(files[path]))),
+        content: btoa(Array.from(new TextEncoder().encode(files[path]), function(b){ return String.fromCharCode(b); }).join('')),
         message: 'Admin: Update '+path,
-        sha: fileInfo.sha
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
       });
     });
   });
@@ -792,13 +798,14 @@ function triggerUpload(inputId) {
       compressImage(file, 1920, 0.85, function(base64, compressedSize) {
         var newSize = (compressedSize / 1024 / 1024).toFixed(1);
         animateProgress(inputId, 15, 30, 200, '压缩完成', origSize + 'MB → ' + newSize + 'MB (压缩 ' + Math.round((1 - compressedSize/file.size)*100) + '%)', function(){
-          var cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
+          var cleanName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
           var path = 'assets/images/' + cleanName;
           uploadToGitHub(path, base64, file.name, inputId);
         });
       });
     });
   };
+  fi.value = '';
   fi.click();
 }
 
@@ -902,7 +909,10 @@ function changePassword() {
 }
 
 // ==================== INIT ====================
+var appInitialized = false;
 function initApp() {
+  if (appInitialized) return;
+  appInitialized = true;
   loadAllData().then(function() {
     renderDashboard();
     renderNews();
