@@ -49,6 +49,7 @@
     "transport_train_desc": "张家界站和张家界西站（高铁站），距景区约20公里，打车约¥60-80",
     "transport_bus_desc": "张家界汽车站直达景区，约40分钟，票价约¥15",
     "transport_car_desc": "导航至张家界国家森林公园门票站，景区有停车场，停车费约¥20/天"
+  },
   "en": {
     "park_full_name": "Zhangjiajie National Forest Park",
     "park_subtitle": "China's First National Forest Park · UNESCO World Heritage",
@@ -99,4 +100,5 @@
     "transport_train_desc": "Zhangjiajie Station & West Station (high-speed), 20km to park. Taxi: ¥60-80. Show driver: 张家界国家森林公园",
     "transport_bus_desc": "Direct bus from Zhangjiajie Bus Station, ~40 min, ¥15. Show driver: 国家森林公园",
     "transport_car_desc": "Navigate to Zhangjiajie National Forest Park Ticket Station. Parking: ~¥20/day. GPS: 29.3256, 110.4348"
+  }
 }

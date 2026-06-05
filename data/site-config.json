@@ -1,0 +1,22 @@
+{
+  "siteName": "Zhangjiajie National Forest Park",
+  "siteTagline": "World Natural Heritage — A Miniature Fairyland",
+  "logo": "assets/images/logo.png",
+  "contactEmail": "zjjpark@outlook.com",
+  "socialLinks": {},
+  "meta": {
+    "title": "Zhangjiajie National Forest Park — Official Website",
+    "description": "Official website of Zhangjiajie National Forest Park. Discover the World Natural Heritage site that inspired Avatar's floating mountains."
+  },
+  "footer": {
+    "copyright": "© 2024 Zhangjiajie National Forest Park",
+    "privacyUrl": "#privacy",
+    "termsUrl": "#terms",
+    "icp": "ICP"
+  },
+  "infoBar": {
+    "ticket": "¥228 / Person",
+    "openingHours": "07:00 – 18:00",
+    "location": "Wulingyuan, Zhangjiajie, Hunan"
+  }
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "yuanjiajie",
+    "href": "scenic-detail.html?id=yuanjiajie",
+    "img": "assets/images/yuanjiajie.jpg",
+    "large": true,
+    "tagEn": "UNESCO World Heritage",
+    "nameEn": "Yuanjiajie",
+    "subTitleEn": "Avatar Filming Site",
+    "descEn": "The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical."
+  },
+  {
+    "id": "tianzishan",
+    "href": "scenic-detail.html?id=tianzishan",
+    "img": "assets/images/tianzishan.jpg",
+    "large": false,
+    "tagEn": "Imperial Brush",
+    "nameEn": "Tianzi Mountain",
+    "subTitleEn": "Miniature Fairyland",
+    "descEn": "Famous from Avatar, known as the \"Miniature Fairyland\". Spectacular sunrise and sea of clouds."
+  },
+  {
+    "id": "jinbianxi",
+    "href": "scenic-detail.html?id=jinbianxi",
+    "img": "assets/images/jinbianxi.jpg",
+    "large": false,
+    "tagEn": "Natural Oxygen Bar",
+    "nameEn": "Jinbian Stream",
+    "subTitleEn": "7.5km Hiking Paradise",
+    "descEn": "7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park."
+  },
+  {
+    "id": "huangshijia",
+    "href": "scenic-detail.html?id=huangshijia",
+    "img": "assets/images/gal-yuanjiajie.jpg",
+    "large": false,
+    "tagEn": "Tujia Culture",
+    "nameEn": "Huangshijia",
+    "subTitleEn": "Essential Zhangjiajie",
+    "descEn": "Legend says Zhang Liang cultivated here. The largest aerial viewing platform in the park."
+  },
+  {
+    "id": "silkongqiao",
+    "href": "scenic-detail.html?id=silkongqiao",
+    "img": "assets/images/gal-clouds.jpg",
+    "large": false,
+    "tagEn": "First Bridge Under Heaven",
+    "nameEn": "First Bridge Under Heaven",
+    "subTitleEn": "Natural Stone Bridge",
+    "descEn": "A natural stone bridge formed between two peaks, standing 387m above the valley floor."
+  },
+  {
+    "id": "yongding",
+    "href": "scenic-detail.html?id=yongding",
+    "img": "assets/images/gal-culture.jpg",
+    "large": false,
+    "tagEn": "Tujia Ancient Town",
+    "nameEn": "Yongding Ancient Town",
+    "subTitleEn": "Tujia Cultural Center",
+    "descEn": "A well-preserved Tujia ancient town with traditional culture, architecture and folk customs."
+  },
+  {
+    "id": "shadao",
+    "href": "scenic-detail.html?id=shadao",
+    "img": "assets/images/gal-sunrise.jpg",
+    "large": false,
+    "tagEn": "Classic Route",
+    "nameEn": "Shadao Valley",
+    "subTitleEn": "Adventurer's Paradise",
+    "descEn": "A maze of gullies with unique landscapes, perfect for adventurers."
+  },
+  {
+    "id": "shuangshiyoupu",
+    "href": "scenic-detail.html?id=shuangshiyoupu",
+    "img": "assets/images/gal-spring.jpg",
+    "large": false,
+    "tagEn": "Scenic Gallery",
+    "nameEn": "Twin Peaks",
+    "subTitleEn": "Facing Peaks",
+    "descEn": "Two towering stone peaks facing each other, forming a unique gateway."
+  },
+  {
+    "id": "wulongkarst",
+    "href": "scenic-detail.html?id=wulongkarst",
+    "img": "assets/images/gal-autumn.jpg",
+    "large": false,
+    "tagEn": "Karst Landscape",
+    "nameEn": "Wulong Karst Caves",
+    "subTitleEn": "Underground Wonderland",
+    "descEn": "Typical karst cave landscape with diverse stalactites, stalagmites and stone flowers."
+  },
+  {
+    "id": "tianpingshan",
+    "href": "scenic-detail.html?id=tianpingshan",
+    "img": "assets/images/gal-winter.jpg",
+    "large": false,
+    "tagEn": "Sunrise & Sea of Clouds",
+    "nameEn": "Tianping Mountain",
+    "subTitleEn": "Best Sunrise Viewpoint",
+    "descEn": "At 1,200m elevation, one of the best spots for sunrise views and sea of clouds."
+  }
+]

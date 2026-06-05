@@ -1,0 +1,47 @@
+[
+  {
+    "img": "assets/images/gal-yuanjiajie.jpg",
+    "titleEn": "Yuanjiajie Sunrise",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/gal-clouds.jpg",
+    "titleEn": "Sea of Clouds",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/gal-autumn.jpg",
+    "titleEn": "Autumn Colors",
+    "cat": "season"
+  },
+  {
+    "img": "assets/images/gal-culture.jpg",
+    "titleEn": "Tujia Culture",
+    "cat": "culture"
+  },
+  {
+    "img": "assets/images/gal-sunrise.jpg",
+    "titleEn": "Tianzishan Sunrise",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/gal-winter.jpg",
+    "titleEn": "Winter Snow",
+    "cat": "season"
+  },
+  {
+    "img": "assets/images/gal-stream.jpg",
+    "titleEn": "Jinbian Stream",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/gal-village.jpg",
+    "titleEn": "Mountain Village",
+    "cat": "culture"
+  },
+  {
+    "img": "assets/images/gal-spring.jpg",
+    "titleEn": "Spring Flowers",
+    "cat": "season"
+  }
+]

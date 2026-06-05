@@ -1,0 +1,19 @@
+{
+  "slides": [
+    {
+      "img": "assets/images/hero-pillars.jpg",
+      "title": "Zhangjiajie National Forest Park",
+      "subtitle": "World Natural Heritage Site"
+    },
+    {
+      "img": "assets/images/hero-clouds.jpg",
+      "title": "Sea of Clouds & Mystic Peaks",
+      "subtitle": "A Miniature Fairyland on Earth"
+    },
+    {
+      "img": "assets/images/hero-stream.jpg",
+      "title": "Avatar's Hallelujah Mountains",
+      "subtitle": "Walk Where Pandora Was Inspired"
+    }
+  ]
+}

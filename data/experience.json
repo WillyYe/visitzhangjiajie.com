@@ -1,0 +1,26 @@
+[
+  {
+    "id": "hiking",
+    "titleEn": "Hiking Adventure",
+    "descEn": "Trek through Jinbian Stream and explore primeval forests",
+    "img": "assets/images/exp-hiking.jpg"
+  },
+  {
+    "id": "photography",
+    "titleEn": "Photography Tour",
+    "descEn": "Capture nature's masterpieces through your lens",
+    "img": "assets/images/exp-photo.jpg"
+  },
+  {
+    "id": "eco",
+    "titleEn": "Eco Education",
+    "descEn": "Learn about geological wonders and ecosystems",
+    "img": "assets/images/exp-eco.jpg"
+  },
+  {
+    "id": "stargazing",
+    "titleEn": "Sea of Clouds & Stargazing",
+    "descEn": "Witness sunrise, sea of clouds, and starry skies",
+    "img": "assets/images/exp-stargaze.jpg"
+  }
+]

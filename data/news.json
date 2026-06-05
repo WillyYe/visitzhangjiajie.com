@@ -1,0 +1,62 @@
+[
+  {
+    "date": {
+      "day": "13",
+      "month": "MAY",
+      "year": "2026"
+    },
+    "tag": "overview",
+    "titleEn": "Zhangjiajie at a Glance",
+    "descEn": "Located in Wulingyuan, Zhangjiajie, Hunan — 4,810 hectares, elevation 400–1,334m, established in 1982 as China's first national forest park.",
+    "contentEn": "<p>Zhangjiajie National Forest Park is located in Wulingyuan District, Zhangjiajie City, Hunan Province. It is China's first national forest park, as well as a World Natural Heritage site, World Geopark, and National 5A Tourist Attraction.</p><p>The park covers a total area of 4,810 hectares, with elevations ranging from 400 to 1,334 meters. It features the world's unique quartz sandstone pillar formations, with over 3,000 peaks rising abruptly in various shapes, earning it the reputation of \"enlarged bonsai, miniature fairyland.\"</p><p>The forest coverage rate reaches 85.28%, with over 4,000 species of flora and fauna recorded, including 81 nationally protected species. Major attractions include Yuanjiajie, Tianzi Mountain, Jinbian Stream, and Huangshijia. It is the inspiration for the \"Hallelujah Mountains\" in the movie Avatar.</p>",
+    "img": "assets/images/news-park.jpg"
+  },
+  {
+    "date": {
+      "day": "11",
+      "month": "MAY",
+      "year": "2026"
+    },
+    "tag": "honor",
+    "titleEn": "World-Class Recognition",
+    "descEn": "China's first national forest park (1982), World Natural Heritage (1992), World Geopark (2004), National 5A scenic spot (2007) — four prestigious designations.",
+    "contentEn": "<p>Since its establishment, Zhangjiajie National Forest Park has received multiple world-class and national honors, becoming a standout among natural protected areas in China and worldwide.</p><p><strong>1982</strong> — Approved by the State Council as China's first national forest park, opening a new chapter in China's forest park development.</p><p><strong>1992</strong> — Listed as a UNESCO World Natural Heritage site for its unique quartz sandstone pillar formations.</p><p><strong>2004</strong> — Designated as a UNESCO Global Geopark, recognizing its significant value in geological research and conservation.</p><p><strong>2007</strong> — Rated as a National 5A Tourist Attraction, marking its tourism service and management at the highest domestic standard.</p>",
+    "img": "assets/images/news-festival.jpg"
+  },
+  {
+    "date": {
+      "day": "10",
+      "month": "MAY",
+      "year": "2026"
+    },
+    "tag": "geo",
+    "titleEn": "380 Million Years of Geological Heritage",
+    "descEn": "380-million-year-old quartz sandstone pillar formations with 3,000+ peaks and 800+ streams — a paradise in miniature.",
+    "contentEn": "<p>Zhangjiajie's geological wonders formed approximately 380 million years ago during the Devonian period. At that time, this area was covered by a vast ocean. Through long geological evolution, over 500 meters of quartz sandstone were deposited.</p><p>Over the subsequent hundreds of millions of years, crustal movements lifted the rock layers, while water erosion and weathering acted like sculptors, carving the sandstone into the strange peaks and rocks we see today. The stone pillars here range from tens to hundreds of meters in height, with various shapes — some like swords pointing to the sky, others resembling people or objects.</p><p>The park contains over 800 streams that wind through the pillar forests, adding vitality to this magical land.</p>",
+    "img": "assets/images/news-cableway.jpg"
+  },
+  {
+    "date": {
+      "day": "07",
+      "month": "MAY",
+      "year": "2026"
+    },
+    "tag": "eco",
+    "titleEn": "85.28% Forest Coverage — A Natural Oxygen Bar",
+    "descEn": "With 85.28% forest coverage, 4,000+ species of flora and fauna, and 81 nationally protected species, the park is a true ecological treasure.",
+    "contentEn": "<p>Zhangjiajie National Forest Park is one of the most important ecological barriers in central China, with extremely rich biodiversity.</p><p>The park's forest coverage rate reaches 85.28%, with main vegetation types including subtropical evergreen broad-leaved forests, mixed coniferous and broad-leaved forests, and dwarf forests at mountain tops. It is a habitat for many rare and endangered species, with over 3,000 species of higher plants and over 400 species of vertebrates recorded.</p><p>Nationally protected rare plants include dove tree (Davidia involucrata), ginkgo, and Bretschneidera sinensis. Rare animals include Chinese giant salamander, macaque, and golden pheasant.</p>",
+    "img": "assets/images/news-cableway.jpg"
+  },
+  {
+    "date": {
+      "day": "05",
+      "month": "MAY",
+      "year": "2026"
+    },
+    "tag": "avatar",
+    "titleEn": "Where Avatar's Floating Mountains Came From",
+    "descEn": "Yuanjiajie is widely recognized by Chinese and American geologists as the inspiration for the floating Hallelujah Mountains in Avatar.",
+    "contentEn": "<p>In 2009, James Cameron's film Avatar was released worldwide, and the floating \"Hallelujah Mountains\" on the planet Pandora amazed audiences. The inspiration for these magical peaks came from the Yuanjiajie scenic area in Zhangjiajie National Forest Park.</p><p>The \"Pillar of Southern Heaven\" (now renamed \"Hallelujah Mountain\") in Yuanjiajie is the core source of this inspiration. This stone pillar stands 1,074 meters tall, rising vertically with lush vegetation on top. When surrounded by clouds and mist, it truly gives the illusion of floating in mid-air.</p><p>Chinese and American geologists jointly recognize the unique value of this natural wonder. In 2010, Zhangjiajie officially renamed the \"Pillar of Southern Heaven\" to \"Hallelujah Mountain\" and established an Avatar-themed tour route.</p>",
+    "img": "assets/images/news-cableway.jpg"
+  }
+]

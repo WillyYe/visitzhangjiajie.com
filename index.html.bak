@@ -1413,25 +1413,185 @@
     }
 
     /* ========== DATA ========== */
-    // Data loaded from JSON files
-    var newsData = [];
-    var heroData = { slides: [] };
-    var siteConfig = {};
+    var newsData = [
+      {
+        date: { day: '13', month: 'MAY' },
+        tag: 'overview',
+        titleEn: 'Zhangjiajie at a Glance',
+        descEn: 'Located in Wulingyuan, Zhangjiajie, Hunan — 4,810 hectares, elevation 400–1,334m, established in 1982 as China\'s first national forest park.',
+        img: 'assets/images/news-park.jpg'
+      },
+      {
+        date: { day: '11', month: 'MAY' },
+        tag: 'honor',
+        titleEn: 'World-Class Recognition',
+        descEn: 'China\'s first national forest park (1982), World Natural Heritage (1992), World Geopark (2004), National 5A scenic spot (2007) — four prestigious designations.',
+        img: 'assets/images/news-festival.jpg'
+      },
+      {
+        date: { day: '10', month: 'MAY' },
+        tag: 'geo',
+        titleEn: '380 Million Years of Geological Heritage',
+        descEn: '380-million-year-old quartz sandstone pillar formations with 3,000+ peaks and 800+ streams — a paradise in miniature.',
+        img: 'assets/images/news-cableway.jpg'
+      },
+      {
+        date: { day: '07', month: 'MAY' },
+        tag: 'eco',
+        titleEn: '85.28% Forest Coverage — A Natural Oxygen Bar',
+        descEn: 'With 85.28% forest coverage, 4,000+ species of flora and fauna, and 81 nationally protected species, the park is a true ecological treasure.',
+        img: 'assets/images/news-cableway.jpg'
+      },
+      {
+        date: { day: '05', month: 'MAY' },
+        tag: 'avatar',
+        titleEn: 'Where Avatar\'s Floating Mountains Came From',
+        descEn: 'Yuanjiajie is widely recognized by Chinese and American geologists as the inspiration for the floating Hallelujah Mountains in Avatar.',
+        img: 'assets/images/news-cableway.jpg'
+      }
+    ];
 
-    // Load all data from JSON files
-    function loadData() {
-      return Promise.all([
-        fetch('data/news.json').then(function(r) { return r.json(); }).then(function(d) { newsData = d; }),
-        fetch('data/scenic.json').then(function(r) { return r.json(); }).then(function(d) { scenicData = d; }),
-        fetch('data/experience.json').then(function(r) { return r.json(); }).then(function(d) { expData = d; }),
-        fetch('data/gallery.json').then(function(r) { return r.json(); }).then(function(d) { galleryData = d; }),
-        fetch('data/hero.json').then(function(r) { return r.json(); }).then(function(d) { heroData = d; }),
-        fetch('data/site-config.json').then(function(r) { return r.json(); }).then(function(d) { siteConfig = d; })
-      ]);
-    }
+    var expData = [
+      {
+        id: 'hiking',
+        titleEn: 'Hiking Adventure',
+        descEn: 'Trek through Jinbian Stream and explore primeval forests',
+        img: 'assets/images/exp-hiking.jpg'
+      },
+      {
+        id: 'photography',
+        titleEn: 'Photography Tour',
+        descEn: 'Capture nature\'s masterpieces through your lens',
+        img: 'assets/images/exp-photo.jpg'
+      },
+      {
+        id: 'eco',
+        titleEn: 'Eco Education',
+        descEn: 'Learn about geological wonders and ecosystems',
+        img: 'assets/images/exp-eco.jpg'
+      },
+      {
+        id: 'stargazing',
+        titleEn: 'Sea of Clouds & Stargazing',
+        descEn: 'Witness sunrise, sea of clouds, and starry skies',
+        img: 'assets/images/exp-stargaze.jpg'
+      }
+    ];
 
+    var scenicData = [
+      {
+        id: 'yuanjiajie',
+        href: 'scenic-detail.html?id=yuanjiajie',
+        img: 'assets/images/yuanjiajie.jpg',
+        large: true,
+        tagEn: 'UNESCO World Heritage',
+        nameEn: 'Yuanjiajie',
+        subTitleEn: 'Avatar Filming Site',
+        descEn: 'The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical.'
+      },
+      {
+        id: 'tianzishan',
+        href: 'scenic-detail.html?id=tianzishan',
+        img: 'assets/images/tianzishan.jpg',
+        large: false,
+        tagEn: 'Imperial Brush',
+        nameEn: 'Tianzi Mountain',
+        subTitleEn: 'Miniature Fairyland',
+        descEn: 'Famous from Avatar, known as the "Miniature Fairyland". Spectacular sunrise and sea of clouds.'
+      },
+      {
+        id: 'jinbianxi',
+        href: 'scenic-detail.html?id=jinbianxi',
+        img: 'assets/images/jinbianxi.jpg',
+        large: false,
+        tagEn: 'Natural Oxygen Bar',
+        nameEn: 'Jinbian Stream',
+        subTitleEn: '7.5km Hiking Paradise',
+        descEn: '7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park.'
+      },
+      {
+        id: 'huangshijia',
+        href: 'scenic-detail.html?id=huangshijia',
+        img: 'assets/images/gal-yuanjiajie.jpg',
+        large: false,
+        tagEn: 'Tujia Culture',
+        nameEn: 'Huangshijia',
+        subTitleEn: 'Essential Zhangjiajie',
+        descEn: 'Legend says Zhang Liang cultivated here. The largest aerial viewing platform in the park with stunning panoramic views.'
+      },
+      {
+        id: 'silkongqiao',
+        href: 'scenic-detail.html?id=silkongqiao',
+        img: 'assets/images/gal-clouds.jpg',
+        large: false,
+        tagEn: 'First Bridge Under Heaven',
+        nameEn: 'First Bridge Under Heaven',
+        subTitleEn: 'Natural Stone Bridge',
+        descEn: 'A natural stone bridge formed between two peaks, standing 387m above the valley floor. A true wonder of nature.'
+      },
+      {
+        id: 'yongding',
+        href: 'scenic-detail.html?id=yongding',
+        img: 'assets/images/gal-culture.jpg',
+        large: false,
+        tagEn: 'Tujia Ancient Town',
+        nameEn: 'Yongding Ancient Town',
+        subTitleEn: 'Tujia Cultural Center',
+        descEn: 'A well-preserved Tujia ancient town with traditional culture, architecture and folk customs.'
+      },
+      {
+        id: 'shadao',
+        href: 'scenic-detail.html?id=shadao',
+        img: 'assets/images/gal-sunrise.jpg',
+        large: false,
+        tagEn: 'Classic Route',
+        nameEn: 'Shadao Valley',
+        subTitleEn: 'Adventurer\'s Paradise',
+        descEn: 'A maze of gullies with unique landscapes, perfect for adventurers seeking wilderness experiences.'
+      },
+      {
+        id: 'shuangshiyoupu',
+        href: 'scenic-detail.html?id=shuangshiyoupu',
+        img: 'assets/images/gal-spring.jpg',
+        large: false,
+        tagEn: 'Scenic Gallery',
+        nameEn: 'Twin Peaks',
+        subTitleEn: 'Facing Peaks',
+        descEn: 'Two towering stone peaks facing each other, forming a unique gateway. Perfect for photos.'
+      },
+      {
+        id: 'wulongkarst',
+        href: 'scenic-detail.html?id=wulongkarst',
+        img: 'assets/images/gal-autumn.jpg',
+        large: false,
+        tagEn: 'Karst Landscape',
+        nameEn: 'Wulong Karst Caves',
+        subTitleEn: 'Underground Wonderland',
+        descEn: 'Typical karst cave landscape with diverse stalactites, stalagmites and stone flowers.'
+      },
+      {
+        id: 'tianpingshan',
+        href: 'scenic-detail.html?id=tianpingshan',
+        img: 'assets/images/gal-winter.jpg',
+        large: false,
+        tagEn: 'Sunrise & Sea of Clouds',
+        nameEn: 'Tianping Mountain',
+        subTitleEn: 'Best Sunrise Viewpoint',
+        descEn: 'At 1,200m elevation, one of the best spots for sunrise views and sea of clouds. Breathtaking panoramic scenery.'
+      }
+    ];
 
-
+    var galleryData = [
+      { img: 'assets/images/gal-yuanjiajie.jpg', titleEn: 'Yuanjiajie Sunrise', cat: 'scenic' },
+      { img: 'assets/images/gal-clouds.jpg', titleEn: 'Sea of Clouds', cat: 'scenic' },
+      { img: 'assets/images/gal-autumn.jpg', titleEn: 'Autumn Colors', cat: 'season' },
+      { img: 'assets/images/gal-culture.jpg', titleEn: 'Tujia Culture', cat: 'culture' },
+      { img: 'assets/images/gal-sunrise.jpg', titleEn: 'Tianzishan Sunrise', cat: 'scenic' },
+      { img: 'assets/images/gal-winter.jpg', titleEn: 'Winter Snow', cat: 'season' },
+      { img: 'assets/images/gal-stream.jpg', titleEn: 'Jinbian Stream', cat: 'scenic' },
+      { img: 'assets/images/gal-village.jpg', titleEn: 'Mountain Village', cat: 'culture' },
+      { img: 'assets/images/gal-spring.jpg', titleEn: 'Spring Flowers', cat: 'season' }
+    ];
 
     /* ========== NEWS CAROUSEL STATE & FUNCTIONS ========== */
     var NewsCarouselState = {
@@ -1882,12 +2042,11 @@
       // Initialize autoplay state
       AppState.heroAutoplay = true;
       
-      // Load data from JSON, then render
-      loadData().then(function() {
-        renderNewsCarousel();
-        renderExperience();
-        renderGallery();
-        renderScenic();
+      // Render dynamic content
+      renderNewsCarousel();
+      renderExperience();
+      renderGallery();
+      renderScenic();
 
       // Start hero slider
       startHeroSlider();
@@ -2060,9 +2219,6 @@
         });
       }
       } // end null check
-      }).catch(function(err) {
-        console.error('Failed to load data:', err);
-      });
     });
     
     // Cleanup on page unload
