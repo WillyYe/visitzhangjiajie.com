@@ -449,7 +449,7 @@ function replaceHeroImage(idx) {
     compressImage(file, 1920, 0.85, function(base64, compressedSize) {
       var newSize = (compressedSize / 1024 / 1024).toFixed(1);
       showToast('⏳ 压缩后 ' + newSize + 'MB，上传中...', '');
-      var cleanName = file.name.replace(/[^a-zA-Z0-9.\\-_]/g, '_');
+      var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
       var path = 'assets/images/' + cleanName;
       directHeroUpload(path, base64, file.name, idx);
     });
@@ -789,7 +789,7 @@ function triggerUpload(inputId) {
       compressImage(file, 1920, 0.85, function(base64, compressedSize) {
         var newSize = (compressedSize / 1024 / 1024).toFixed(1);
         animateProgress(inputId, 15, 30, 200, '压缩完成', origSize + 'MB → ' + newSize + 'MB (压缩 ' + Math.round((1 - compressedSize/file.size)*100) + '%)', function(){
-          var cleanName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+          var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
           var path = 'assets/images/' + cleanName;
           uploadToGitHub(path, base64, file.name, inputId);
         });
