@@ -379,8 +379,8 @@ function renderHero() {
   heroData.slides.forEach(function(s, i) {
     h += '<div class="hero-card">' +
       '<div class="hero-img-wrap">' +
-        '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
-        '<div class="hero-img-placeholder" style="display:none">🖼️</div>' +
+        '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' +
+        '<div class="hero-img-placeholder" style="display:none"><span style="font-size:14px;text-align:center;line-height:1.4">图片未上传<br><span style="font-size:11px;color:#aaa">点击下方「替换图片」上传</span></span></div>' +
       '</div>' +
       '<div class="hero-body">' +
         '<div class="hero-idx">Slide #' + (i+1) + '</div>' +
@@ -477,7 +477,9 @@ function directHeroUpload(path, base64Content, fileName, idx) {
   }).then(function() {
     heroData.slides[idx].img = path;
     renderHero();
-    showToast('图片已替换 ✅ 点击「同步 Hero 到 GitHub」更新网页', 'success');
+    showToast('✅ 图片已替换，正在同步 Hero 数据...', 'success');
+    // 自动同步 hero.json 到 GitHub
+    saveHeroToGitHub();
   }).catch(function(err){
     var msg = friendlyError(err.message || '');
     showToast('❌ 替换失败：' + msg, 'error');
