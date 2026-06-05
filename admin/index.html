@@ -237,9 +237,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 // ==================== CONFIG ====================
 var ADMIN_PWD = 'zhangjiajie2026';
 var AUTH_KEY = 'zjj_admin_auth';
-var GH_TOKEN = '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';
-var GH_REPO = 'WillyYe/visitzhangjiajie.com';
+var GH_WORKER = 'https://raspy-fog-ae80.mydeng1995.workers.dev';
 var GH_BRANCH = 'main';
+
+// 统一通过 Cloudflare Worker 代理所有 GitHub API 调用
+function ghFetch(path, method, body) {
+  var payload = { path: path, method: method, branch: GH_BRANCH };
+  if (body) {
+    payload.content = body.content;
+    payload.message = body.message;
+    payload.sha = body.sha;
+  }
+  return fetch(GH_WORKER, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
 
 // ==================== AUTH ====================
 
@@ -405,26 +419,15 @@ function replaceHeroImage(idx) {
 }
 
 function directHeroUpload(path, base64Content, fileName, idx) {
-  var token = GH_TOKEN;
-  var repo = GH_REPO;
-  var branch = GH_BRANCH;
-
   showToast('⏳ 正在上传图片...','');
 
   // Check if file exists for sha
-  fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
-    headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
-  }).then(function(r){ return r.ok ? r.json() : null; })
+  ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
   .then(function(fileInfo) {
-    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
-      method: 'PUT',
-      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: 'Replace hero image: ' + fileName,
-        content: base64Content,
-        branch: branch,
-        sha: fileInfo ? fileInfo.sha : undefined
-      })
+    return ghFetch(path, 'PUT', {
+      content: base64Content,
+      message: 'Replace hero image: ' + fileName,
+      sha: fileInfo ? fileInfo.sha : null
     });
   }).then(function(r){
     if (r.ok) {
@@ -588,26 +591,15 @@ function deleteHero(i) {
 
 // ==================== HERO GITHUB SYNC ====================
 function saveHeroToGitHub() {
-  var token = GH_TOKEN;
-  var repo = GH_REPO;
-  var branch = GH_BRANCH;
-
   showToast('⏳ 正在同步 hero.json 到 GitHub...','');
   var content = JSON.stringify(heroData, null, 2);
   var path = 'data/hero.json';
 
-  fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
-    headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
-  }).then(function(r){return r.json()}).then(function(fileInfo) {
-    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
-      method: 'PUT',
-      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: 'Admin: Update hero.json',
-        content: btoa(unescape(encodeURIComponent(content))),
-        sha: fileInfo.sha,
-        branch: branch
-      })
+  ghFetch(path, 'GET').then(function(r){return r.json()}).then(function(fileInfo) {
+    return ghFetch(path, 'PUT', {
+      content: btoa(unescape(encodeURIComponent(content))),
+      message: 'Admin: Update hero.json',
+      sha: fileInfo.sha
     });
   }).then(function(r){
     if (r.ok) { showToast('Hero 已同步到 GitHub！页面将在几分钟内更新 🎉','success'); }
@@ -619,10 +611,6 @@ function saveHeroToGitHub() {
 
 // ==================== GITHUB API SAVE ====================
 function saveAllToGitHub() {
-  var token = GH_TOKEN;
-  var repo = GH_REPO;
-  var branch = GH_BRANCH;
-
   var files = {
     'data/news.json': JSON.stringify(newsData, null, 2),
     'data/scenic.json': JSON.stringify(scenicData, null, 2),
@@ -633,18 +621,11 @@ function saveAllToGitHub() {
 
   showToast('正在保存到 GitHub...','');
   var promises = Object.keys(files).map(function(path) {
-    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
-      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
-    }).then(function(r){return r.json()}).then(function(fileInfo) {
-      return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
-        method: 'PUT',
-        headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
-        body: JSON.stringify({
-          message: 'Admin: Update '+path,
-          content: btoa(unescape(encodeURIComponent(files[path]))),
-          sha: fileInfo.sha,
-          branch: branch
-        })
+    return ghFetch(path, 'GET').then(function(r){return r.json()}).then(function(fileInfo) {
+      return ghFetch(path, 'PUT', {
+        content: btoa(unescape(encodeURIComponent(files[path]))),
+        message: 'Admin: Update '+path,
+        sha: fileInfo.sha
       });
     });
   });
@@ -679,30 +660,18 @@ function triggerUpload(inputId) {
 }
 
 function uploadToGitHub(path, base64Content, fileName, inputId) {
-  var token = GH_TOKEN;
-  var repo = GH_REPO;
-  var branch = GH_BRANCH;
-
   var previewDiv = document.getElementById('prev_' + inputId);
   previewDiv.innerHTML = '<div class="upload-progress">⏳ 上传中...</div>';
+  var sha = null;
 
   // First check if file exists (to get sha)
-  fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch, {
-    headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json'}
-  }).then(function(r){
-    var sha = null;
-    if (r.ok) return r.json().then(function(d){sha=d.sha; return d;});
-    return null;
+  ghFetch(path, 'GET').then(function(r){
+    if (r.ok) return r.json().then(function(d){sha=d.sha;});
   }).then(function(){
-    return fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
-      method: 'PUT',
-      headers: {Authorization:'Bearer '+token, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: 'Upload image: ' + fileName,
-        content: base64Content,
-        branch: branch,
-        sha: sha || undefined
-      })
+    return ghFetch(path, 'PUT', {
+      content: base64Content,
+      message: 'Upload image: ' + fileName,
+      sha: sha || null
     });
   }).then(function(r){
     if (r.ok) {
