@@ -226,9 +226,7 @@
       background-size: cover;
       background-position: center;
     }
-    .slide-1 .hero-slide-bg { background-image: url('assets/images/hero-pillars.jpg'); }
-    .slide-2 .hero-slide-bg { background-image: url('assets/images/hero-clouds.jpg'); }
-    .slide-3 .hero-slide-bg { background-image: url('assets/images/hero-stream.jpg'); }
+    /* Hero slide backgrounds are set dynamically via inline styles in renderHero() */
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -1140,34 +1138,20 @@
 
   <!-- ========== HERO ========== -->
   <section class="hero" id="hero">
-    <div class="hero-slides" id="heroSlides">
-      <div class="hero-slide slide-1 active">
-        <div class="hero-slide-bg"></div>
-      </div>
-      <div class="hero-slide slide-2">
-        <div class="hero-slide-bg"></div>
-      </div>
-      <div class="hero-slide slide-3">
-        <div class="hero-slide-bg"></div>
-      </div>
-    </div>
+    <div class="hero-slides" id="heroSlides"></div>
     <div class="hero-overlay"></div>
-    <div class="hero-content">
+    <div class="hero-content" id="heroContent">
       <div class="hero-badge">
         <span class="hero-badge-dot"></span>
         <span>World Natural Heritage · UNESCO</span>
       </div>
-      <h1 class="hero-title">
+      <h1 class="hero-title" id="heroTitle">
         Zhangjiajie National Forest Park
-        <span class="hero-title-en">ZHANGJIAJIE NATIONAL FOREST PARK</span>
+        <span class="hero-title-en" id="heroTitleEn">ZHANGJIAJIE NATIONAL FOREST PARK</span>
       </h1>
-      <p class="hero-desc">Explore the pillar-like peaks and experience natural wonders. China's first national forest park, filming location of Avatar.</p>
+      <p class="hero-desc" id="heroDesc">Explore the pillar-like peaks and experience natural wonders. China's first national forest park, filming location of Avatar.</p>
     </div>
-    <div class="hero-dots" id="heroDots">
-      <button class="hero-dot active" data-slide="0"></button>
-      <button class="hero-dot" data-slide="1"></button>
-      <button class="hero-dot" data-slide="2"></button>
-    </div>
+    <div class="hero-dots" id="heroDots"></div>
     <button class="hero-nav prev" aria-label="Previous slide">‹</button>
     <button class="hero-nav next" aria-label="Next slide">›</button>
     <button class="hero-pause" aria-label="Pause autoplay">⏸</button>
@@ -1444,6 +1428,50 @@
       touchStartX: 0,
       touchEndX: 0
     };
+
+    function renderHero() {
+      var container = document.getElementById('heroSlides');
+      var dotsContainer = document.getElementById('heroDots');
+      if (!container || !dotsContainer) return;
+      
+      var slides = heroData.slides || [];
+      if (slides.length === 0) return;
+      
+      // Generate slides
+      container.innerHTML = slides.map(function(s, i) {
+        return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + '">' +
+          '<div class="hero-slide-bg" style="background-image:url(\'' + (s.img || '') + '\')"></div>' +
+          '</div>';
+      }).join('');
+      
+      // Generate dots
+      dotsContainer.innerHTML = slides.map(function(s, i) {
+        return '<button class="hero-dot ' + (i === 0 ? 'active' : '') + '" data-slide="' + i + '"></button>';
+      }).join('');
+      
+      // Update text content from first slide
+      updateHeroText(0);
+      
+      // Reset slider state
+      AppState.currentSlide = 0;
+    }
+    
+    function updateHeroText(index) {
+      var slides = heroData.slides || [];
+      if (!slides[index]) return;
+      var s = slides[index];
+      
+      var titleEl = document.getElementById('heroTitle');
+      var titleEnEl = document.getElementById('heroTitleEn');
+      var descEl = document.getElementById('heroDesc');
+      
+      if (titleEl && s.title) {
+        titleEl.innerHTML = s.title + '<span class="hero-title-en" id="heroTitleEn">' + (s.title.toUpperCase()) + '</span>';
+      }
+      if (descEl && s.subtitle) {
+        descEl.textContent = s.subtitle;
+      }
+    }
 
     function renderNewsCarousel(resetSlide) {
       if (resetSlide === undefined) resetSlide = true;
@@ -1737,6 +1765,8 @@
           
           slides[AppState.currentSlide].classList.add('active');
           dots[AppState.currentSlide].classList.add('active');
+          
+          updateHeroText(AppState.currentSlide);
         });
       }, 5000);
     }
@@ -1753,6 +1783,8 @@
       
       slides[AppState.currentSlide].classList.add('active');
       dots[AppState.currentSlide].classList.add('active');
+      
+      updateHeroText(index);
       
       clearInterval(AppState.heroSlider);
       startHeroSlider();
@@ -1884,6 +1916,7 @@
       
       // Load data from JSON, then render
       loadData().then(function() {
+        renderHero();
         renderNewsCarousel();
         renderExperience();
         renderGallery();

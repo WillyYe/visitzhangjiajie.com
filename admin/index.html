@@ -637,11 +637,13 @@ function saveHero() {
   var obj = {img:imgPath,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
   if (editingIndex >= 0) heroData.slides[editingIndex] = obj; else heroData.slides.push(obj);
   closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
+  saveHeroToGitHub();
 }
 function deleteHero(i) {
   if (heroData.slides.length <= 3) { showToast('至少保留 3 张 Hero 图片，不可删除','error'); return; }
   if (confirm('确定删除 Slide #'+(i+1)+' "'+esc(heroData.slides[i].title)+'" 吗？')) {
-    heroData.slides.splice(i,1); renderHero(); renderDashboard(); showToast('已删除 ✅ 点击同步按钮更新网页','success');
+    heroData.slides.splice(i,1); renderHero(); renderDashboard(); showToast('已删除 ✅ 正在同步到 GitHub...','success');
+    saveHeroToGitHub();
   }
 }
 
