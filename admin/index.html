@@ -70,7 +70,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 /* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; }
 .modal-overlay.open { display: flex; }
-.modal { background: #fff; border-radius: 12px; padding: 28px; width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15); }
+.modal { background: #fff; border-radius: 12px; padding: 28px; width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15); }
 .modal h3 { margin-bottom: 20px; font-size: 18px; }
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
@@ -78,6 +78,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--pink); }
 .form-group textarea { min-height: 100px; resize: vertical; }
 .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* Editor Cards (Info / Attraction / Tip) */
+.editor-card { background: #fafafa; border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.editor-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.editor-card-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: var(--pink); color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.editor-card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-left: 8px; }
+.editor-card-remove { background: #ffebee; color: #d32f2f; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.editor-card-remove:hover { background: #ffcdd2; }
+.editor-field { margin-bottom: 10px; }
+.editor-field:last-child { margin-bottom: 0; }
+.editor-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-light); margin-bottom: 4px; }
+.editor-field input, .editor-field textarea { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; }
+.editor-field input:focus, .editor-field textarea:focus { border-color: var(--pink); }
+.editor-field textarea { min-height: 60px; resize: vertical; }
+.editor-field input.icon-input { width: 70px; text-align: center; }
+.editor-row { display: flex; gap: 10px; }
+.editor-row .editor-field { flex: 1; }
+.editor-row .editor-field.icon-field { flex: 0 0 70px; }
+.editor-section-title { font-size: 14px; font-weight: 600; margin: 20px 0 10px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.editor-section-hint { font-size: 12px; color: var(--text-light); font-weight: 400; margin-left: auto; }
+.editor-add-btn { margin-top: 8px; }
 
 /* Toast */
 .toast { position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
@@ -587,13 +608,20 @@ function addInfoCard() {
   var count = container.querySelectorAll('.info-row').length;
   if (count >= 8) return;
   var idx = Date.now();
+  var num = count + 1;
   var div = document.createElement('div');
-  div.className = 'info-row';
+  div.className = 'editor-card info-row';
   div.id = 'infoRow_' + idx;
-  div.innerHTML = '<input placeholder="🏷" id="fInfoIcon_' + idx + '" style="width:60px">' +
-    '<input placeholder="Label" id="fInfoLabel_' + idx + '">' +
-    '<input placeholder="Value" id="fInfoValue_' + idx + '">' +
-    '<button class="btn-icon" onclick="this.parentElement.remove(); updateInfoAddBtn()">🗑️</button>';
+  div.innerHTML =
+    '<div class="editor-card-header">'+
+    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Info Card</span></div>'+
+    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateInfoAddBtn()">删除</button>'+
+    '</div>'+
+    '<div class="editor-row">'+
+    '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🏔️" id="fInfoIcon_' + idx + '"></div>'+
+    '<div class="editor-field"><label>Label</label><input placeholder="例如：Elevation" id="fInfoLabel_' + idx + '"></div>'+
+    '<div class="editor-field"><label>Value</label><input placeholder="例如：1,074m" id="fInfoValue_' + idx + '"></div>'+
+    '</div>';
   container.appendChild(div);
   updateInfoAddBtn();
 }
@@ -614,13 +642,20 @@ function addAttraction() {
   var count = container.querySelectorAll('.attr-row').length;
   if (count >= 6) return;
   var idx = Date.now();
+  var num = count + 1;
   var div = document.createElement('div');
-  div.className = 'attr-row';
+  div.className = 'editor-card attr-row';
   div.id = 'attrRow_' + idx;
-  div.innerHTML = '<input placeholder="🗿" id="fAttrIcon_' + idx + '" style="width:60px">' +
-    '<input placeholder="Name" id="fAttrName_' + idx + '">' +
-    '<input placeholder="Description" id="fAttrDesc_' + idx + '">' +
-    '<button class="btn-icon" onclick="this.parentElement.remove(); updateAttrAddBtn()">🗑️</button>';
+  div.innerHTML =
+    '<div class="editor-card-header">'+
+    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Attraction</span></div>'+
+    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateAttrAddBtn()">删除</button>'+
+    '</div>'+
+    '<div class="editor-row">'+
+    '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🗿" id="fAttrIcon_' + idx + '"></div>'+
+    '<div class="editor-field"><label>Name</label><input placeholder="景点名称" id="fAttrName_' + idx + '"></div>'+
+    '</div>'+
+    '<div class="editor-field"><label>Description</label><textarea placeholder="景点描述..." id="fAttrDesc_' + idx + '"></textarea></div>';
   container.appendChild(div);
   updateAttrAddBtn();
 }
@@ -641,11 +676,16 @@ function addTip() {
   var count = container.querySelectorAll('.tip-row').length;
   if (count >= 6) return;
   var idx = Date.now();
+  var num = count + 1;
   var div = document.createElement('div');
-  div.className = 'tip-row';
+  div.className = 'editor-card tip-row';
   div.id = 'tipRow_' + idx;
-  div.innerHTML = '<input placeholder="Travel tip..." id="fTip_' + idx + '">' +
-    '<button class="btn-icon" onclick="this.parentElement.remove(); updateTipAddBtn()">🗑️</button>';
+  div.innerHTML =
+    '<div class="editor-card-header">'+
+    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Travel Tip</span></div>'+
+    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateTipAddBtn()">删除</button>'+
+    '</div>'+
+    '<div class="editor-field"><label>Content</label><textarea placeholder="输入旅行贴士..." id="fTip_' + idx + '"></textarea></div>';
   container.appendChild(div);
   updateTipAddBtn();
 }
@@ -666,9 +706,9 @@ function readInfoCards() {
   if (!container) return [];
   var arr = [];
   container.querySelectorAll('.info-row').forEach(function(row) {
-    var icon = row.querySelector('input[id^="fInfoIcon"]').value.trim();
-    var label = row.querySelector('input[id^="fInfoLabel"]').value.trim();
-    var value = row.querySelector('input[id^="fInfoValue"]').value.trim();
+    var icon = row.querySelector('[id^="fInfoIcon"]').value.trim();
+    var label = row.querySelector('[id^="fInfoLabel"]').value.trim();
+    var value = row.querySelector('[id^="fInfoValue"]').value.trim();
     if (label) arr.push({icon:icon, label:label, value:value});
   });
   while (arr.length < 4) arr.push({icon:'🏔️', label:'', value:''});
@@ -679,9 +719,9 @@ function readAttractions() {
   if (!container) return [];
   var arr = [];
   container.querySelectorAll('.attr-row').forEach(function(row) {
-    var icon = row.querySelector('input[id^="fAttrIcon"]').value.trim();
-    var name = row.querySelector('input[id^="fAttrName"]').value.trim();
-    var desc = row.querySelector('input[id^="fAttrDesc"]').value.trim();
+    var icon = row.querySelector('[id^="fAttrIcon"]').value.trim();
+    var name = row.querySelector('[id^="fAttrName"]').value.trim();
+    var desc = row.querySelector('[id^="fAttrDesc"]').value.trim();
     if (name) arr.push({icon:icon, name:name, desc:desc});
   });
   while (arr.length < 3) arr.push({icon:'🗿', name:'', desc:''});
@@ -692,7 +732,7 @@ function readTips() {
   if (!container) return [];
   var arr = [];
   container.querySelectorAll('.tip-row').forEach(function(row) {
-    var val = row.querySelector('input[id^="fTip"]').value.trim();
+    var val = row.querySelector('[id^="fTip"]').value.trim();
     if (val) arr.push(val);
   });
   while (arr.length < 3) arr.push('');
@@ -827,41 +867,54 @@ function openScenicModal(idx) {
   if (!s.tips || !Array.isArray(s.tips)) s.tips = ['','',''];
 
   // 构建 Info Cards HTML
-  var infoHtml = '<div class="form-section"><h4>📊 Info Cards（4-8个）</h4><div id="infoCardsEdit">';
+  var infoHtml = '<div class="editor-section-title">📊 Info Cards <span class="editor-section-hint">4–8 个</span></div><div id="infoCardsEdit">';
   s.info.forEach(function(item, i) {
     if (i >= 8) return;
-    infoHtml += '<div class="array-row" id="infoRow'+i+'">'+
-      '<input placeholder="Icon" value="'+esc(item.icon||'')+'" id="fInfoIcon'+i+'" style="width:60px">'+
-      '<input placeholder="Label" value="'+esc(item.label||'')+'" id="fInfoLabel'+i+'">'+
-      '<input placeholder="Value" value="'+esc(item.value||'')+'" id="fInfoValue'+i+'">'+
-      (i >= 4 ? '<button class="btn-icon" onclick="removeInfoCard('+i+')" title="删除">🗑️</button>' : '')+
+    infoHtml += '<div class="editor-card info-row" id="infoRow'+i+'">'+
+      '<div class="editor-card-header">'+
+      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Info Card</span></div>'+
+      (i >= 4 ? '<button class="editor-card-remove" onclick="removeInfoCard('+i+')">删除</button>' : '')+
+      '</div>'+
+      '<div class="editor-row">'+
+      '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🏔️" value="'+esc(item.icon||'')+'" id="fInfoIcon'+i+'"></div>'+
+      '<div class="editor-field"><label>Label</label><input placeholder="例如：Elevation" value="'+esc(item.label||'')+'" id="fInfoLabel'+i+'"></div>'+
+      '<div class="editor-field"><label>Value</label><input placeholder="例如：1,074m" value="'+esc(item.value||'')+'" id="fInfoValue'+i+'"></div>'+
+      '</div>'+
       '</div>';
   });
-  infoHtml += '</div><button class="btn btn-outline btn-sm" onclick="addInfoCard()" id="addInfoBtn"'+(s.info.length>=8?'disabled':'')+'>➕ 添加 Info 卡片</button></div>';
+  infoHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addInfoCard()" id="addInfoBtn"'+(s.info.length>=8?'disabled':'')+'>➕ 添加 Info Card</button>';
 
   // 构建 Attractions HTML
-  var attrHtml = '<div class="form-section"><h4>🗿 Key Attractions（3-6个）</h4><div id="attrEdit">';
+  var attrHtml = '<div class="editor-section-title">🗿 Key Attractions <span class="editor-section-hint">3–6 个</span></div><div id="attrEdit">';
   s.attractions.forEach(function(item, i) {
     if (i >= 6) return;
-    attrHtml += '<div class="array-row" id="attrRow'+i+'">'+
-      '<input placeholder="Icon" value="'+esc(item.icon||'')+'" id="fAttrIcon'+i+'" style="width:60px">'+
-      '<input placeholder="Name" value="'+esc(item.name||'')+'" id="fAttrName'+i+'">'+
-      '<input placeholder="Description" value="'+esc(item.desc||'')+'" id="fAttrDesc'+i+'">'+
-      (i >= 3 ? '<button class="btn-icon" onclick="removeAttraction('+i+')" title="删除">🗑️</button>' : '')+
+    attrHtml += '<div class="editor-card attr-row" id="attrRow'+i+'">'+
+      '<div class="editor-card-header">'+
+      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Attraction</span></div>'+
+      (i >= 3 ? '<button class="editor-card-remove" onclick="removeAttraction('+i+')">删除</button>' : '')+
+      '</div>'+
+      '<div class="editor-row">'+
+      '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🗿" value="'+esc(item.icon||'')+'" id="fAttrIcon'+i+'"></div>'+
+      '<div class="editor-field"><label>Name</label><input placeholder="景点名称" value="'+esc(item.name||'')+'" id="fAttrName'+i+'"></div>'+
+      '</div>'+
+      '<div class="editor-field"><label>Description</label><textarea placeholder="景点描述..." id="fAttrDesc'+i+'">'+esc(item.desc||'')+'</textarea></div>'+
       '</div>';
   });
-  attrHtml += '</div><button class="btn btn-outline btn-sm" onclick="addAttraction()" id="addAttrBtn"'+(s.attractions.length>=6?'disabled':'')+'>➕ 添加景点</button></div>';
+  attrHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addAttraction()" id="addAttrBtn"'+(s.attractions.length>=6?'disabled':'')+'>➕ 添加 Attraction</button>';
 
   // 构建 Tips HTML
-  var tipsHtml = '<div class="form-section"><h4>💡 Travel Tips（3-6条）</h4><div id="tipsEdit">';
+  var tipsHtml = '<div class="editor-section-title">💡 Travel Tips <span class="editor-section-hint">3–6 条</span></div><div id="tipsEdit">';
   s.tips.forEach(function(tip, i) {
     if (i >= 6) return;
-    tipsHtml += '<div class="array-row" id="tipRow'+i+'">'+
-      '<input placeholder="Travel tip '+(i+1)+'" value="'+esc(tip||'')+'" id="fTip'+i+'">'+
-      (i >= 3 ? '<button class="btn-icon" onclick="removeTip('+i+')" title="删除">🗑️</button>' : '')+
+    tipsHtml += '<div class="editor-card tip-row" id="tipRow'+i+'">'+
+      '<div class="editor-card-header">'+
+      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Travel Tip</span></div>'+
+      (i >= 3 ? '<button class="editor-card-remove" onclick="removeTip('+i+')">删除</button>' : '')+
+      '</div>'+
+      '<div class="editor-field"><label>Content</label><textarea placeholder="输入旅行贴士..." id="fTip'+i+'">'+esc(tip||'')+'</textarea></div>'+
       '</div>';
   });
-  tipsHtml += '</div><button class="btn btn-outline btn-sm" onclick="addTip()" id="addTipBtn"'+(s.tips.length>=6?'disabled':'')+'>➕ 添加贴士</button></div>';
+  tipsHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addTip()" id="addTipBtn"'+(s.tips.length>=6?'disabled':'')+'>➕ 添加 Travel Tip</button>';
 
   // 轮播图2、3
   var img1 = (s.images&&s.images[1])||'';
