@@ -357,7 +357,7 @@
     var newsData = [];
 
     function loadNewsData() {
-      return fetch('data/news.json')
+      return fetch('data/news.json?t=' + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(d) { newsData = d; });
     }

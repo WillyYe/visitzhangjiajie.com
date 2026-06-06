@@ -204,6 +204,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   <!-- News -->
   <div class="content-section" id="sec-news">
     <div class="main-header" style="margin-bottom:16px"><h2>新闻管理</h2><button class="btn btn-primary" onclick="openNewsModal()">+ 新增新闻</button></div>
+    <div class="hero-sync-bar" style="margin-bottom:12px;">
+      <button class="btn btn-primary" id="btnSyncNews" onclick="saveNewsToGitHub()">💾 同步新闻到 GitHub</button>
+      <span class="sync-status" id="newsSyncStatus" style="margin-left:12px;font-size:13px;display:inline-flex;align-items:center;gap:6px">
+        <span class="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block"></span>
+        <span class="sync-text">未同步</span>
+      </span>
+    </div>
+    <div style="background:#f0f7ff;border:1px solid #b3d9ff;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#333;line-height:1.7">
+      <strong>📋 操作说明：</strong><br>
+      1. 点击「新增新闻」添加新闻，或点击「编辑」修改已有新闻。<br>
+      2. 标题和描述为必填项；图片建议尺寸 800×600 以上。<br>
+      3. 保存后会<strong>自动同步到 GitHub</strong>，前台约 1-2 分钟后更新。也可手动点击「同步新闻到 GitHub」按钮。<br>
+      4. 日期格式：日（如 13）、月（英文缩写如 MAY）、年（如 2026）。
+    </div>
     <div class="table-wrapper"><table><thead><tr><th>日期</th><th>标签</th><th>标题</th><th>图片</th><th>操作</th></tr></thead><tbody id="newsTableBody"></tbody></table></div>
   </div>
 
@@ -539,34 +553,71 @@ function imgUploadHtml(currentPath, previewStyle) {
 // --- News Modal ---
 function openNewsModal(idx) {
   editingIndex = idx !== undefined ? idx : -1;
-  var n = editingIndex >= 0 ? newsData[editingIndex] : {date:{day:'',month:'',year:''},tag:'',titleEn:'',descEn:'',contentEn:'',img:''};
+  var now = new Date();
+  var dayStr = String(now.getDate()).padStart(2, '0');
+  var monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var monthStr = monthNames[now.getMonth()];
+  var yearStr = String(now.getFullYear());
+  var n = editingIndex >= 0 ? newsData[editingIndex] : {date:{day:dayStr,month:monthStr,year:yearStr},tag:'overview',titleEn:'',descEn:'',contentEn:'',img:''};
   showModal(editingIndex>=0?'编辑新闻':'新增新闻',
-    '<div class="form-group"><label>日期 (Day)</label><input id="fDay" value="'+esc(n.date.day)+'"></div>'+
-    '<div class="form-group"><label>日期 (Month)</label><input id="fMonth" value="'+esc(n.date.month)+'"></div>'+
-    '<div class="form-group"><label>日期 (Year)</label><input id="fYear" value="'+esc(n.date.year||'')+'"></div>'+
-    '<div class="form-group"><label>标签</label><select id="fTag"><option value="overview" '+(n.tag==='overview'?'selected':'')+'>overview</option><option value="honor" '+(n.tag==='honor'?'selected':'')+'>honor</option><option value="geo" '+(n.tag==='geo'?'selected':'')+'>geo</option><option value="eco" '+(n.tag==='eco'?'selected':'')+'>eco</option><option value="avatar" '+(n.tag==='avatar'?'selected':'')+'>avatar</option></select></div>'+
-    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(n.titleEn)+'"></div>'+
-    '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(n.descEn)+'</textarea></div>'+
-    '<div class="form-group"><label>正文 (HTML)</label><textarea id="fContent" style="min-height:150px">'+esc(n.contentEn||'')+'</textarea></div>'+
+    '<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#5d4037;line-height:1.6">'+
+    '<strong>💡 填写提示：</strong>标题和描述为必填；图片建议 800×600 以上；日期会自动填入今天。'+
+    '</div>'+
+    '<div class="form-group"><label>标题 <span style="font-size:11px;color:#999" id="newsTitleCount">0/80</span></label><input id="fTitle" value="'+esc(n.titleEn)+'" maxlength="80" oninput="document.getElementById(\'newsTitleCount\').textContent=this.value.length+\'/80\'"></div>'+
+    '<div class="form-group"><label>描述 <span style="font-size:11px;color:#999" id="newsDescCount">0/200</span></label><textarea id="fDesc" maxlength="200" oninput="document.getElementById(\'newsDescCount\').textContent=this.value.length+\'/200\'">'+esc(n.descEn)+'</textarea></div>'+
+    '<div class="form-group"><label>日期（日 / 月 / 年）</label><div style="display:flex;gap:8px">'+
+      '<input id="fDay" value="'+esc(n.date.day)+'" placeholder="13" style="flex:1" title="日，如 13">'+
+      '<input id="fMonth" value="'+esc(n.date.month)+'" placeholder="MAY" style="flex:2" title="英文月份缩写，如 MAY">'+
+      '<input id="fYear" value="'+esc(n.date.year||yearStr)+'" placeholder="2026" style="flex:1" title="年，如 2026">'+
+    '</div></div>'+
+    '<div class="form-group"><label>标签</label><select id="fTag"><option value="overview" '+(n.tag==='overview'?'selected':'')+'>overview — 概览</option><option value="honor" '+(n.tag==='honor'?'selected':'')+'>honor — 荣誉</option><option value="geo" '+(n.tag==='geo'?'selected':'')+'>geo — 地质</option><option value="eco" '+(n.tag==='eco'?'selected':'')+'>eco — 生态</option><option value="avatar" '+(n.tag==='avatar'?'selected':'')+'>avatar — 阿凡达</option></select></div>'+
+    '<div class="form-group"><label>正文（支持 HTML）</label><textarea id="fContent" style="min-height:120px" placeholder="可输入富文本 HTML，前台会原样渲染">'+esc(n.contentEn||'')+'</textarea></div>'+
     imgUploadHtml(n.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNews()">保存</button></div>');
+  setTimeout(function(){
+    var tEl = document.getElementById('fTitle');
+    var dEl = document.getElementById('fDesc');
+    var tCnt = document.getElementById('newsTitleCount');
+    var dCnt = document.getElementById('newsDescCount');
+    if (tEl && tCnt) tCnt.textContent = tEl.value.length + '/80';
+    if (dEl && dCnt) dCnt.textContent = dEl.value.length + '/200';
+  }, 50);
 }
 
 function saveNews() {
+  var title = document.getElementById('fTitle').value.trim();
+  var desc = document.getElementById('fDesc').value.trim();
+  var img = document.getElementById(modalImgId).value.trim();
+  var day = document.getElementById('fDay').value.trim();
+  var month = document.getElementById('fMonth').value.trim();
+
+  if (!title) { showToast('❌ 标题不能为空', 'error'); return; }
+  if (!desc) { showToast('❌ 描述不能为空', 'error'); return; }
+  if (!img) { showToast('❌ 请上传图片', 'error'); return; }
+  if (!day || !month) { showToast('❌ 日期不能为空', 'error'); return; }
+
   var obj = {
-    date: {day: document.getElementById('fDay').value, month: document.getElementById('fMonth').value, year: document.getElementById('fYear').value},
+    date: {day: day, month: month, year: document.getElementById('fYear').value.trim()},
     tag: document.getElementById('fTag').value,
-    titleEn: document.getElementById('fTitle').value,
-    descEn: document.getElementById('fDesc').value,
+    titleEn: title,
+    descEn: desc,
     contentEn: document.getElementById('fContent').value,
-    img: document.getElementById(modalImgId).value
+    img: img
   };
   if (editingIndex >= 0) newsData[editingIndex] = obj; else newsData.push(obj);
   closeModal(); renderNews(); renderDashboard();
-  showToast('新闻已保存 ✅', 'success');
+  showToast('✅ 已保存到本地，正在同步到 GitHub...', 'success');
+  saveNewsToGitHub();
 }
 
-function deleteNews(i) { if(confirm('确定删除 "'+newsData[i].titleEn+'" 吗？')){newsData.splice(i,1); renderNews(); renderDashboard(); showToast('已删除','success');} }
+function deleteNews(i) {
+  if (confirm('确定删除 "' + newsData[i].titleEn + '" 吗？')) {
+    newsData.splice(i, 1);
+    renderNews(); renderDashboard();
+    showToast('✅ 已删除，正在同步到 GitHub...', 'success');
+    saveNewsToGitHub();
+  }
+}
 
 // --- Scenic Modal ---
 function openScenicModal(idx) {
@@ -679,6 +730,77 @@ function deleteHero(i) {
   }
 }
 
+// ==================== NEWS GITHUB SYNC ====================
+var newsSyncLock = false;
+
+function updateNewsSyncStatus(state, message) {
+  var el = document.getElementById('newsSyncStatus');
+  if (!el) return;
+  var dot = el.querySelector('.sync-dot');
+  var text = el.querySelector('.sync-text');
+  var states = {
+    idle:    { color: '#aaa', label: '未同步' },
+    saving:  { color: '#f9a825', label: '同步中...' },
+    success: { color: '#43a047', label: '已同步 ✓' },
+    error:   { color: '#e53935', label: '同步失败 ✕' }
+  };
+  var s = states[state] || states.idle;
+  dot.style.background = s.color;
+  text.textContent = message || s.label;
+}
+
+function saveNewsToGitHub() {
+  if (newsSyncLock) {
+    showToast('⏳ 正在同步中，请稍候...', '');
+    return;
+  }
+  newsSyncLock = true;
+  var btn = document.getElementById('btnSyncNews');
+  if (btn) btn.disabled = true;
+  updateNewsSyncStatus('saving');
+
+  showToast('⏳ 第 1 步：正在同步 news.json 到 GitHub...', '');
+  var content = JSON.stringify(newsData, null, 2);
+  var path = 'data/news.json';
+  var retryCount = 0;
+
+  function doSync() {
+    ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
+      return ghFetch(path, 'PUT', {
+        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
+        message: 'Admin: Update news.json',
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+      });
+    }).then(function(r){
+      if (r.ok) {
+        newsSyncLock = false;
+        if (btn) btn.disabled = false;
+        updateNewsSyncStatus('success');
+        showToast('✅ 第 2 步：新闻已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+        return;
+      }
+      return r.json().then(function(d){
+        var msg = d.message || '';
+        if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
+          retryCount++;
+          showToast('🔄 检测到文件冲突，正在自动重试...', '');
+          updateNewsSyncStatus('saving', '冲突重试中...');
+          return doSync();
+        }
+        throw new Error(msg);
+      });
+    }).catch(function(err){
+      newsSyncLock = false;
+      if (btn) btn.disabled = false;
+      var msg = friendlyError(err.message || '');
+      updateNewsSyncStatus('error', msg.slice(0, 30));
+      showToast('❌ 同步失败：' + msg, 'error');
+    });
+  }
+
+  doSync();
+}
+
 // ==================== HERO GITHUB SYNC ====================
 var heroSyncLock = false; // 防止并发同步
 
@@ -761,21 +883,45 @@ function saveAllToGitHub() {
     'data/hero.json': JSON.stringify(heroData, null, 2)
   };
 
-  showToast('正在保存到 GitHub...','');
-  var promises = Object.keys(files).map(function(path) {
+  showToast('⏳ 正在保存到 GitHub...', '');
+  var paths = Object.keys(files);
+  var completed = 0;
+  var failed = [];
+
+  function syncFile(path) {
     return ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
       return ghFetch(path, 'PUT', {
         content: btoa(Array.from(new TextEncoder().encode(files[path]), function(b){ return String.fromCharCode(b); }).join('')),
-        message: 'Admin: Update '+path,
+        message: 'Admin: Update ' + path,
         sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
       });
+    }).then(function(r){
+      if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+      completed++;
+      return true;
+    }).catch(function(err){
+      failed.push({path: path, err: err.message});
+      return false;
     });
+  }
+
+  // 串行同步避免并发冲突
+  var chain = Promise.resolve();
+  paths.forEach(function(path) {
+    chain = chain.then(function(){ return syncFile(path); });
   });
 
-  Promise.all(promises).then(function() {
-    showToast('已保存到 GitHub！页面将在几分钟内更新 🎉','success');
+  chain.then(function(){
+    if (failed.length === 0) {
+      showToast('✅ 全部 ' + completed + ' 个文件已保存到 GitHub！页面将在几分钟内更新 🎉', 'success');
+      updateHeroSyncStatus('success');
+      updateNewsSyncStatus('success');
+    } else {
+      var firstErr = friendlyError(failed[0].err);
+      showToast('⚠️ ' + completed + ' 个文件成功，' + failed.length + ' 个失败：' + firstErr, 'error');
+    }
   }).catch(function(err) {
-    showToast('保存失败: '+err.message,'error');
+    showToast('❌ 保存失败：' + friendlyError(err.message), 'error');
   });
 }
 
