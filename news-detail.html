@@ -11,7 +11,7 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
 
   <style>
     /* ========== RESET & BASE ========== */
@@ -79,7 +79,6 @@
       font-size: 14px;
       font-weight: 600;
     }
-
     /* ========== HERO ========== */
     .hero {
       height: 50vh;
@@ -282,7 +281,6 @@
       .news-featured-img { height: 200px; }
       .hero { height: 40vh; min-height: 260px; }
     }
-  
     /* Hide Chinese content - English only */
     .zh-content { display: none !important; }
   </style>
@@ -408,7 +406,7 @@
       var html = '';
       var count = 0;
 
-      for (var i = 0; i < newsData.length & count < 3; i++) {
+      for (var i = 0; i < newsData.length && count < 3; i++) {
         if (i === currentIndex) continue;
         var item = newsData[i];
         html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
