@@ -1490,7 +1490,7 @@
         for (var j = startIdx; j < endIdx; j++) {
           var item = newsData[j];
           html += '<a href="news-detail.html?id=' + j + '" class="news-carousel-card">';
-          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(item.img) + '\')">';
+          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')">';
           html += '<div class="news-date">';
           html += '<div class="news-date-day">' + escapeHtml(item.date.day) + '</div>';
           html += '<div>' + escapeHtml(item.date.month) + '</div>';
