@@ -711,28 +711,44 @@ function saveHeroToGitHub() {
   showToast('⏳ 第 1 步：正在同步 hero.json 到 GitHub...', '');
   var content = JSON.stringify(heroData, null, 2);
   var path = 'data/hero.json';
+  var retryCount = 0;
 
-  ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
-    return ghFetch(path, 'PUT', {
-      content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
-      message: 'Admin: Update hero.json',
-      sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
-    });
-  }).then(function(r){
-    if (r.ok) {
+  function doSync() {
+    ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
+      return ghFetch(path, 'PUT', {
+        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
+        message: 'Admin: Update hero.json',
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+      });
+    }).then(function(r){
+      if (r.ok) {
+        heroSyncLock = false;
+        if (btn) btn.disabled = false;
+        updateHeroSyncStatus('success');
+        showToast('✅ 第 2 步：已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+        return;
+      }
+      // SHA 冲突 → 自动重试一次
+      return r.json().then(function(d){
+        var msg = d.message || '';
+        if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
+          retryCount++;
+          showToast('🔄 检测到文件冲突，正在自动重试...', '');
+          updateHeroSyncStatus('saving', '冲突重试中...');
+          return doSync();
+        }
+        throw new Error(msg);
+      });
+    }).catch(function(err){
       heroSyncLock = false;
       if (btn) btn.disabled = false;
-      updateHeroSyncStatus('success');
-      showToast('✅ 第 2 步：已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
-    }
-    else { return r.json().then(function(d){ throw new Error(d.message); }); }
-  }).catch(function(err){
-    heroSyncLock = false;
-    if (btn) btn.disabled = false;
-    var msg = friendlyError(err.message || '');
-    updateHeroSyncStatus('error', msg.slice(0, 30));
-    showToast('❌ 同步失败：' + msg, 'error');
-  });
+      var msg = friendlyError(err.message || '');
+      updateHeroSyncStatus('error', msg.slice(0, 30));
+      showToast('❌ 同步失败：' + msg, 'error');
+    });
+  }
+
+  doSync();
 }
 
 // ==================== GITHUB API SAVE ====================
