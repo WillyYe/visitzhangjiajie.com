@@ -6,6 +6,9 @@
   <title id="pageTitle">Scenic Detail | Zhangjiajie National Forest Park</title>
   <meta name="description" id="metaDesc" content="Explore Zhangjiajie National Forest Park scenic spots." />
   <meta name="theme-color" content="#1a4a30" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <!-- Preconnect for Fonts -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -432,6 +435,12 @@
 
     // ========== RENDER ALL ==========
     function renderAll() {
+      if (!currentScenic) {
+        document.getElementById('scenicContent').innerHTML =
+          '<p style="color:#c0392b;padding:40px;text-align:center;">Scenic spot not found. Please go back and try again.</p>';
+        return;
+      }
+
       // Clear previous slides
       var slider = document.getElementById('heroSlider');
       slider.querySelectorAll('.hero-slide').forEach(function(s) { s.remove(); });
@@ -446,18 +455,20 @@
       document.title = currentScenic.name + ' | Zhangjiajie Park';
       document.getElementById('pageTitle').textContent = currentScenic.name + ' | Zhangjiajie Park';
       document.getElementById('metaDesc').setAttribute('content',
-        currentScenic.desc.substring(0, 160));
+        (currentScenic.desc || '').substring(0, 160));
     }
 
     // ========== RENDER HERO SLIDER ==========
     function renderHeroSlider() {
+      if (!currentScenic) return;
       var slider = document.getElementById('heroSlider');
       var prevBtn = document.getElementById('prevBtn');
       var indicator = document.getElementById('sliderIndicator');
       var slidesHtml = '';
       var dotsHtml = '';
 
-      currentScenic.images.forEach(function(img, idx) {
+      var images = currentScenic.images || [currentScenic.img || ''];
+      images.forEach(function(img, idx) {
         slidesHtml += '<div class="hero-slide' + (idx === 0 ? ' active' : '') + '">';
         slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + img + '\')"></div>';
         slidesHtml += '<div class="hero-overlay"></div>';
@@ -504,28 +515,37 @@
 
     // ========== SCENIC NAVIGATION ==========
     function prevScenic() {
+      if (!scenicData || !currentScenic) return;
       var idx = scenicData.indexOf(currentScenic);
-      if (idx > 0) window.location.href = 'scenic-detail.html?id=' + scenicData[idx - 1].id;
+      if (idx > 0 && scenicData[idx - 1] && scenicData[idx - 1].id) {
+        window.location.href = 'scenic-detail.html?id=' + scenicData[idx - 1].id;
+      }
     }
     function nextScenic() {
+      if (!scenicData || !currentScenic) return;
       var idx = scenicData.indexOf(currentScenic);
-      if (idx < scenicData.length - 1) window.location.href = 'scenic-detail.html?id=' + scenicData[idx + 1].id;
+      if (idx < scenicData.length - 1 && scenicData[idx + 1] && scenicData[idx + 1].id) {
+        window.location.href = 'scenic-detail.html?id=' + scenicData[idx + 1].id;
+      }
     }
 
     // ========== AUTO-PLAY ==========
     function startHeroSlider() {
       if (heroInterval) clearInterval(heroInterval);
-      if (!currentScenic || currentScenic.images.length <= 1) return;
+      if (!currentScenic) return;
+      var images = currentScenic.images || [];
+      if (images.length <= 1) return;
       heroInterval = setInterval(function() {
-        goToSlide((currentSlide + 1) % currentScenic.images.length);
+        goToSlide((currentSlide + 1) % images.length);
       }, 5000);
     }
 
     // ========== RENDER INFO CARDS ==========
     function renderInfoCards() {
+      if (!currentScenic) return;
       var container = document.getElementById('scenicContent');
       var html = '<div class="info-grid">';
-      currentScenic.info.forEach(function(item) {
+      (currentScenic.info || []).forEach(function(item) {
         html += '<div class="info-card">';
         html += '<div class="info-icon">' + item.icon + '</div>';
         html += '<div class="info-label">' + escHtml(item.label) + '</div>';
@@ -538,22 +558,24 @@
 
     // ========== RENDER DESC ==========
     function renderDesc() {
+      if (!currentScenic) return;
       var container = document.getElementById('scenicContent');
       var html = '<div class="section">';
-      html += '<h2 class="section-title">About ' + escHtml(currentScenic.name) + '</h2>';
-      html += '<p>' + escHtml(currentScenic.desc) + '</p>';
+      html += '<h2 class="section-title">About ' + escHtml(currentScenic.name || '') + '</h2>';
+      html += '<p>' + escHtml(currentScenic.desc || '') + '</p>';
       html += '</div>';
       var infoGrid = container.querySelector('.info-grid');
-      infoGrid.insertAdjacentHTML('afterend', html);
+      if (infoGrid) infoGrid.insertAdjacentHTML('afterend', html);
     }
 
     // ========== RENDER ATTRACTIONS ==========
     function renderAttractions() {
+      if (!currentScenic) return;
       var container = document.getElementById('scenicContent');
       var html = '<div class="section">';
       html += '<h2 class="section-title">Key Attractions</h2>';
       html += '<ul class="attraction-list">';
-      currentScenic.attractions.forEach(function(attr) {
+      (currentScenic.attractions || []).forEach(function(attr) {
         html += '<li>';
         html += '<div class="attraction-icon">' + attr.icon + '</div>';
         html += '<div class="attraction-info">';
@@ -569,10 +591,11 @@
 
     // ========== RENDER TIPS ==========
     function renderTips() {
+      if (!currentScenic) return;
       var container = document.getElementById('scenicContent');
       var html = '<div class="tip-box">';
       html += '<h4>💡 Travel Tips</h4><ul>';
-      currentScenic.tips.forEach(function(tip) {
+      (currentScenic.tips || []).forEach(function(tip) {
         html += '<li>' + escHtml(tip) + '</li>';
       });
       html += '</ul></div>';
