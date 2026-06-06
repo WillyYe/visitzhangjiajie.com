@@ -2218,12 +2218,6 @@
       });
     });
     
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', function() {
-      if (AppState.heroSlider) {
-        clearInterval(AppState.heroSlider);
-      }
-      stopNewsAutoplay();
     });
   </script>
 
