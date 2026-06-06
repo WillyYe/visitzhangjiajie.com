@@ -1462,14 +1462,15 @@
       var s = slides[index];
       
       var titleEl = document.getElementById('heroTitle');
-      var titleEnEl = document.getElementById('heroTitleEn');
       var descEl = document.getElementById('heroDesc');
       
-      if (titleEl && s.title) {
-        titleEl.innerHTML = s.title + '<span class="hero-title-en" id="heroTitleEn">' + (s.title.toUpperCase()) + '</span>';
+      // 无论是否为空，只要元素存在就更新（避免显示 HTML 默认文字）
+      if (titleEl) {
+        var displayTitle = s.title || 'Zhangjiajie National Forest Park';
+        titleEl.innerHTML = displayTitle + '<span class="hero-title-en" id="heroTitleEn">' + displayTitle.toUpperCase() + '</span>';
       }
-      if (descEl && s.subtitle) {
-        descEl.textContent = s.subtitle;
+      if (descEl) {
+        descEl.textContent = s.subtitle || 'Explore the pillar-like peaks and experience natural wonders.';
       }
     }
 
