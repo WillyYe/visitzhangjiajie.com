@@ -2218,6 +2218,18 @@
       });
     });
     
+    // bfcache-safe: use pagehide (does NOT disable bfcache)
+    window.addEventListener('pagehide', function() {
+      if (AppState.heroSlider) clearInterval(AppState.heroSlider);
+      stopNewsAutoplay();
+    });
+
+    // Re-init sliders when restored from bfcache
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        startHeroSlider();
+        startNewsAutoplay();
+      }
     });
   </script>
 
