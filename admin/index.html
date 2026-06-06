@@ -395,7 +395,8 @@ function renderDashboard() {
 function renderNews() {
   var h = '';
   newsData.forEach(function(n,i){
-    h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td>'+esc(n.img)+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
+    var imgPreview = n.img ? '<img src="../'+n.img+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
+    h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceNewsImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
   });
   document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
@@ -546,12 +547,12 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 function imgUploadHtml(currentPath, previewStyle) {
   var ps = previewStyle || '';
   var previewSrc = currentPath ? ('../' + currentPath + '?t=' + Date.now()) : '';
-  var previewImg = currentPath ? '<img src="'+previewSrc+'" alt="preview" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display=\'none\'">' : '';
+  var previewImg = currentPath ? '<img src="'+previewSrc+'" alt="preview" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div style=color:#e53935;font-size:12px;padding:8px;background:#ffebee;border-radius:6px>⚠️ 图片加载失败，请检查路径或点击下方「上传图片」重新上传</div>\'">' : '<div style="color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center">暂无图片<br><span style="font-size:11px">点击下方「上传图片」按钮添加</span></div>';
   return '<div class="form-group"><label>图片路径</label>'+
     '<div class="img-upload-wrap">'+
       '<input id="'+modalImgId+'" value="'+esc(currentPath)+'">'+
       '<button type="button" class="img-upload-btn" onclick="triggerUpload(\''+modalImgId+'\')">📁 上传图片</button>'+
-      (currentPath ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350" onclick="document.getElementById(\''+modalImgId+'\').value=\'\';document.getElementById(\'prev_'+modalImgId+'\').innerHTML=\'\'">✕ 清除</button>' : '')+
+      (currentPath ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350" onclick="document.getElementById(\''+modalImgId+'\').value=\'\';document.getElementById(\'prev_'+modalImgId+'\').innerHTML=\'<div style=color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center>暂无图片<br><span style=font-size:11px>点击下方「上传图片」按钮添加</span></div>\'">✕ 清除</button>' : '')+
     '</div>'+
     '<div class="img-preview" id="prev_'+modalImgId+'">'+previewImg+'</div>'+
   '</div>';
@@ -574,7 +575,7 @@ function openNewsModal(idx) {
     '<div class="form-group"><label>描述 <span style="font-size:11px;color:#999" id="newsDescCount">0/200</span></label><textarea id="fDesc" maxlength="200" oninput="document.getElementById(\'newsDescCount\').textContent=this.value.length+\'/200\'">'+esc(n.descEn)+'</textarea></div>'+
     '<div class="form-group"><label>日期（日 / 月 / 年）</label><div style="display:flex;gap:8px">'+
       '<input id="fDay" value="'+esc(n.date.day)+'" placeholder="13" style="flex:1" title="日，如 13">'+
-      '<input id="fMonth" value="'+esc(n.date.month)+'" placeholder="MAY" style="flex:2" title="英文月份缩写，如 MAY">'+
+      '<input id="fMonth" value="'+esc(n.date.month)+'" placeholder="MAY" style="flex:2" title="英文月份缩写，如 MAY" onblur="var v=this.value.trim().toUpperCase();var m=\'JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC\'.split(\' \');if(v&&m.indexOf(v)===-1){this.style.borderColor=\'#e53935\';this.style.background=\'#ffebee\';}else{this.style.borderColor=\'\';this.style.background=\'\';}">'+
       '<input id="fYear" value="'+esc(n.date.year||yearStr)+'" placeholder="2026" style="flex:1" title="年，如 2026">'+
     '</div></div>'+
     '<div class="form-group"><label>标签</label><select id="fTag"><option value="overview" '+(n.tag==='overview'?'selected':'')+'>overview — 概览</option><option value="honor" '+(n.tag==='honor'?'selected':'')+'>honor — 荣誉</option><option value="geo" '+(n.tag==='geo'?'selected':'')+'>geo — 地质</option><option value="eco" '+(n.tag==='eco'?'selected':'')+'>eco — 生态</option><option value="avatar" '+(n.tag==='avatar'?'selected':'')+'>avatar — 阿凡达</option></select></div>'+
@@ -602,6 +603,9 @@ function saveNews() {
   if (!desc) { showToast('❌ 描述不能为空', 'error'); return; }
   if (!img) { showToast('❌ 请上传图片', 'error'); return; }
   if (!day || !month) { showToast('❌ 日期不能为空', 'error'); return; }
+  var monthUpper = month.toUpperCase();
+  var validMonths = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  if (validMonths.indexOf(monthUpper) === -1) { showToast('❌ 月份格式错误，请使用英文缩写（如 MAY、JUN）', 'error'); return; }
 
   var obj = {
     date: {day: day, month: month, year: document.getElementById('fYear').value.trim()},
@@ -618,12 +622,50 @@ function saveNews() {
 }
 
 function deleteNews(i) {
+  if (newsData.length <= 3) { showToast('至少保留 3 条新闻，不可删除','error'); return; }
   if (confirm('确定删除 "' + newsData[i].titleEn + '" 吗？')) {
     newsData.splice(i, 1);
     renderNews(); renderDashboard();
     showToast('✅ 已删除，正在同步到 GitHub...', 'success');
     saveNewsToGitHub();
   }
+}
+
+// 快速替换 News 图片（表格行内操作，一步完成上传+保存+同步）
+function replaceNewsImage(i) {
+  var fi = document.getElementById('fileInput');
+  fi.onchange = function() {
+    var file = fi.files[0];
+    if (!file) return;
+    var btn = document.querySelectorAll('#newsTableBody button')[i*3+1]; // 获取替换按钮
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ 压缩中...'; }
+    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+      var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
+      var path = 'assets/images/' + cleanName;
+      if (btn) { btn.textContent = '⏳ 上传中...'; }
+      ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(fileInfo){
+        return ghFetch(path, 'PUT', {
+          content: base64,
+          message: 'Replace news image: ' + file.name,
+          sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+        });
+      }).then(function(r){
+        if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+        newsData[i].img = path;
+        renderNews();
+        showToast('✅ 图片已替换，正在同步新闻数据...', 'success');
+        saveNewsToGitHub();
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
+      }).catch(function(err){
+        var msg = friendlyError(err.message || '');
+        showToast('❌ 替换失败：' + msg, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
+      });
+    });
+  };
+  fi.value = '';
+  fi.click();
 }
 
 // --- Scenic Modal ---
@@ -739,6 +781,7 @@ function deleteHero(i) {
 
 // ==================== NEWS GITHUB SYNC ====================
 var newsSyncLock = false;
+var allSyncLock = false; // saveAllToGitHub 互斥锁
 
 function updateNewsSyncStatus(state, message) {
   var el = document.getElementById('newsSyncStatus');
@@ -882,6 +925,14 @@ function saveHeroToGitHub() {
 
 // ==================== GITHUB API SAVE ====================
 function saveAllToGitHub() {
+  if (allSyncLock || newsSyncLock || heroSyncLock) {
+    showToast('⏳ 正在同步中，请等待当前同步完成后再操作', '');
+    return;
+  }
+  allSyncLock = true;
+  updateNewsSyncStatus('saving');
+  updateHeroSyncStatus('saving');
+
   var files = {
     'data/news.json': JSON.stringify(newsData, null, 2),
     'data/scenic.json': JSON.stringify(scenicData, null, 2),
@@ -919,6 +970,7 @@ function saveAllToGitHub() {
   });
 
   chain.then(function(){
+    allSyncLock = false;
     if (failed.length === 0) {
       showToast('✅ 全部 ' + completed + ' 个文件已保存到 GitHub！页面将在几分钟内更新 🎉', 'success');
       updateHeroSyncStatus('success');
@@ -926,8 +978,13 @@ function saveAllToGitHub() {
     } else {
       var firstErr = friendlyError(failed[0].err);
       showToast('⚠️ ' + completed + ' 个文件成功，' + failed.length + ' 个失败：' + firstErr, 'error');
+      updateHeroSyncStatus('error', '部分失败');
+      updateNewsSyncStatus('error', '部分失败');
     }
   }).catch(function(err) {
+    allSyncLock = false;
+    updateHeroSyncStatus('error');
+    updateNewsSyncStatus('error');
     showToast('❌ 保存失败：' + friendlyError(err.message), 'error');
   });
 }

@@ -366,19 +366,32 @@
     function getNewsIndex() {
       var params = new URLSearchParams(window.location.search);
       var id = parseInt(params.get('id'), 10);
+      if (newsData.length === 0) return -1;
       if (isNaN(id) || id < 0 || id >= newsData.length) return 0;
       return id;
     }
 
     function getCurrentNews() {
       var index = getNewsIndex();
+      if (index === -1 || !newsData[index]) return { data: null, index: -1 };
       return { data: newsData[index], index: index };
     }
 
     // ========== RENDER NEWS DETAIL ==========
     function renderNewsDetail() {
       var news = getCurrentNews().data;
-
+      if (!news) {
+        document.getElementById('heroBg').style.background = '#1a4a30';
+        document.getElementById('heroBadge').textContent = 'NEWS';
+        document.getElementById('heroTitle').textContent = 'No news available';
+        document.getElementById('heroDate').textContent = '';
+        document.getElementById('newsTag').textContent = '';
+        document.getElementById('newsDateText').textContent = '';
+        document.getElementById('newsFeaturedImg').style.display = 'none';
+        document.getElementById('newsBody').innerHTML = '<p style="color:#888;text-align:center;padding:40px 0">暂无新闻数据</p>';
+        document.title = 'News | Zhangjiajie National Forest Park';
+        return;
+      }
       document.getElementById('heroBg').style.backgroundImage = 'url(\'' + news.img + '?v=2\')';
       document.getElementById('heroBadge').textContent = news.tag.toUpperCase();
       document.getElementById('heroTitle').textContent = news.titleEn;
@@ -425,13 +438,13 @@
 
     // ========== INITIALIZE ==========
     document.addEventListener('DOMContentLoaded', function() {
-      
-      renderRelatedNews();
-    
       loadNewsData().then(function() {
         renderNewsDetail();
+        renderRelatedNews();
       }).catch(function(err) {
         console.error('Failed to load news:', err);
+        renderNewsDetail();
+        renderRelatedNews();
       });
     });
   </script>
