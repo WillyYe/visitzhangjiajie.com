@@ -32,7 +32,7 @@
   {
     "id": "huangshijia",
     "href": "scenic-detail.html?id=huangshijia",
-    "img": "assets/images/gal-yuanjiajie.jpg",
+    "img": "assets/images/scenic-huangshijia.jpg",
     "large": false,
     "tagEn": "Tujia Culture",
     "nameEn": "Huangshijia",
@@ -42,7 +42,7 @@
   {
     "id": "silkongqiao",
     "href": "scenic-detail.html?id=silkongqiao",
-    "img": "assets/images/gal-clouds.jpg",
+    "img": "assets/images/scenic-firstbridge.jpg",
     "large": false,
     "tagEn": "First Bridge Under Heaven",
     "nameEn": "First Bridge Under Heaven",
@@ -52,7 +52,7 @@
   {
     "id": "yongding",
     "href": "scenic-detail.html?id=yongding",
-    "img": "assets/images/gal-culture.jpg",
+    "img": "assets/images/scenic-yongding.jpg",
     "large": false,
     "tagEn": "Tujia Ancient Town",
     "nameEn": "Yongding Ancient Town",
@@ -62,7 +62,7 @@
   {
     "id": "shadao",
     "href": "scenic-detail.html?id=shadao",
-    "img": "assets/images/gal-sunrise.jpg",
+    "img": "assets/images/scenic-shadao.jpg",
     "large": false,
     "tagEn": "Classic Route",
     "nameEn": "Shadao Valley",
@@ -72,7 +72,7 @@
   {
     "id": "shuangshiyoupu",
     "href": "scenic-detail.html?id=shuangshiyoupu",
-    "img": "assets/images/gal-spring.jpg",
+    "img": "assets/images/scenic-twinpeaks.jpg",
     "large": false,
     "tagEn": "Scenic Gallery",
     "nameEn": "Twin Peaks",
@@ -82,7 +82,7 @@
   {
     "id": "wulongkarst",
     "href": "scenic-detail.html?id=wulongkarst",
-    "img": "assets/images/gal-autumn.jpg",
+    "img": "assets/images/scenic-wulong.jpg",
     "large": false,
     "tagEn": "Karst Landscape",
     "nameEn": "Wulong Karst Caves",
@@ -92,7 +92,7 @@
   {
     "id": "tianpingshan",
     "href": "scenic-detail.html?id=tianpingshan",
-    "img": "assets/images/gal-winter.jpg",
+    "img": "assets/images/scenic-tianping.jpg",
     "large": false,
     "tagEn": "Sunrise & Sea of Clouds",
     "nameEn": "Tianping Mountain",

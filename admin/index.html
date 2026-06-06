@@ -223,7 +223,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
   <!-- Scenic -->
   <div class="content-section" id="sec-scenic">
-    <div class="main-header" style="margin-bottom:16px"><h2>景区管理</h2><button class="btn btn-primary" onclick="openScenicModal()">+ 新增景区</button></div>
+    <div class="main-header" style="margin-bottom:16px"><h2>景区管理</h2><div style="display:flex;align-items:center;gap:12px"><div class="sync-status" id="scenicSyncStatus"><span class="sync-dot"></span><span class="sync-text">未同步</span></div><button class="btn btn-primary" onclick="openScenicModal()">+ 新增景区</button></div></div>
+    <div class="info-banner" style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:12px 16px;margin-bottom:16px;color:#2e7d32;font-size:13px">
+      <strong>操作说明：</strong>点击「编辑」修改景区信息，点击「🔄 替换图片」快速更换图片。修改后自动同步到 GitHub，前台约 1-2 分钟更新。
+    </div>
     <div class="table-wrapper"><table><thead><tr><th>ID</th><th>名称</th><th>标签</th><th>图片</th><th>大图</th><th>操作</th></tr></thead><tbody id="scenicTableBody"></tbody></table></div>
   </div>
 
@@ -404,7 +407,8 @@ function renderNews() {
 function renderScenic() {
   var h = '';
   scenicData.forEach(function(s,i){
-    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.nameEn)+'</td><td>'+esc(s.tagEn)+'</td><td>'+esc(s.img)+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
+    var imgPreview = s.img ? '<img src="../'+s.img+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
+    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.nameEn)+'</td><td>'+esc(s.tagEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceScenicImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
   });
   document.getElementById('scenicTableBody').innerHTML = h || '<tr><td colspan="6" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
@@ -684,17 +688,69 @@ function openScenicModal(idx) {
 }
 
 function saveScenic() {
-  var id = document.getElementById('fId').value;
+  var id = document.getElementById('fId').value.trim();
+  var nameEn = document.getElementById('fName').value.trim();
+  var img = document.getElementById(modalImgId).value.trim();
+  if (!id) { showToast('❌ ID 不能为空', 'error'); return; }
+  if (!nameEn) { showToast('❌ 名称不能为空', 'error'); return; }
+  if (!img) { showToast('❌ 请上传图片', 'error'); return; }
   var obj = {
-    id: id, href: 'scenic-detail.html?id='+id,     img: document.getElementById(modalImgId).value,
-    large: document.getElementById('fLarge').checked, tagEn: document.getElementById('fTag').value,
-    nameEn: document.getElementById('fName').value, subTitleEn: document.getElementById('fSub').value,
-    descEn: document.getElementById('fDesc').value
+    id: id, href: 'scenic-detail.html?id='+id,     img: img,
+    large: document.getElementById('fLarge').checked, tagEn: document.getElementById('fTag').value.trim(),
+    nameEn: nameEn, subTitleEn: document.getElementById('fSub').value.trim(),
+    descEn: document.getElementById('fDesc').value.trim()
   };
   if (editingIndex >= 0) scenicData[editingIndex] = obj; else scenicData.push(obj);
-  closeModal(); renderScenic(); renderDashboard(); showToast('景区已保存 ✅','success');
+  closeModal(); renderScenic(); renderDashboard();
+  showToast('✅ 景区已保存，正在同步到 GitHub...', 'success');
+  saveScenicToGitHub();
 }
-function deleteScenic(i) { if(confirm('确定删除 "'+scenicData[i].nameEn+'" 吗？')){scenicData.splice(i,1); renderScenic(); renderDashboard(); showToast('已删除','success');} }
+function deleteScenic(i) {
+  if (scenicData.length <= 3) { showToast('至少保留 3 个景区，不可删除', 'error'); return; }
+  if (confirm('确定删除 "'+scenicData[i].nameEn+'" 吗？')) {
+    scenicData.splice(i,1); renderScenic(); renderDashboard();
+    showToast('✅ 已删除，正在同步到 GitHub...', 'success');
+    saveScenicToGitHub();
+  }
+}
+
+// 快速替换 Scenic 图片（表格行内操作，一步完成上传+保存+同步）
+function replaceScenicImage(i) {
+  var fi = document.getElementById('fileInput');
+  fi.onchange = function() {
+    var file = fi.files[0];
+    if (!file) return;
+    var btns = document.querySelectorAll('#scenicTableBody tr')[i].querySelectorAll('button');
+    var btn = btns[1]; // 替换图片按钮
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ 压缩中...'; }
+    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+      var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
+      var path = 'assets/images/' + cleanName;
+      if (btn) { btn.textContent = '⏳ 上传中...'; }
+      ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(fileInfo){
+        return ghFetch(path, 'PUT', {
+          content: base64,
+          message: 'Replace scenic image: ' + file.name,
+          sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+        });
+      }).then(function(r){
+        if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+        scenicData[i].img = path;
+        renderScenic();
+        showToast('✅ 图片已替换，正在同步景区数据...', 'success');
+        saveScenicToGitHub();
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
+      }).catch(function(err){
+        var msg = friendlyError(err.message || '');
+        showToast('❌ 替换失败：' + msg, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
+      });
+    });
+  };
+  fi.value = '';
+  fi.click();
+}
 
 // --- Experience Modal ---
 function openExpModal(idx) {
@@ -851,6 +907,73 @@ function saveNewsToGitHub() {
   doSync();
 }
 
+// ==================== SCENIC GITHUB SYNC ====================
+var scenicSyncLock = false;
+
+function updateScenicSyncStatus(state, message) {
+  var el = document.getElementById('scenicSyncStatus');
+  if (!el) return;
+  var dot = el.querySelector('.sync-dot');
+  var text = el.querySelector('.sync-text');
+  var states = {
+    idle:    { color: '#aaa', label: '未同步' },
+    saving:  { color: '#f9a825', label: '同步中...' },
+    success: { color: '#43a047', label: '已同步 ✓' },
+    error:   { color: '#e53935', label: '同步失败 ✕' }
+  };
+  var s = states[state] || states.idle;
+  dot.style.background = s.color;
+  text.textContent = message || s.label;
+}
+
+function saveScenicToGitHub() {
+  if (scenicSyncLock) {
+    showToast('⏳ 正在同步中，请稍候...', '');
+    return;
+  }
+  scenicSyncLock = true;
+  updateScenicSyncStatus('saving');
+
+  showToast('⏳ 第 1 步：正在同步 scenic.json 到 GitHub...', '');
+  var content = JSON.stringify(scenicData, null, 2);
+  var path = 'data/scenic.json';
+  var retryCount = 0;
+
+  function doSync() {
+    ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
+      return ghFetch(path, 'PUT', {
+        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
+        message: 'Admin: Update scenic.json',
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+      });
+    }).then(function(r){
+      if (r.ok) {
+        scenicSyncLock = false;
+        updateScenicSyncStatus('success');
+        showToast('✅ 第 2 步：景区已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+        return;
+      }
+      return r.json().then(function(d){
+        var msg = d.message || '';
+        if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
+          retryCount++;
+          showToast('🔄 检测到文件冲突，正在自动重试...', '');
+          updateScenicSyncStatus('saving', '冲突重试中...');
+          return doSync();
+        }
+        throw new Error(msg);
+      });
+    }).catch(function(err){
+      scenicSyncLock = false;
+      var msg = friendlyError(err.message || '');
+      updateScenicSyncStatus('error', msg.slice(0, 30));
+      showToast('❌ 同步失败：' + msg, 'error');
+    });
+  }
+
+  doSync();
+}
+
 // ==================== HERO GITHUB SYNC ====================
 var heroSyncLock = false; // 防止并发同步
 
@@ -925,13 +1048,14 @@ function saveHeroToGitHub() {
 
 // ==================== GITHUB API SAVE ====================
 function saveAllToGitHub() {
-  if (allSyncLock || newsSyncLock || heroSyncLock) {
+  if (allSyncLock || newsSyncLock || heroSyncLock || scenicSyncLock) {
     showToast('⏳ 正在同步中，请等待当前同步完成后再操作', '');
     return;
   }
   allSyncLock = true;
   updateNewsSyncStatus('saving');
   updateHeroSyncStatus('saving');
+  updateScenicSyncStatus('saving');
 
   var files = {
     'data/news.json': JSON.stringify(newsData, null, 2),
@@ -975,16 +1099,19 @@ function saveAllToGitHub() {
       showToast('✅ 全部 ' + completed + ' 个文件已保存到 GitHub！页面将在几分钟内更新 🎉', 'success');
       updateHeroSyncStatus('success');
       updateNewsSyncStatus('success');
+      updateScenicSyncStatus('success');
     } else {
       var firstErr = friendlyError(failed[0].err);
       showToast('⚠️ ' + completed + ' 个文件成功，' + failed.length + ' 个失败：' + firstErr, 'error');
       updateHeroSyncStatus('error', '部分失败');
       updateNewsSyncStatus('error', '部分失败');
+      updateScenicSyncStatus('error', '部分失败');
     }
   }).catch(function(err) {
     allSyncLock = false;
     updateHeroSyncStatus('error');
     updateNewsSyncStatus('error');
+    updateScenicSyncStatus('error');
     showToast('❌ 保存失败：' + friendlyError(err.message), 'error');
   });
 }

@@ -1385,6 +1385,15 @@
       heroAutoplay: true
     };
 
+    // Scenic auto-scroll state
+    var ScenicCarouselState = {
+      timer: null,
+      delay: 5000,
+      isPaused: false,
+      touchStartX: 0,
+      touchEndX: 0
+    };
+
     /* ========== UTILITY FUNCTIONS ========== */
     function escapeHtml(str) {
       if (!str) return '';
@@ -1647,31 +1656,31 @@
 
     function renderScenic() {
       try {
-        console.log('[renderScenic] START, AppState.scenicPage =', AppState.scenicPage);
         var container = document.getElementById('scenicGrid');
         var pagination = document.getElementById('scenicPagination');
-        if (!container) { console.error('[renderScenic] ERROR: scenicGrid not found'); return; }
-        if (!pagination) { console.error('[renderScenic] ERROR: scenicPagination not found'); return; }
-        
-        
+        if (!container || !pagination) return;
+
+        // 空数据保护
+        if (!scenicData || scenicData.length === 0) {
+          container.innerHTML = '';
+          pagination.innerHTML = '';
+          stopScenicAutoplay();
+          return;
+        }
+
         var itemsPerPage = 3;
         var totalPages = Math.ceil(scenicData.length / itemsPerPage);
         var currentPage = AppState.scenicPage || 1;
-        
-                
-        // Calculate start and end indices
+        if (currentPage > totalPages) { currentPage = 1; AppState.scenicPage = 1; }
+
         var startIdx = (currentPage - 1) * itemsPerPage;
         var endIdx = Math.min(startIdx + itemsPerPage, scenicData.length);
         var pageItems = scenicData.slice(startIdx, endIdx);
-        
-        console.log('[renderScenic] Rendering items', startIdx, 'to', (endIdx-1), '(', pageItems.length, 'items)');
-        
-        // Render current page items
+
         var html = '';
-        pageItems.forEach(function(item, idx) {
-          console.log('[renderScenic] Item', idx, ':', item.id, ', img:', item.img);
+        pageItems.forEach(function(item) {
           html += '<a href="' + item.href + '" class="scenic-card fade-up">';
-          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '\')"></div>';
+          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')"></div>';
           html += '<div class="scenic-overlay">';
           html += '<div class="scenic-tag">' + escapeHtml(item.tagEn) + '</div>';
           html += '<h3 class="scenic-name">' + escapeHtml(item.nameEn) + '</h3>';
@@ -1680,48 +1689,85 @@
           html += '<span class="scenic-link">' + escapeHtml('Explore More →') + '</span>';
           html += '</div></a>';
         });
-        
-        console.log('[renderScenic] Setting innerHTML, length =', html.length);
+
         container.innerHTML = html;
-        
-        // IMPORTANT: Show cards IMMEDIATELY (don't wait for images)
+
         var cards = container.querySelectorAll('.fade-up');
-        console.log('[renderScenic] Found', cards.length, 'cards, adding .visible');
-        cards.forEach(function(el) {
-          el.classList.add('visible');
-        });
-        
-        // Preload background images (non-blocking, for debugging only)
-        var bgElements = container.querySelectorAll('.scenic-bg');
-        console.log('[renderScenic] Preloading', bgElements.length, 'background images');
-        bgElements.forEach(function(bg, idx) {
-          var style = bg.style.backgroundImage;
-          var urlMatch = style.match(/url\(['"]?([^'"]+)['"]?\)/);
-          if (urlMatch && urlMatch[1]) {
-            var img = new Image();
-            img.onload = function() { console.log('[renderScenic] Image', idx, 'loaded:', urlMatch[1]); };
-            img.onerror = function() { console.error('[renderScenic] Image', idx, 'FAILED:', urlMatch[1]); };
-            img.src = urlMatch[1];
-          }
-        });
-        
+        cards.forEach(function(el) { el.classList.add('visible'); });
+
         // Render pagination dots
         var dotsHtml = '';
         for (var i = 1; i <= totalPages; i++) {
-          dotsHtml += '<button class="pagination-dot' + (i === currentPage ? ' active' : '') + '" onclick="goToScenicPage(' + i + ')"></button>';
+          dotsHtml += '<button class="pagination-dot' + (i === currentPage ? ' active' : '') + '" onclick="goToScenicPage(' + i + ')" aria-label="Page ' + i + '"></button>';
         }
-        console.log('[renderScenic] Rendering', totalPages, 'pagination dots');
         pagination.innerHTML = dotsHtml;
-        
-        console.log('[renderScenic] COMPLETED successfully');
+
+        // Restart auto-scroll
+        startScenicAutoplay();
       } catch(e) {
-        console.error('[renderScenic] ERROR:', e.message, e.stack);
+        console.error('[renderScenic] ERROR:', e.message);
       }
     }
 
     function goToScenicPage(page) {
+      var totalPages = Math.ceil((scenicData || []).length / 3);
+      if (totalPages <= 0) return;
+      if (page < 1) page = totalPages;
+      if (page > totalPages) page = 1;
       AppState.scenicPage = page;
       renderScenic();
+    }
+
+    function nextScenicPage() {
+      var totalPages = Math.ceil((scenicData || []).length / 3);
+      if (totalPages <= 1) return;
+      var next = (AppState.scenicPage || 1) + 1;
+      if (next > totalPages) next = 1;
+      goToScenicPage(next);
+    }
+
+    function startScenicAutoplay() {
+      stopScenicAutoplay();
+      var totalPages = Math.ceil((scenicData || []).length / 3);
+      if (totalPages <= 1) return;
+      ScenicCarouselState.timer = setInterval(function() {
+        if (!ScenicCarouselState.isPaused) {
+          nextScenicPage();
+        }
+      }, ScenicCarouselState.delay);
+    }
+
+    function stopScenicAutoplay() {
+      if (ScenicCarouselState.timer) {
+        clearInterval(ScenicCarouselState.timer);
+        ScenicCarouselState.timer = null;
+      }
+    }
+
+    function pauseScenicAutoplay() { ScenicCarouselState.isPaused = true; }
+    function resumeScenicAutoplay() { ScenicCarouselState.isPaused = false; }
+
+    function handleScenicTouchStart(e) {
+      ScenicCarouselState.touchStartX = e.touches[0].clientX;
+      pauseScenicAutoplay();
+    }
+    function handleScenicTouchMove(e) {
+      ScenicCarouselState.touchEndX = e.touches[0].clientX;
+    }
+    function handleScenicTouchEnd(e) {
+      if (ScenicCarouselState.touchStartX === 0) { resumeScenicAutoplay(); return; }
+      var diff = ScenicCarouselState.touchStartX - ScenicCarouselState.touchEndX;
+      var threshold = 50;
+      if (Math.abs(diff) > threshold) {
+        if (diff > 0) nextScenicPage();
+        else {
+          var prev = (AppState.scenicPage || 1) - 1;
+          goToScenicPage(prev);
+        }
+      }
+      ScenicCarouselState.touchStartX = 0;
+      ScenicCarouselState.touchEndX = 0;
+      resumeScenicAutoplay();
     }
 
     function renderGallery() {
@@ -2018,6 +2064,19 @@
             renderNewsCarousel(false);
           }, 250);
         });
+      }
+
+      // Scenic section auto-scroll + touch swipe
+      var scenicSection = document.getElementById('scenic');
+      if (scenicSection) {
+        scenicSection.addEventListener('mouseenter', pauseScenicAutoplay);
+        scenicSection.addEventListener('mouseleave', resumeScenicAutoplay);
+        var scenicGridEl = document.getElementById('scenicGrid');
+        if (scenicGridEl) {
+          scenicGridEl.addEventListener('touchstart', handleScenicTouchStart, { passive: true });
+          scenicGridEl.addEventListener('touchmove', handleScenicTouchMove, { passive: true });
+          scenicGridEl.addEventListener('touchend', handleScenicTouchEnd, { passive: true });
+        }
       }
       
       // Fade animation
