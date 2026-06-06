@@ -408,9 +408,11 @@ function renderScenic() {
   var h = '';
   scenicData.forEach(function(s,i){
     var imgPreview = s.img ? '<img src="../'+s.img+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
-    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.nameEn)+'</td><td>'+esc(s.tagEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceScenicImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
+    var subTitleShort = (s.subTitleEn||'').length > 20 ? (s.subTitleEn||'').substring(0,20)+'...' : (s.subTitleEn||'—');
+    var descShort = (s.descEn||'').length > 30 ? (s.descEn||'').substring(0,30)+'...' : (s.descEn||'—');
+    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.nameEn)+'</td><td>'+esc(s.tagEn)+'</td><td title="'+esc(s.subTitleEn)+'">'+esc(subTitleShort)+'</td><td title="'+esc(s.descEn)+'">'+esc(descShort)+'</td><td style="text-align:center">'+imgPreview+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceScenicImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
   });
-  document.getElementById('scenicTableBody').innerHTML = h || '<tr><td colspan="6" style="text-align:center;color:#999">暂无数据</td></tr>';
+  document.getElementById('scenicTableBody').innerHTML = h || '<tr><td colspan="8" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
 
 function renderExp() {
@@ -694,6 +696,17 @@ function saveScenic() {
   if (!id) { showToast('❌ ID 不能为空', 'error'); return; }
   if (!nameEn) { showToast('❌ 名称不能为空', 'error'); return; }
   if (!img) { showToast('❌ 请上传图片', 'error'); return; }
+  // ID 重复检查
+  var duplicateIdx = -1;
+  for (var i = 0; i < scenicData.length; i++) {
+    if (scenicData[i].id === id) { duplicateIdx = i; break; }
+  }
+  if (editingIndex < 0 && duplicateIdx >= 0) {
+    showToast('❌ ID "' + id + '" 已存在，请使用其他 ID', 'error'); return;
+  }
+  if (editingIndex >= 0 && duplicateIdx >= 0 && duplicateIdx !== editingIndex) {
+    showToast('❌ ID "' + id + '" 已被其他景区使用，请使用其他 ID', 'error'); return;
+  }
   var obj = {
     id: id, href: 'scenic-detail.html?id='+id,     img: img,
     large: document.getElementById('fLarge').checked, tagEn: document.getElementById('fTag').value.trim(),
@@ -708,6 +721,11 @@ function saveScenic() {
 function deleteScenic(i) {
   if (scenicData.length <= 3) { showToast('至少保留 3 个景区，不可删除', 'error'); return; }
   if (confirm('确定删除 "'+scenicData[i].nameEn+'" 吗？')) {
+    // 尝试删除关联的图片文件（最佳努力，失败不阻塞）
+    var imgPath = scenicData[i].img;
+    if (imgPath) {
+      deleteFileFromGitHub(imgPath, 'Delete unused image: ' + imgPath).catch(function(){});
+    }
     scenicData.splice(i,1); renderScenic(); renderDashboard();
     showToast('✅ 已删除，正在同步到 GitHub...', 'success');
     saveScenicToGitHub();
@@ -720,6 +738,7 @@ function replaceScenicImage(i) {
   fi.onchange = function() {
     var file = fi.files[0];
     if (!file) return;
+    var oldImg = scenicData[i].img; // 保存旧图片路径
     var btns = document.querySelectorAll('#scenicTableBody tr')[i].querySelectorAll('button');
     var btn = btns[1]; // 替换图片按钮
     if (btn) { btn.disabled = true; btn.textContent = '⏳ 压缩中...'; }
@@ -736,15 +755,17 @@ function replaceScenicImage(i) {
         });
       }).then(function(r){
         if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+        // 删除旧图片（最佳努力，失败不阻塞）
+        if (oldImg && oldImg !== path) {
+          deleteFileFromGitHub(oldImg, 'Delete old image: ' + oldImg).catch(function(){});
+        }
         scenicData[i].img = path;
         renderScenic();
         showToast('✅ 图片已替换，正在同步景区数据...', 'success');
         saveScenicToGitHub();
-        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
       }).catch(function(err){
         var msg = friendlyError(err.message || '');
         showToast('❌ 替换失败：' + msg, 'error');
-        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
       });
     });
   };
@@ -972,6 +993,20 @@ function saveScenicToGitHub() {
   }
 
   doSync();
+}
+
+// ==================== DELETE FILE FROM GITHUB ====================
+// 从 GitHub 仓库删除文件（最佳努力，失败不阻塞主流程）
+function deleteFileFromGitHub(path, message) {
+  return ghFetch(path, 'GET').then(function(r) {
+    if (!r.ok) throw new Error('File not found');
+    return r.json();
+  }).then(function(fileInfo) {
+    return ghFetch(path, 'DELETE', {
+      message: message || 'Delete file: ' + path,
+      sha: fileInfo.sha
+    });
+  });
 }
 
 // ==================== HERO GITHUB SYNC ====================
