@@ -229,7 +229,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   <div class="content-section" id="sec-hero">
     <div class="main-header" style="margin-bottom:16px"><h2>Hero 轮播管理</h2><span class="hero-limit-hint" id="heroLimitHint"></span></div>
     <div class="hero-grid" id="heroGrid"></div>
-    <div class="hero-sync-bar"><button class="btn btn-primary" onclick="saveHeroToGitHub()">💾 同步 Hero 到 GitHub</button></div>
+    <div class="hero-sync-bar">
+      <button class="btn btn-primary" id="btnSyncHero" onclick="saveHeroToGitHub()">💾 同步 Hero 到 GitHub</button>
+      <span class="sync-status" id="heroSyncStatus" style="margin-left:12px;font-size:13px;display:inline-flex;align-items:center;gap:6px">
+        <span class="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block"></span>
+        <span class="sync-text">未同步</span>
+      </span>
+    </div>
   </div>
 
   <!-- Settings -->
@@ -325,12 +331,13 @@ var DATA_BASE = '../data/';
 var newsData = [], scenicData = [], expData = [], galleryData = [], heroData = {slides:[]};
 
 function loadAllData() {
+  var t = Date.now();
   return Promise.all([
-    fetch(DATA_BASE + 'news.json').then(function(r){return r.json()}).then(function(d){newsData=d}),
-    fetch(DATA_BASE + 'scenic.json').then(function(r){return r.json()}).then(function(d){scenicData=d}),
-    fetch(DATA_BASE + 'experience.json').then(function(r){return r.json()}).then(function(d){expData=d}),
-    fetch(DATA_BASE + 'gallery.json').then(function(r){return r.json()}).then(function(d){galleryData=d}),
-    fetch(DATA_BASE + 'hero.json').then(function(r){return r.json()}).then(function(d){heroData=d})
+    fetch(DATA_BASE + 'news.json?t=' + t).then(function(r){return r.json()}).then(function(d){newsData=d}),
+    fetch(DATA_BASE + 'scenic.json?t=' + t).then(function(r){return r.json()}).then(function(d){scenicData=d}),
+    fetch(DATA_BASE + 'experience.json?t=' + t).then(function(r){return r.json()}).then(function(d){expData=d}),
+    fetch(DATA_BASE + 'gallery.json?t=' + t).then(function(r){return r.json()}).then(function(d){galleryData=d}),
+    fetch(DATA_BASE + 'hero.json?t=' + t).then(function(r){return r.json()}).then(function(d){heroData=d})
   ]);
 }
 
@@ -407,6 +414,9 @@ function renderHero() {
       '<div class="hero-img-wrap">' +
         (hasImg ? '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' : '') +
         '<div class="hero-img-placeholder" style="' + (hasImg ? 'display:none' : 'display:flex') + '"><span style="font-size:14px;text-align:center;line-height:1.4">图片未上传<br><span style="font-size:11px;color:#aaa">点击下方「替换图片」上传</span></span></div>' +
+        '<div class="hero-progress" id="heroProg_' + i + '" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(0,0,0,0.1);border-radius:0 0 8px 8px;overflow:hidden">' +
+          '<div class="hero-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#43a047,#66bb6a);transition:width 0.3s"></div>' +
+        '</div>' +
       '</div>' +
       '<div class="hero-body">' +
         '<div class="hero-idx">Slide #' + (i+1) + '</div>' +
@@ -441,14 +451,20 @@ function renderHero() {
 // ==================== HERO IMAGE REPLACE ====================
 function replaceHeroImage(idx) {
   var fi = document.getElementById('fileInput');
-  pendingUploads._targetInput = null; // direct replace, no modal input
+  pendingUploads._targetInput = null;
   fi.onchange = function() {
     var file = fi.files[0];
     if (!file) return;
+    // 显示进度条
+    var prog = document.getElementById('heroProg_' + idx);
+    var fill = prog ? prog.querySelector('.hero-progress-fill') : null;
+    if (prog) prog.style.display = 'block';
+    if (fill) fill.style.width = '5%';
     showToast('🖼 压缩图片中...', '');
     compressImage(file, 1920, 0.85, function(base64, compressedSize) {
       var newSize = (compressedSize / 1024 / 1024).toFixed(1);
-      showToast('⏳ 压缩后 ' + newSize + 'MB，上传中...', '');
+      if (fill) fill.style.width = '30%';
+      showToast('⏳ 压缩完成 ' + newSize + 'MB，准备上传...', '');
       var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
       var path = 'assets/images/' + cleanName;
       directHeroUpload(path, base64, file.name, idx);
@@ -459,10 +475,14 @@ function replaceHeroImage(idx) {
 }
 
 function directHeroUpload(path, base64Content, fileName, idx) {
+  var prog = document.getElementById('heroProg_' + idx);
+  var fill = prog ? prog.querySelector('.hero-progress-fill') : null;
+  if (fill) fill.style.width = '40%';
   showToast('🔍 检查仓库中...', '');
 
   ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
   .then(function(fileInfo) {
+    if (fill) fill.style.width = '60%';
     showToast('📤 正在上传 ' + fileName + ' ...', '');
     return ghFetch(path, 'PUT', {
       content: base64Content,
@@ -471,11 +491,16 @@ function directHeroUpload(path, base64Content, fileName, idx) {
     });
   }).then(function(r){
     if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+    if (fill) fill.style.width = '100%';
     heroData.slides[idx].img = path;
     renderHero();
     showToast('✅ 图片已替换，正在同步 Hero 数据...', 'success');
+    // 隐藏进度条（等一小段时间让用户体验完成）
+    setTimeout(function(){ if (prog) prog.style.display = 'none'; }, 1200);
     saveHeroToGitHub();
   }).catch(function(err){
+    if (prog) { prog.querySelector('.hero-progress-fill').style.background = '#e53935'; }
+    setTimeout(function(){ if (prog) prog.style.display = 'none'; }, 2000);
     var msg = friendlyError(err.message || '');
     showToast('❌ 替换失败：' + msg, 'error');
   });
@@ -618,16 +643,23 @@ function deleteGallery(i) { if(confirm('确定删除此图片吗？')){galleryDa
 
 // --- Hero Modal (add or edit) ---
 function openHeroModal(idx) {
-  // If called from "add card", idx is undefined → new slide
-  // If called from edit (legacy), idx is the slide index
   editingIndex = idx !== undefined ? idx : -1;
   var s = editingIndex >= 0 ? heroData.slides[editingIndex] : {img:'',title:'',subtitle:''};
   var titleText = editingIndex >= 0 ? '编辑 Hero Slide #'+(editingIndex+1) : '新增 Hero Slide';
   showModal(titleText,
-    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(s.title)+'"></div>'+
-    '<div class="form-group"><label>副标题</label><input id="fSub" value="'+esc(s.subtitle)+'"></div>'+
+    '<div class="form-group"><label>标题 <span style="font-size:11px;color:#999" id="titleCount">0/60</span></label><input id="fTitle" value="'+esc(s.title)+'" maxlength="60" oninput="document.getElementById(\'titleCount\').textContent=this.value.length+\'/60\'"></div>'+
+    '<div class="form-group"><label>副标题 <span style="font-size:11px;color:#999" id="subCount">0/120</span></label><input id="fSub" value="'+esc(s.subtitle)+'" maxlength="120" oninput="document.getElementById(\'subCount\').textContent=this.value.length+\'/120\'"></div>'+
     imgUploadHtml(s.img)+
     '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveHero()">保存</button></div>');
+  // 初始化字符计数
+  setTimeout(function(){
+    var tEl = document.getElementById('fTitle');
+    var sEl = document.getElementById('fSub');
+    var tCnt = document.getElementById('titleCount');
+    var sCnt = document.getElementById('subCount');
+    if (tEl && tCnt) tCnt.textContent = tEl.value.length + '/60';
+    if (sEl && sCnt) sCnt.textContent = sEl.value.length + '/120';
+  }, 50);
 }
 function saveHero() {
   var count = heroData.slides.length;
@@ -636,7 +668,7 @@ function saveHero() {
   if (!imgPath) { showToast('请上传或填写图片路径','error'); return; }
   var obj = {img:imgPath,title:document.getElementById('fTitle').value,subtitle:document.getElementById('fSub').value};
   if (editingIndex >= 0) heroData.slides[editingIndex] = obj; else heroData.slides.push(obj);
-  closeModal(); renderHero(); renderDashboard(); showToast('Hero 已保存 ✅','success');
+  closeModal(); renderHero(); renderDashboard(); showToast('✅ 已保存到本地，正在同步到 GitHub...','success');
   saveHeroToGitHub();
 }
 function deleteHero(i) {
@@ -648,8 +680,35 @@ function deleteHero(i) {
 }
 
 // ==================== HERO GITHUB SYNC ====================
+var heroSyncLock = false; // 防止并发同步
+
+function updateHeroSyncStatus(state, message) {
+  var el = document.getElementById('heroSyncStatus');
+  if (!el) return;
+  var dot = el.querySelector('.sync-dot');
+  var text = el.querySelector('.sync-text');
+  var states = {
+    idle:    { color: '#aaa', label: '未同步' },
+    saving:  { color: '#f9a825', label: '同步中...' },
+    success: { color: '#43a047', label: '已同步 ✓' },
+    error:   { color: '#e53935', label: '同步失败 ✕' }
+  };
+  var s = states[state] || states.idle;
+  dot.style.background = s.color;
+  text.textContent = message || s.label;
+}
+
 function saveHeroToGitHub() {
-  showToast('⏳ 正在同步 hero.json 到 GitHub...','');
+  if (heroSyncLock) {
+    showToast('⏳ 正在同步中，请稍候...', '');
+    return;
+  }
+  heroSyncLock = true;
+  var btn = document.getElementById('btnSyncHero');
+  if (btn) btn.disabled = true;
+  updateHeroSyncStatus('saving');
+
+  showToast('⏳ 第 1 步：正在同步 hero.json 到 GitHub...', '');
   var content = JSON.stringify(heroData, null, 2);
   var path = 'data/hero.json';
 
@@ -660,10 +719,19 @@ function saveHeroToGitHub() {
       sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
     });
   }).then(function(r){
-    if (r.ok) { showToast('Hero 已同步到 GitHub！页面将在几分钟内更新 🎉','success'); }
+    if (r.ok) {
+      heroSyncLock = false;
+      if (btn) btn.disabled = false;
+      updateHeroSyncStatus('success');
+      showToast('✅ 第 2 步：已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+    }
     else { return r.json().then(function(d){ throw new Error(d.message); }); }
   }).catch(function(err){
-    showToast('同步失败: '+err.message,'error');
+    heroSyncLock = false;
+    if (btn) btn.disabled = false;
+    var msg = friendlyError(err.message || '');
+    updateHeroSyncStatus('error', msg.slice(0, 30));
+    showToast('❌ 同步失败：' + msg, 'error');
   });
 }
 
@@ -804,12 +872,14 @@ function triggerUpload(inputId) {
 
 function friendlyError(errMsg) {
   var msg = errMsg || '';
-  if (msg.indexOf('Bad credentials') !== -1 || msg.indexOf('401') !== -1) return 'GitHub 授权失败，Token 可能已过期，请联系管理员更新';
-  if (msg.indexOf('Not Found') !== -1 || msg.indexOf('404') !== -1) return '文件路径不存在，请检查仓库配置';
-  if (msg.indexOf('too large') !== -1 || msg.indexOf('too long') !== -1 || msg.indexOf('413') !== -1) return '图片体积过大，请换一张小一点的图片';
+  if (msg.indexOf('Bad credentials') !== -1 || msg.indexOf('401') !== -1) return 'GitHub Token 已失效，请在「设置」中重新配置 Token';
+  if (msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) return '文件已被其他修改覆盖，请刷新页面后重试';
+  if (msg.indexOf('Not Found') !== -1 || msg.indexOf('404') !== -1) return '文件路径不存在，请检查仓库配置是否正确';
+  if (msg.indexOf('too large') !== -1 || msg.indexOf('too long') !== -1 || msg.indexOf('413') !== -1) return '图片体积过大（超过 100MB），请压缩后再上传';
   if (msg.indexOf('NetworkError') !== -1 || msg.indexOf('Failed to fetch') !== -1) return '网络连接失败，请检查网络后重试';
-  if (msg.indexOf('timeout') !== -1) return '上传超时，请重试';
-  if (msg.indexOf('CORS') !== -1) return '跨域请求被拦截，请检查服务端配置';
+  if (msg.indexOf('timeout') !== -1) return '上传超时，请重试或检查网络速度';
+  if (msg.indexOf('CORS') !== -1) return '跨域请求被拦截，请检查 Token 权限';
+  if (msg.indexOf('403') !== -1) return 'Token 权限不足，请确保 Token 有 Contents 读写权限';
   return msg || '未知错误，请重试或联系管理员';
 }
 
