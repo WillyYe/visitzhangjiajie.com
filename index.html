@@ -594,6 +594,7 @@
     .scenic-inner {
       max-width: 1200px;
       margin: 0 auto;
+      position: relative;
     }
     .scenic-grid {
       display: grid;
@@ -681,6 +682,37 @@
     .pagination-dot:hover:not(.active) {
       background: rgba(13, 43, 30, 0.4);
     }
+
+    /* ========== SCENIC NAV ARROWS ========== */
+    .scenic-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      z-index: 10;
+      border: none;
+      font-size: 20px;
+      color: var(--green-mid);
+      opacity: 0;
+    }
+    #scenic:hover .scenic-nav {
+      opacity: 1;
+    }
+    .scenic-nav:hover {
+      background: var(--white);
+      transform: translateY(-50%) scale(1.1);
+    }
+    .scenic-nav.prev { left: 12px; }
+    .scenic-nav.next { right: 12px; }
 
     /* ========== EXPERIENCE ========== */
     .exp-grid {
@@ -1052,6 +1084,9 @@
       .news-carousel-wrapper { border-radius: 12px; }
       .exp-grid { grid-template-columns: 1fr; }
       .scenic-grid { grid-template-columns: 1fr; }
+      .scenic-nav { opacity: 0.8; width: 40px; height: 40px; font-size: 18px; }
+      .scenic-nav.prev { left: 8px; }
+      .scenic-nav.next { right: 8px; }
       .transport-layout { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; }
       .info-inner { gap: 24px; }
@@ -1219,6 +1254,8 @@
       <div class="scenic-grid" id="scenicGrid">
         <!-- Scenic cards will be rendered by JS -->
       </div>
+      <button class="scenic-nav prev" id="scenicNavPrev" aria-label="Previous page">&#8249;</button>
+      <button class="scenic-nav next" id="scenicNavNext" aria-label="Next page">&#8250;</button>
       <div class="pagination-container" id="scenicPagination">
         <!-- Pagination dots will be rendered by JS -->
       </div>
@@ -1726,6 +1763,14 @@
       goToScenicPage(next);
     }
 
+    function prevScenicPage() {
+      var totalPages = Math.ceil((scenicData || []).length / 3);
+      if (totalPages <= 1) return;
+      var prev = (AppState.scenicPage || 1) - 1;
+      if (prev < 1) prev = totalPages;
+      goToScenicPage(prev);
+    }
+
     function startScenicAutoplay() {
       stopScenicAutoplay();
       var totalPages = Math.ceil((scenicData || []).length / 3);
@@ -2066,7 +2111,7 @@
         });
       }
 
-      // Scenic section auto-scroll + touch swipe
+      // Scenic section auto-scroll + touch swipe + nav arrows
       var scenicSection = document.getElementById('scenic');
       if (scenicSection) {
         scenicSection.addEventListener('mouseenter', pauseScenicAutoplay);
@@ -2077,6 +2122,12 @@
           scenicGridEl.addEventListener('touchmove', handleScenicTouchMove, { passive: true });
           scenicGridEl.addEventListener('touchend', handleScenicTouchEnd, { passive: true });
         }
+
+        // Scenic nav arrows
+        var scenicNavPrev = document.getElementById('scenicNavPrev');
+        var scenicNavNext = document.getElementById('scenicNavNext');
+        if (scenicNavPrev) scenicNavPrev.addEventListener('click', prevScenicPage);
+        if (scenicNavNext) scenicNavNext.addEventListener('click', nextScenicPage);
       }
       
       // Fade animation
