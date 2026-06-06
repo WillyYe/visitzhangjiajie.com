@@ -347,11 +347,11 @@ var newsData = [], scenicData = [], expData = [], galleryData = [], heroData = {
 function loadAllData() {
   var t = Date.now();
   return Promise.all([
-    fetch(DATA_BASE + 'news.json?t=' + t).then(function(r){return r.json()}).then(function(d){newsData=d}),
-    fetch(DATA_BASE + 'scenic.json?t=' + t).then(function(r){return r.json()}).then(function(d){scenicData=d}),
-    fetch(DATA_BASE + 'experience.json?t=' + t).then(function(r){return r.json()}).then(function(d){expData=d}),
-    fetch(DATA_BASE + 'gallery.json?t=' + t).then(function(r){return r.json()}).then(function(d){galleryData=d}),
-    fetch(DATA_BASE + 'hero.json?t=' + t).then(function(r){return r.json()}).then(function(d){heroData=d})
+    fetch(DATA_BASE + 'news.json?t=' + t).then(function(r){return r.json()}).then(function(d){newsData=d}).catch(function(e){console.error('news.json加载失败:',e);showToast('⚠️ news.json加载失败','error');}),
+    fetch(DATA_BASE + 'scenic.json?t=' + t).then(function(r){return r.json()}).then(function(d){scenicData=d}).catch(function(e){console.error('scenic.json加载失败:',e);showToast('⚠️ scenic.json加载失败','error');}),
+    fetch(DATA_BASE + 'experience.json?t=' + t).then(function(r){return r.json()}).then(function(d){expData=d}).catch(function(e){console.error('experience.json加载失败:',e);showToast('⚠️ experience.json加载失败','error');}),
+    fetch(DATA_BASE + 'gallery.json?t=' + t).then(function(r){return r.json()}).then(function(d){galleryData=d}).catch(function(e){console.error('gallery.json加载失败:',e);showToast('⚠️ gallery.json加载失败','error');}),
+    fetch(DATA_BASE + 'hero.json?t=' + t).then(function(r){return r.json()}).then(function(d){heroData=d}).catch(function(e){console.error('hero.json加载失败:',e);showToast('⚠️ hero.json加载失败','error');})
   ]);
 }
 
@@ -365,6 +365,13 @@ document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
     document.querySelectorAll('.content-section').forEach(function(s){s.classList.remove('active')});
     document.getElementById('sec-' + section).classList.add('active');
     document.getElementById('pageTitle').textContent = this.textContent.trim();
+    // Re-render section when navigated to
+    if (section === 'news') renderNews();
+    if (section === 'scenic') renderScenic();
+    if (section === 'experience') renderExp();
+    if (section === 'gallery') renderGallery();
+    if (section === 'hero') renderHero();
+    if (section === 'dashboard') renderDashboard();
   });
 });
 
