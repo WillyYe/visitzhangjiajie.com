@@ -2226,6 +2226,19 @@
         stopNewsAutoplay();
       }
     });
+
+    // Re-render dynamic content when restored from bfcache
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        // Page restored from bfcache - re-render all dynamic modules
+        renderHero();
+        renderNewsCarousel();
+        renderExperience();
+        renderGallery();
+        renderScenic();
+        startHeroSlider();
+      }
+    });
   </script>
 
 </body>
