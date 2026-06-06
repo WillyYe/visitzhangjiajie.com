@@ -2218,17 +2218,12 @@
       });
     });
     
-    // bfcache-safe: use pagehide (does NOT disable bfcache)
-    window.addEventListener('pagehide', function() {
-      if (AppState.heroSlider) clearInterval(AppState.heroSlider);
-      stopNewsAutoplay();
-    });
-
-    // Re-init sliders when restored from bfcache
-    window.addEventListener('pageshow', function(e) {
-      if (e.persisted) {
-        startHeroSlider();
-        startNewsAutoplay();
+    // bfcache-safe: only cleanup on actual unload (not bfcache)
+    window.addEventListener('pagehide', function(e) {
+      if (!e.persisted) {
+        // Page is being truly unloaded (not going to bfcache)
+        if (AppState.heroSlider) clearInterval(AppState.heroSlider);
+        stopNewsAutoplay();
       }
     });
   </script>
