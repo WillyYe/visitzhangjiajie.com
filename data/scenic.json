@@ -1,102 +1,302 @@
 [
   {
     "id": "yuanjiajie",
-    "href": "scenic-detail.html?id=yuanjiajie",
     "img": "assets/images/yuanjiajie.jpg",
     "large": true,
-    "tagEn": "UNESCO World Heritage",
-    "nameEn": "Yuanjiajie",
-    "subTitleEn": "Avatar Filming Site",
-    "descEn": "The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical."
+    "tag": "UNESCO World Heritage",
+    "name": "Yuanjiajie",
+    "subTitle": "Avatar Filming Site",
+    "desc": "The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical.",
+    "images": [
+      "assets/images/yuanjiajie.jpg",
+      "assets/images/gal-yuanjiajie.jpg",
+      "assets/images/gal-sunrise.jpg"
+    ],
+    "info": [
+      {"icon": "🏔️", "label": "Elevation", "value": "1,074m"},
+      {"icon": "📏", "label": "Area", "value": "1,200 ha"},
+      {"icon": "⏱️", "label": "Best Time", "value": "Apr-Oct"},
+      {"icon": "🎫", "label": "Ticket", "value": "Included"}
+    ],
+    "attractions": [
+      {"icon": "🗿", "name": "Southern Sky Pillar", "desc": "The iconic 1,072m quartz sandstone pillar that inspired Avatar"},
+      {"icon": "🌉", "name": "First Bridge Under Heaven", "desc": "Natural stone bridge between two peaks"},
+      {"icon": "⛩️", "name": "Palace of Heavenly King", "desc": "Ancient temple with stunning views"}
+    ],
+    "tips": [
+      "Take the Bailong Elevator (world's tallest outdoor elevator) to save climbing time",
+      "Visit early morning to avoid crowds and see the sea of clouds",
+      "Wear comfortable hiking shoes as there are many stairs"
+    ]
   },
   {
     "id": "tianzishan",
-    "href": "scenic-detail.html?id=tianzishan",
     "img": "assets/images/tianzishan.jpg",
     "large": false,
-    "tagEn": "Imperial Brush",
-    "nameEn": "Tianzi Mountain",
-    "subTitleEn": "Miniature Fairyland",
-    "descEn": "Famous from Avatar, known as the \"Miniature Fairyland\". Spectacular sunrise and sea of clouds."
+    "tag": "Imperial Brush",
+    "name": "Tianzi Mountain",
+    "subTitle": "Miniature Fairyland",
+    "desc": "Famous from Avatar, known as the \"Miniature Fairyland\". Spectacular sunrise and sea of clouds.",
+    "images": [
+      "assets/images/tianzishan.jpg",
+      "assets/images/gal-sunrise.jpg",
+      "assets/images/gal-clouds.jpg"
+    ],
+    "info": [
+      {"icon": "🏔️", "label": "Elevation", "value": "1,262m"},
+      {"icon": "📍", "label": "Location", "value": "North Area"},
+      {"icon": "⏱️", "label": "Best Time", "value": "Sunrise"},
+      {"icon": "🎫", "label": "Ticket", "value": "Included"}
+    ],
+    "attractions": [
+      {"icon": "🌅", "name": "Sunrise Platform", "desc": "Best spot to watch sunrise over the sea of clouds"},
+      {"icon": "👑", "name": "Imperial Hat", "desc": "Famous peak resembling an emperor's hat"},
+      {"icon": "🌊", "name": "Sea of Clouds", "desc": "Magnificent cloud sea views"}
+    ],
+    "tips": [
+      "Stay at the mountain accommodation for the best sunrise experience",
+      "The cable car provides easy access to the summit",
+      "Bring warm clothes even in summer for early morning visits"
+    ]
   },
   {
     "id": "jinbianxi",
-    "href": "scenic-detail.html?id=jinbianxi",
     "img": "assets/images/jinbianxi.jpg",
     "large": false,
-    "tagEn": "Natural Oxygen Bar",
-    "nameEn": "Jinbian Stream",
-    "subTitleEn": "7.5km Hiking Paradise",
-    "descEn": "7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park."
+    "tag": "Natural Oxygen Bar",
+    "name": "Jinbian Stream",
+    "subTitle": "7.5km Hiking Paradise",
+    "desc": "7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park.",
+    "images": [
+      "assets/images/jinbianxi.jpg",
+      "assets/images/gal-stream.jpg",
+      "assets/images/jinbianxi.jpg"
+    ],
+    "info": [
+      {"icon": "📏", "label": "Length", "value": "7.5km"},
+      {"icon": "💧", "label": "Water", "value": "Crystal Clear"},
+      {"icon": "🌲", "label": "Forest", "value": "95% Coverage"},
+      {"icon": "⏱️", "label": "Duration", "value": "2-3 hrs"}
+    ],
+    "attractions": [
+      {"icon": "🏞️", "name": "Ginkgo Ancient Tree", "desc": "800-year-old ginkgo tree by the stream"},
+      {"icon": "🗿", "name": "Three Sisters Peak", "desc": "Three peaks standing together"},
+      {"icon": "🦋", "name": "Butterfly Valley", "desc": "Home to many butterfly species"}
+    ],
+    "tips": [
+      "Start early morning to enjoy the mist and cool air",
+      "Bring water and snacks for the hike",
+      "The path is relatively flat, suitable for all ages"
+    ]
   },
   {
     "id": "huangshijia",
-    "href": "scenic-detail.html?id=huangshijia",
     "img": "assets/images/scenic-huangshijia.jpg",
     "large": false,
-    "tagEn": "Tujia Culture",
-    "nameEn": "Huangshijia",
-    "subTitleEn": "Essential Zhangjiajie",
-    "descEn": "Legend says Zhang Liang cultivated here. The largest aerial viewing platform in the park."
+    "tag": "Tujia Culture",
+    "name": "Huangshijia",
+    "subTitle": "Essential Zhangjiajie",
+    "desc": "Known as \"The Eyes of Zhangjiajie\", Huangshijia is the largest aerial viewing platform in the park. It offers 360-degree panoramic views of the pillar formations.",
+    "images": [
+      "assets/images/gal-yuanjiajie.jpg",
+      "assets/images/gal-clouds.jpg",
+      "assets/images/gal-sunrise.jpg"
+    ],
+    "info": [
+      {"icon": "🏔️", "label": "Elevation", "value": "1,200m"},
+      {"icon": "👁️", "label": "Views", "value": "360° Panoramic"},
+      {"icon": "⏱️", "label": "Visit", "value": "2-3 hrs"},
+      {"icon": "🎫", "label": "Access", "value": "Cable Car"}
+    ],
+    "attractions": [
+      {"icon": "🌅", "name": "Five Famous Peaks", "desc": "Five peaks resembling five fingers"},
+      {"icon": "🎯", "name": "Needle Eye Rock", "desc": "Rock with a hole through it"},
+      {"icon": "🌳", "name": "Ancient Pine Grove", "desc": "Century-old pines"}
+    ],
+    "tips": [
+      "Take the cable car up, hike down for different perspectives",
+      "Morning visits offer the best lighting for photos",
+      "The loop trail takes about 2 hours"
+    ]
   },
   {
     "id": "silkongqiao",
-    "href": "scenic-detail.html?id=silkongqiao",
     "img": "assets/images/scenic-firstbridge.jpg",
     "large": false,
-    "tagEn": "First Bridge Under Heaven",
-    "nameEn": "First Bridge Under Heaven",
-    "subTitleEn": "Natural Stone Bridge",
-    "descEn": "A natural stone bridge formed between two peaks, standing 387m above the valley floor."
+    "tag": "First Bridge Under Heaven",
+    "name": "First Bridge Under Heaven",
+    "subTitle": "Natural Stone Bridge",
+    "desc": "A natural stone bridge formed between two towering quartz sandstone peaks, standing 387 meters above the valley floor - a geological wonder.",
+    "images": [
+      "assets/images/gal-clouds.jpg",
+      "assets/images/gal-yuanjiajie.jpg",
+      "assets/images/gal-sunrise.jpg"
+    ],
+    "info": [
+      {"icon": "🌉", "label": "Height", "value": "387m"},
+      {"icon": "📏", "label": "Span", "value": "3m wide"},
+      {"icon": "🗿", "label": "Type", "value": "Natural"},
+      {"icon": "🎫", "label": "Location", "value": "Yuanjiajie"}
+    ],
+    "attractions": [
+      {"icon": "📸", "name": "Photo Point", "desc": "Classic photo opportunity"},
+      {"icon": "🌁", "name": "Cloud Bridge", "desc": "Bridges through clouds"},
+      {"icon": "🦅", "name": "Eagle Nest", "desc": "Eagles often seen here"}
+    ],
+    "tips": [
+      "Part of the Yuanjiajie circuit, combine with other attractions",
+      "Watch your step on the narrow bridge",
+      "Best visited in morning for clear views"
+    ]
   },
   {
     "id": "yongding",
-    "href": "scenic-detail.html?id=yongding",
     "img": "assets/images/scenic-yongding.jpg",
     "large": false,
-    "tagEn": "Tujia Ancient Town",
-    "nameEn": "Yongding Ancient Town",
-    "subTitleEn": "Tujia Cultural Center",
-    "descEn": "A well-preserved Tujia ancient town with traditional culture, architecture and folk customs."
+    "tag": "Tujia Ancient Town",
+    "name": "Yongding Ancient Town",
+    "subTitle": "Tujia Cultural Center",
+    "desc": "A well-preserved Tujia ancient town where you can experience authentic Tujia culture, architecture, and traditional customs.",
+    "images": [
+      "assets/images/gal-culture.jpg",
+      "assets/images/gal-village.jpg",
+      "assets/images/gal-culture.jpg"
+    ],
+    "info": [
+      {"icon": "🏛️", "label": "History", "value": "1,000+ years"},
+      {"icon": "🎭", "label": "Culture", "value": "Tujia"},
+      {"icon": "🏘️", "label": "Architecture", "value": "Traditional"},
+      {"icon": "🎪", "label": "Events", "value": "Year-round"}
+    ],
+    "attractions": [
+      {"icon": "🏠", "name": "Diaojia Houses", "desc": "Traditional stilted houses"},
+      {"icon": "🎭", "name": "Tujia Brocade", "desc": "Traditional textile art"},
+      {"icon": "🥘", "name": "Local Cuisine", "desc": "Authentic Tujia dishes"}
+    ],
+    "tips": [
+      "Visit during festivals for special cultural performances",
+      "Try the local Tujia cuisine - very spicy and flavorful",
+      "Best experienced in the evening when traditional shows start"
+    ]
   },
   {
     "id": "shadao",
-    "href": "scenic-detail.html?id=shadao",
     "img": "assets/images/scenic-shadao.jpg",
     "large": false,
-    "tagEn": "Classic Route",
-    "nameEn": "Shadao Valley",
-    "subTitleEn": "Adventurer's Paradise",
-    "descEn": "A maze of gullies with unique landscapes, perfect for adventurers."
+    "tag": "Classic Route",
+    "name": "Shadao Valley",
+    "subTitle": "Adventurer's Paradise",
+    "desc": "A dramatic valley with unique landscapes, perfect for adventurous travelers seeking wilderness experiences and off-the-beaten-path scenery.",
+    "images": [
+      "assets/images/gal-sunrise.jpg",
+      "assets/images/gal-autumn.jpg",
+      "assets/images/gal-spring.jpg"
+    ],
+    "info": [
+      {"icon": "🗺️", "label": "Length", "value": "5km"},
+      {"icon": "⚠️", "label": "Difficulty", "value": "Moderate"},
+      {"icon": "🌿", "label": "Terrain", "value": "Varied"},
+      {"icon": "🦅", "label": "Wildlife", "value": "Rich"}
+    ],
+    "attractions": [
+      {"icon": "🏞️", "name": "Hidden Valley", "desc": "Secluded scenic spots"},
+      {"icon": "💧", "name": "Waterfall Trail", "desc": "Multiple waterfalls"},
+      {"icon": "🌲", "name": "Primeval Forest", "desc": "Undisturbed nature"}
+    ],
+    "tips": [
+      "Bring hiking gear and navigation tools",
+      "Go with a local guide for safety",
+      "Start early to maximize daylight hours"
+    ]
   },
   {
     "id": "shuangshiyoupu",
-    "href": "scenic-detail.html?id=shuangshiyoupu",
     "img": "assets/images/scenic-twinpeaks.jpg",
     "large": false,
-    "tagEn": "Scenic Gallery",
-    "nameEn": "Twin Peaks",
-    "subTitleEn": "Facing Peaks",
-    "descEn": "Two towering stone peaks facing each other, forming a unique gateway."
+    "tag": "Scenic Gallery",
+    "name": "Twin Peaks",
+    "subTitle": "Facing Peaks",
+    "desc": "Two towering stone peaks facing each other, forming a unique natural gateway. This spot offers perfect photo opportunities.",
+    "images": [
+      "assets/images/gal-spring.jpg",
+      "assets/images/gal-autumn.jpg",
+      "assets/images/gal-winter.jpg"
+    ],
+    "info": [
+      {"icon": "📸", "label": "Photo Spot", "value": "Best"},
+      {"icon": "🗿", "label": "Formation", "value": "Natural"},
+      {"icon": "👥", "label": "Crowds", "value": "Moderate"},
+      {"icon": "🎫", "label": "Access", "value": "Easy"}
+    ],
+    "attractions": [
+      {"icon": "📷", "name": "Classic Vista", "desc": "Most photographed spot"},
+      {"icon": "🌅", "name": "Golden Hour", "desc": "Best light at sunset"},
+      {"icon": "🎨", "name": "Four Seasons", "desc": "Different beauty each season"}
+    ],
+    "tips": [
+      "Come during golden hour for the best photos",
+      "The nearby tea house offers great views while resting",
+      "Consider a professional photo service for memories"
+    ]
   },
   {
     "id": "wulongkarst",
-    "href": "scenic-detail.html?id=wulongkarst",
     "img": "assets/images/scenic-wulong.jpg",
     "large": false,
-    "tagEn": "Karst Landscape",
-    "nameEn": "Wulong Karst Caves",
-    "subTitleEn": "Underground Wonderland",
-    "descEn": "Typical karst cave landscape with diverse stalactites, stalagmites and stone flowers."
+    "tag": "Karst Landscape",
+    "name": "Wulong Karst Caves",
+    "subTitle": "Underground Wonderland",
+    "desc": "A typical karst cave system featuring diverse stalactites, stalagmites and stone formations. The underground wonderland is breathtaking.",
+    "images": [
+      "assets/images/gal-autumn.jpg",
+      "assets/images/gal-spring.jpg",
+      "assets/images/gal-sunrise.jpg"
+    ],
+    "info": [
+      {"icon": "🕳️", "label": "Cave Length", "value": "3km"},
+      {"icon": "🌡️", "label": "Temperature", "value": "15-18°C"},
+      {"icon": "💧", "label": "Underground Lake", "value": "Present"},
+      {"icon": "🦇", "label": "Wildlife", "value": "Bats"}
+    ],
+    "attractions": [
+      {"icon": "🗺️", "name": "Three Natural Bridges", "desc": "Three natural karst bridges"},
+      {"icon": "🏔️", "name": "Houpeng Dome", "desc": "Erosion formations"},
+      {"icon": "⚫", "name": "Qianzhai Cave", "desc": "Deep underground cave"}
+    ],
+    "tips": [
+      "Wear warm clothes - the cave is always cold",
+      "Book a local guide for the best experience",
+      "Camera flash brings out the cave formations"
+    ]
   },
   {
     "id": "tianpingshan",
-    "href": "scenic-detail.html?id=tianpingshan",
     "img": "assets/images/scenic-tianping.jpg",
     "large": false,
-    "tagEn": "Sunrise & Sea of Clouds",
-    "nameEn": "Tianping Mountain",
-    "subTitleEn": "Best Sunrise Viewpoint",
-    "descEn": "At 1,200m elevation, one of the best spots for sunrise views and sea of clouds."
+    "tag": "Sunrise & Sea of Clouds",
+    "name": "Tianping Mountain",
+    "subTitle": "Best Sunrise Viewpoint",
+    "desc": "At 1,200 meters elevation, Tianping Mountain is one of the best spots for sunrise views and sea of clouds in Zhangjiajie.",
+    "images": [
+      "assets/images/gal-winter.jpg",
+      "assets/images/gal-autumn.jpg",
+      "assets/images/gal-sunrise.jpg"
+    ],
+    "info": [
+      {"icon": "🏔️", "label": "Elevation", "value": "1,200m"},
+      {"icon": "🌅", "label": "Best For", "value": "Sunrise"},
+      {"icon": "🌊", "label": "Sea of Clouds", "value": "Frequent"},
+      {"icon": "🏕️", "label": "Camping", "value": "Available"}
+    ],
+    "attractions": [
+      {"icon": "🌄", "name": "Sunrise Platform", "desc": "The main sunrise viewing spot"},
+      {"icon": "⛺", "name": "Stargazing", "desc": "Clear night skies"},
+      {"icon": "🌲", "name": "Forest Trail", "desc": "Scenic hiking path"}
+    ],
+    "tips": [
+      "Stay overnight for the sunrise - camping available",
+      "Check weather forecast before visiting",
+      "Bring a tripod for long exposure sunrise shots"
+    ]
   }
 ]

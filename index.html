@@ -1716,13 +1716,13 @@
 
         var html = '';
         pageItems.forEach(function(item) {
-          html += '<a href="' + item.href + '" class="scenic-card fade-up">';
+          html += '<a href="scenic-detail.html?id=' + escapeHtml(item.id) + '" class="scenic-card fade-up">';
           html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')"></div>';
           html += '<div class="scenic-overlay">';
-          html += '<div class="scenic-tag">' + escapeHtml(item.tagEn) + '</div>';
-          html += '<h3 class="scenic-name">' + escapeHtml(item.nameEn) + '</h3>';
-          html += '<p class="scenic-sub">' + escapeHtml(item.subTitleEn) + '</p>';
-          html += '<p class="scenic-desc">' + escapeHtml(item.descEn) + '</p>';
+          html += '<div class="scenic-tag">' + escapeHtml(item.tag || '') + '</div>';
+          html += '<h3 class="scenic-name">' + escapeHtml(item.name || '') + '</h3>';
+          html += '<p class="scenic-sub">' + escapeHtml(item.subTitle || '') + '</p>';
+          html += '<p class="scenic-desc">' + escapeHtml(item.desc || '') + '</p>';
           html += '<span class="scenic-link">' + escapeHtml('Explore More →') + '</span>';
           html += '</div></a>';
         });
