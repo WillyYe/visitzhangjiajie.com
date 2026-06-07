@@ -7,7 +7,7 @@ function renderScenic() {
   var h = '';
   scenicData.forEach(function(s, i) {
     var imgPreview = s.img
-      ? '<img src="../' + s.img + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">'
+      ? '<img src="../' + s.img.replace('assets/images/','assets/images/thumb/') + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" loading="lazy" onerror="this.onerror=null;this.src=\'../' + s.img + '\'">'
       : '<span style="color:#aaa;font-size:11px">未上传</span>';
     var subTitleShort = (s.subTitle || '').length > 20 ? (s.subTitle || '').substring(0, 20) + '...' : (s.subTitle || '—');
     var descShort = (s.desc || '').length > 30 ? (s.desc || '').substring(0, 30) + '...' : (s.desc || '—');
