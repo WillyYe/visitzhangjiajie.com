@@ -10,10 +10,10 @@ function renderExp() {
     var imgPreview = e.img
       ? '<img src="../' + e.img + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">'
       : '<span style="color:#aaa;font-size:11px">未上传</span>';
-    var descShort = (e.desc || e.descEn || '').length > 30 ? (e.desc || e.descEn || '').substring(0, 30) + '...' : (e.desc || e.descEn || '—');
+    var descShort = (e.descEn || '').length > 30 ? (e.descEn || '').substring(0, 30) + '...' : (e.descEn || '—');
     var validImages = (e.images || []).filter(function(x) { return x; });
-    var detailIcon = (validImages.length > 1) || (e.info && e.info.length) || (e.tips && e.tips.length) ? ' 🖼️' : '';
-    h += '<tr><td>' + esc(e.id) + '</td><td>' + esc(title) + detailIcon + '</td><td title="' + esc(e.desc || e.descEn || '') + '">' + esc(descShort) + '</td><td style="text-align:center">' + imgPreview + '</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal(' + i + ')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceExpImage(' + i + ')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteExp(' + i + ')">删除</button></td></tr>';
+    var detailIcon = (validImages.length > 1) || (e.infoEn && e.infoEn.length) || (e.tipsEn && e.tipsEn.length) ? ' 🖼️' : '';
+    h += '<tr><td>' + esc(e.id) + '</td><td>' + esc(title) + detailIcon + '</td><td title="' + esc(e.descEn || '') + '">' + esc(descShort) + '</td><td style="text-align:center">' + imgPreview + '</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal(' + i + ')">Edit</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceExpImage(' + i + ')">🔄 Replace</button><button class="btn btn-danger btn-sm" onclick="deleteExp(' + i + ')">Delete</button></td></tr>';
   });
   document.getElementById('expTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
@@ -116,7 +116,7 @@ function readInfoCards() {
     var icon = (row.querySelector('[id^="fInfoIcon"]') || {}).value || '';
     var label = (row.querySelector('[id^="fInfoLabel"]') || {}).value || '';
     var value = (row.querySelector('[id^="fInfoValue"]') || {}).value || '';
-    if (label) arr.push({ icon: icon.trim(), label: label.trim(), value: value.trim() });
+    if (icon || label || value) arr.push({ icon: icon.trim(), label: label.trim(), value: value.trim() });
   });
   while (arr.length < 4) arr.push({ icon: '⏱️', label: '', value: '' });
   return arr.slice(0, 8);
@@ -230,9 +230,11 @@ function saveExp() {
   var img2 = (document.getElementById('fExpImg2') || {}).value || '';
   img2 = img2.trim();
 
-  if (!id) { showToast('❌ ID 不能为空', 'error'); return; }
-  if (!title) { showToast('❌ 中文标题不能为空', 'error'); return; }
-  if (!img) { showToast('❌ 请上传封面图片', 'error'); return; }
+  if (!id) { showToast('❌ ID cannot be empty', 'error'); return; }
+  if (!title) { showToast('❌ Chinese title cannot be empty', 'error'); return; }
+  var titleEn = ((document.getElementById('fExpTitleEn') || {}).value || '').trim();
+  if (!titleEn) { showToast('❌ English title cannot be empty', 'error'); return; }
+  if (!img) { showToast('❌ Please upload a cover image', 'error'); return; }
 
   // ID 重复检查
   var duplicateIdx = -1;
@@ -254,15 +256,18 @@ function saveExp() {
     id: id,
     img: img,
     title: title,
-    titleEn: ((document.getElementById('fExpTitleEn') || {}).value || '').trim(),
+    titleEn: titleEn,
     desc: ((document.getElementById('fExpDesc') || {}).value || '').trim(),
     descEn: ((document.getElementById('fExpDescEn') || {}).value || '').trim(),
     images: images,
-    info: readInfoCards(),
     infoEn: readInfoCards(),
-    tips: readTips(),
     tipsEn: readTips()
   };
+  // 保留已有的 info 和 tips 字段（如果存在），避免丢失历史数据
+  if (editingIndex >= 0 && expData[editingIndex]) {
+    if (expData[editingIndex].info) obj.info = expData[editingIndex].info;
+    if (expData[editingIndex].tips) obj.tips = expData[editingIndex].tips;
+  }
 
   if (editingIndex >= 0) {
     expData[editingIndex] = obj;
@@ -273,14 +278,14 @@ function saveExp() {
   closeModal();
   renderExp();
   renderDashboard();
-  showToast('✅ 体验已保存，正在同步到 GitHub...', 'success');
+  showToast('✅ Experience saved, syncing to GitHub...', 'success');
   saveExpToGitHub();
 }
 
 // ==================== DELETE ====================
 function deleteExp(i) {
-  if (expData.length <= 2) { showToast('至少保留 2 个体验，不可删除', 'error'); return; }
-  if (!confirm('确定删除 "' + (expData[i].title || expData[i].titleEn || '') + '" 吗？')) return;
+  if (expData.length <= 2) { showToast('At least 2 experiences required', 'error'); return; }
+  if (!confirm('Delete "' + (expData[i].titleEn || expData[i].title || '') + '"?')) return;
 
   // 删除关联的图片文件（最佳努力，失败不阻塞主流程）
   var e = expData[i];
@@ -298,7 +303,7 @@ function deleteExp(i) {
   expData.splice(i, 1);
   renderExp();
   renderDashboard();
-  showToast('✅ 已删除，正在同步到 GitHub...', 'success');
+  showToast('✅ Deleted, syncing to GitHub...', 'success');
   saveExpToGitHub();
 }
 
@@ -336,13 +341,13 @@ function replaceExpImage(i) {
         if (expData[i].images.length < 1) expData[i].images.push(path);
         else expData[i].images[0] = path;
         renderExp();
-        showToast('✅ 图片已替换，正在同步体验数据...', 'success');
+        showToast('✅ Image replaced, syncing experience data...', 'success');
         saveExpToGitHub();
       }).catch(function(err) {
         var msg = friendlyError(err.message || '');
-        showToast('❌ 替换失败：' + msg, 'error');
+        showToast('❌ Replace failed: ' + msg, 'error');
       }).finally(function() {
-        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Replace'; }
       });
     });
   };
@@ -359,10 +364,10 @@ function updateExpSyncStatus(state, message) {
   var dot = el.querySelector('.sync-dot');
   var text = el.querySelector('.sync-text');
   var states = {
-    idle:    { color: '#aaa', label: '未同步' },
-    saving:  { color: '#f9a825', label: '同步中...' },
-    success: { color: '#43a047', label: '已同步 ✓' },
-    error:   { color: '#e53935', label: '同步失败 ✕' }
+    idle:    { color: '#aaa', label: 'Not synced' },
+    saving:  { color: '#f9a825', label: 'Syncing...' },
+    success: { color: '#43a047', label: 'Synced ✓' },
+    error:   { color: '#e53935', label: 'Sync failed ✕' }
   };
   var s = states[state] || states.idle;
   if (dot) dot.style.background = s.color;
@@ -378,7 +383,7 @@ function saveExpToGitHub() {
   expSyncLock = true;
   updateExpSyncStatus('saving');
 
-  showToast('⏳ 第 1 步：正在同步 experience.json 到 GitHub...', '');
+  showToast('⏳ Step 1: Syncing experience.json to GitHub...', '');
   var content = JSON.stringify(expData, null, 2);
   var path = 'data/experience.json';
   var retryCount = 0;
@@ -399,15 +404,15 @@ function saveExpToGitHub() {
       if (r.ok) {
         expSyncLock = false;
         updateExpSyncStatus('success');
-        showToast('✅ 第 2 步：体验已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+        showToast('✅ Step 2: Experience synced to GitHub! Frontend will update in 1-2 minutes 🎉', 'success');
         return;
       }
       return r.json().then(function(d) {
         var msg = d.message || '';
         if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
           retryCount++;
-          showToast('🔄 检测到文件冲突，正在自动重试...', '');
-          updateExpSyncStatus('saving', '冲突重试中...');
+          showToast('🔄 Conflict detected, retrying...', '');
+          updateExpSyncStatus('saving', 'Retrying...');
           return doSync();
         }
         throw new Error(msg);
@@ -416,7 +421,7 @@ function saveExpToGitHub() {
       expSyncLock = false;
       var msg = friendlyError(err.message || '');
       updateExpSyncStatus('error', msg.slice(0, 30));
-      showToast('❌ 同步失败：' + msg, 'error');
+      showToast('❌ Sync failed: ' + msg, 'error');
     });
   }
 

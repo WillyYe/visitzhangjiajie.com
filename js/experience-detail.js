@@ -49,10 +49,10 @@ function renderAll() {
   renderDesc();
   renderTips();
 
-  document.title = (currentExp.titleEn || currentExp.title || 'Experience') + ' | Zhangjiajie Park';
-  document.getElementById('pageTitle').textContent = (currentExp.titleEn || currentExp.title || 'Experience') + ' | Zhangjiajie Park';
+  document.title = (currentExp.titleEn || 'Experience') + ' | Zhangjiajie Park';
+  document.getElementById('pageTitle').textContent = (currentExp.titleEn || 'Experience') + ' | Zhangjiajie Park';
   document.getElementById('metaDesc').setAttribute('content',
-    (currentExp.descEn || currentExp.desc || '').substring(0, 160));
+    (currentExp.descEn || '').substring(0, 160));
 }
 
 // ========== RENDER HERO SLIDER ==========
@@ -71,9 +71,9 @@ function renderHeroSlider() {
     slidesHtml += '<div class="hero-overlay"></div>';
     slidesHtml += '<div class="hero-content">';
     slidesHtml += '<div class="hero-badge">Experience</div>';
-    slidesHtml += '<h1 class="hero-title">' + escHtml(currentExp.titleEn || currentExp.title || '') + '</h1>';
+    slidesHtml += '<h1 class="hero-title">' + escHtml(currentExp.titleEn || '') + '</h1>';
     slidesHtml += '<p class="hero-subtitle">' + escHtml(currentExp.descEn || '') + '</p>';
-    slidesHtml += '<p class="hero-desc">' + escHtml(((currentExp.descEn || '')).substring(0, 150)) + '...</p>';
+    slidesHtml += '<p class="hero-desc">' + escHtml((currentExp.descEn || '').substring(0, 150)) + '...</p>';
     slidesHtml += '</div></div>';
 
     dotsHtml += '<button class="indicator-dot' + (idx === 0 ? ' active' : '') + '" onclick="goToSlide(' + idx + ')"></button>';
@@ -144,7 +144,7 @@ function renderInfoCards() {
   var html = '<div class="info-grid">';
   (currentExp.infoEn || currentExp.info || []).forEach(function(item) {
     html += '<div class="info-card">';
-    html += '<div class="info-icon">' + item.icon + '</div>';
+    html += '<div class="info-icon">' + escHtml(item.icon || '') + '</div>';
     html += '<div class="info-label">' + escHtml(item.label) + '</div>';
     html += '<div class="info-value">' + escHtml(item.value) + '</div>';
     html += '</div>';
@@ -158,8 +158,8 @@ function renderDesc() {
   if (!currentExp) return;
   var container = document.getElementById('experienceContent');
   var html = '<div class="section">';
-  html += '<h2 class="section-title">About ' + escHtml(currentExp.titleEn || currentExp.title || '') + '</h2>';
-  html += '<p>' + escHtml(currentExp.descEn || currentExp.desc || '') + '</p>';
+  html += '<h2 class="section-title">About ' + escHtml(currentExp.titleEn || '') + '</h2>';
+  html += '<p>' + escHtml(currentExp.descEn || '') + '</p>';
   html += '</div>';
   var infoGrid = container.querySelector('.info-grid');
   if (infoGrid) infoGrid.insertAdjacentHTML('afterend', html);
