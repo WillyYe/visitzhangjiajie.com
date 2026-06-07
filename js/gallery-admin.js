@@ -24,39 +24,23 @@
     var grid = document.getElementById('galleryGrid');
     if (!grid) return;
 
-    var h = '';
-    _galData().forEach(function(item, i) {
-      var imgPath = item.img || '';
-      var title = item.titleEn || item.title || _autoTitle(imgPath);
-      h += '<div class="gal-card" data-idx="' + i + '">';
-      h += '  <div class="gal-card-img-wrap">';
-      h += '    <img src="../' + esc(imgPath) + '?t=' + Date.now() + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
-      h += '    <div class="gal-card-placeholder" style="display:none"><span>加载失败</span></div>';
-      h += '    <div class="gal-card-actions">';
-      h += '      <button class="gal-btn" onclick="replaceGalleryImage(' + i + ')" title="替换图片">🔄</button>';
-      h += '      <button class="gal-btn gal-btn-danger" onclick="deleteGalleryImage(' + i + ')" title="删除图片">🗑️</button>';
-      h += '    </div>';
-      h += '    <div class="gal-progress" id="galProg_' + i + '" style="display:none">';
-      h += '      <div class="gal-progress-bar" id="galProgBar_' + i + '"></div>';
-      h += '      <span class="gal-progress-text" id="galProgText_' + i + '">0%</span>';
-      h += '    </div>';
-      h += '  </div>';
-      h += '  <div class="gal-card-title">' + esc(title) + '</div>';
-      h += '</div>';
-    });
-
-    // "Add" card (also acts as drop zone target)
-    h += '<div class="gal-card gal-card-add" id="galAddCard" onclick="triggerGalleryAdd()">';
-    h += '  <div class="gal-card-add-inner">';
-    h += '    <span class="gal-add-icon">+</span>';
-    h += '    <span class="gal-add-text">新增图片</span>';
-    h += '    <span class="gal-add-hint">点击或拖放</span>';
-    h += '  </div>';
-    h += '</div>';
-
-    if (_galData().length === 0) {
+    if (!isUploading && _galData().length === 0) {
       grid.innerHTML = '<div class="gal-empty">暂无图片<br><span>点击「新增图片」或拖放图片到此处</span></div>';
     } else {
+      var h = '';
+      _galData().forEach(function(item, i) {
+        var imgPath = item.img || '';
+        var title = item.titleEn || item.title || _autoTitle(imgPath);
+        h += _renderCard(i, imgPath, title, false);
+      });
+      // "Add" card
+      h += '<div class="gal-card gal-card-add" id="galAddCard" onclick="triggerGalleryAdd()">';
+      h += '  <div class="gal-card-add-inner">';
+      h += '    <span class="gal-add-icon">+</span>';
+      h += '    <span class="gal-add-text">新增图片</span>';
+      h += '    <span class="gal-add-hint">点击或拖放</span>';
+      h += '  </div>';
+      h += '</div>';
       grid.innerHTML = h;
     }
 
@@ -200,7 +184,36 @@
     var total = files.length;
     var completed = 0;
     var failed = 0;
-    var newItems = [];
+    var startLen = _galData().length;
+
+    // ===== Render temporary upload cards first =====
+    var grid = document.getElementById('galleryGrid');
+    var h = '';
+    // Existing items (re-render so indices match)
+    _galData().forEach(function(item, i) {
+      var imgPath = item.img || '';
+      var title = item.titleEn || item.title || _autoTitle(imgPath);
+      h += _renderCard(i, imgPath, title, false);
+    });
+    // Temp upload cards
+    Array.from(files).forEach(function(file, i) {
+      var tempIdx = startLen + i;
+      h += _renderCard(tempIdx, '', _autoTitle(file.name), true);
+    });
+    // Add button
+    h += '<div class="gal-card gal-card-add" id="galAddCard" onclick="triggerGalleryAdd()">';
+    h += '  <div class="gal-card-add-inner">';
+    h += '    <span class="gal-add-icon">+</span>';
+    h += '    <span class="gal-add-text">新增图片</span>';
+    h += '    <span class="gal-add-hint">点击或拖放</span>';
+    h += '  </div>';
+    h += '</div>';
+    if (grid) grid.innerHTML = h;
+
+    // Show initial progress on all temp cards
+    Array.from(files).forEach(function(file, i) {
+      _setCardProgress(startLen + i, 2, '等待上传...');
+    });
 
     showToast('📤 开始上传 ' + total + ' 张图片...', '');
 
@@ -213,25 +226,30 @@
         } else {
           showToast('✅ 全部 ' + completed + ' 张图片上传成功', 'success');
         }
-        // Refresh render
+        // Refresh render with real cards
         renderGalleryAdmin();
         _updateGallerySyncStatus('unsaved');
         return;
       }
 
       var file = files[idx];
-      var tempIdx = _galData().length + idx; // temporary index for progress bar
+      var tempIdx = startLen + idx;
 
-      _setCardProgress(tempIdx, 5, '压缩中...');
+      _setCardProgress(tempIdx, 5, '正在压缩主图...');
 
       _uploadGalleryFile(file, function(pct, label) {
         _setCardProgress(tempIdx, pct, label);
       }, function(err, newPath) {
         if (err) {
           failed++;
+          _setCardProgress(tempIdx, 100, '上传失败');
           console.error('Gallery upload failed for', file.name, err);
+          // Mark the temp card as failed
+          var bar = document.getElementById('galProgBar_' + tempIdx);
+          if (bar) bar.style.background = '#e53935';
         } else {
           completed++;
+          _setCardProgress(tempIdx, 100, '上传成功');
           _galData().push(_makeGalleryItem(newPath, file.name));
         }
         // Continue to next file
@@ -240,6 +258,30 @@
     }
 
     processNext(0);
+  }
+
+  // Render a single gallery card (reused for real and temp cards)
+  function _renderCard(idx, imgPath, title, progressVisible) {
+    var h = '<div class="gal-card" data-idx="' + idx + '">';
+    h += '  <div class="gal-card-img-wrap">';
+    if (imgPath) {
+      h += '    <img src="../' + esc(imgPath) + '?t=' + Date.now() + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
+    }
+    h += '    <div class="gal-card-placeholder" style="display:' + (imgPath ? 'none' : 'flex') + '"><span>待上传</span></div>';
+    if (progressVisible !== true) {
+      h += '    <div class="gal-card-actions">';
+      h += '      <button class="gal-btn" onclick="replaceGalleryImage(' + idx + ')" title="替换图片">🔄</button>';
+      h += '      <button class="gal-btn gal-btn-danger" onclick="deleteGalleryImage(' + idx + ')" title="删除图片">🗑️</button>';
+      h += '    </div>';
+    }
+    h += '    <div class="gal-progress" id="galProg_' + idx + '" style="display:' + (progressVisible ? 'block' : 'none') + '">';
+    h += '      <div class="gal-progress-bar" id="galProgBar_' + idx + '"></div>';
+    h += '      <span class="gal-progress-text" id="galProgText_' + idx + '">0%</span>';
+    h += '    </div>';
+    h += '  </div>';
+    h += '  <div class="gal-card-title">' + esc(title) + '</div>';
+    h += '</div>';
+    return h;
   }
 
   // Upload a single file through the 3-tier pipeline
