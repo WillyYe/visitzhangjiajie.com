@@ -186,6 +186,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 </style>
 <script src="../js/common.js?v=2"></script>
 <script src="../js/scenic-admin.js?v=2"></script>
+<script src="../js/experience-admin.js?v=2"></script>
 </head>
 <body>
 
@@ -403,14 +404,6 @@ function renderNews() {
     h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceNewsImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
   });
   document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
-}
-
-function renderExp() {
-  var h = '';
-  expData.forEach(function(e,i){
-    h += '<tr><td>'+esc(e.id)+'</td><td>'+esc(e.titleEn)+'</td><td>'+esc(e.descEn)+'</td><td>'+esc(e.img)+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal('+i+')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteExp('+i+')">删除</button></td></tr>';
-  });
-  document.getElementById('expTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
 
 function renderGallery() {
@@ -646,24 +639,7 @@ function replaceNewsImage(i) {
 
 // --- Scenic Modal ---
 // 快速替换 Scenic 图片（表格行内操作，一步完成上传+保存+同步）
-
-// --- Experience Modal ---
-function openExpModal(idx) {
-  editingIndex = idx !== undefined ? idx : -1;
-  var e = editingIndex >= 0 ? expData[editingIndex] : {id:'',titleEn:'',descEn:'',img:''};
-  showModal(editingIndex>=0?'编辑体验':'新增体验',
-    '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(e.id)+'"></div>'+
-    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(e.titleEn)+'"></div>'+
-    '<div class="form-group"><label>描述</label><textarea id="fDesc">'+esc(e.descEn)+'</textarea></div>'+
-    imgUploadHtml(e.img)+
-    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">保存</button></div>');
-}
-function saveExp() {
-  var obj = {id:document.getElementById('fId').value,titleEn:document.getElementById('fTitle').value,descEn:document.getElementById('fDesc').value,img:document.getElementById(modalImgId).value};
-  if (editingIndex >= 0) expData[editingIndex] = obj; else expData.push(obj);
-  closeModal(); renderExp(); renderDashboard(); showToast('体验已保存 ✅','success');
-}
-function deleteExp(i) { if(confirm('确定删除 "'+expData[i].titleEn+'" 吗？')){expData.splice(i,1); renderExp(); renderDashboard(); showToast('已删除','success');} }
+// --- Experience Modal (moved to js/experience-admin.js) ---
 
 // --- Gallery Modal ---
 function openGalleryModal() {

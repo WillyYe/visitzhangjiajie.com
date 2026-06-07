@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Experience Detail | Zhangjiajie National Forest Park</title>
+  <meta name="description" id="metaDesc" content="Explore Zhangjiajie National Forest Park experiences." />
+  <meta name="theme-color" content="#1a4a30" />
+
+  <!-- Preconnect for Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #1a1a1a;
+      background: #fff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ========== COLOR VARIABLES ========== */
+    :root {
+      --green-dark: #0d2b1e;
+      --green-mid: #1a4a30;
+      --green-light: #2d6a4f;
+      --green-accent: #52b788;
+      --gold: #b5882a;
+      --gold-light: #d4a843;
+      --cream: #f7f3ee;
+      --cream-dark: #e8e4de;
+      --text-dark: #1a1a1a;
+      --text-mid: #4a4a4a;
+      --text-light: #888;
+      --white: #fff;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: var(--green-dark);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--white);
+    }
+    .header-logo-icon {
+      width: 40px; height: 40px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header-logo-text {
+      font-family: serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* ========== HERO SLIDER ========== */
+    .hero-slider {
+      position: relative;
+      height: 70vh;
+      min-height: 500px;
+      overflow: hidden;
+      background: var(--green-dark);
+      margin-top: 64px;
+    }
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    .hero-slide.active { opacity: 1; }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--white);
+      padding: 0 24px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: serif;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 700;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .hero-subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      opacity: 0.9;
+      margin-bottom: 16px;
+    }
+    .hero-desc {
+      font-size: 15px;
+      opacity: 0.8;
+      max-width: 600px;
+      line-height: 1.8;
+    }
+
+    /* ========== NAVIGATION ARROWS ========== */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      color: var(--white);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .nav-arrow:hover { background: var(--gold); border-color: var(--gold); }
+    .nav-arrow.prev { left: 32px; }
+    .nav-arrow.next { right: 32px; }
+    .nav-arrow.disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-arrow.disabled:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
+
+    /* ========== SLIDER INDICATOR ========== */
+    .slider-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+    }
+    .indicator-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .indicator-dot.active { background: var(--gold); width: 24px; border-radius: 4px; }
+
+    /* ========== CONTENT ========== */
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .info-card {
+      background: var(--cream);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.25s;
+    }
+    .info-card:hover { transform: translateY(-4px); }
+    .info-icon { font-size: 32px; margin-bottom: 12px; }
+    .info-label {
+      font-size: 12px;
+      color: var(--text-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .info-value { font-size: 16px; font-weight: 500; color: var(--green-dark); }
+
+    /* ========== SECTION ========== */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--cream-dark);
+    }
+    .section p { font-size: 15px; color: var(--text-mid); line-height: 1.9; margin-bottom: 16px; }
+
+    /* ========== TIPS ========== */
+    .tip-box {
+      background: linear-gradient(135deg, #f0faf4, #e8f5ec);
+      border-left: 4px solid var(--green-accent);
+      padding: 24px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+    }
+    .tip-box h4 { font-size: 15px; font-weight: 600; color: var(--green-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .tip-box ul { margin: 12px 0 0; padding-left: 20px; }
+    .tip-box li { font-size: 14px; color: var(--text-mid); margin-bottom: 8px; }
+
+    /* ========== CTA ========== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: var(--white);
+      padding: 48px;
+      border-radius: 16px;
+      text-align: center;
+      margin-top: 48px;
+    }
+    .cta-section h3 { font-family: serif; font-size: 22px; margin-bottom: 12px; }
+    .cta-section p { opacity: 0.85; margin-bottom: 24px; }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--gold);
+      color: var(--white);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    /* ========== BACK LINK ========== */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green-mid);
+      font-size: 14px;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green-dark); }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--cream);
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    .footer a { color: var(--green-mid); }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .nav-arrow { width: 44px; height: 44px; font-size: 18px; }
+      .nav-arrow.prev { left: 12px; }
+      .nav-arrow.next { right: 12px; }
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-section { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-icon">🏔️</div>
+      <div class="header-logo-text">Zhangjiajie Park</div>
+    </a>
+  </header>
+
+  <!-- HERO SLIDER -->
+  <section class="hero-slider" id="heroSlider">
+    <!-- Slides rendered by JS -->
+    <button class="nav-arrow prev" onclick="prevSlide()" id="prevBtn">←</button>
+    <button class="nav-arrow next" onclick="nextSlide()" id="nextBtn">→</button>
+    <div class="slider-indicator" id="sliderIndicator"></div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="content-section">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span>Back to Park</span>
+    </a>
+    <div id="experienceContent"></div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h3>Ready to Experience?</h3>
+      <p>Plan your perfect Zhangjiajie adventure today</p>
+      <a href="index.html" class="cta-btn">
+        <span>🌲</span> Back to Park
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2024 Zhangjiajie National Forest Park · World Natural Heritage</p>
+  </footer>
+
+  <script src="js/common.js?v=2"></script>
+  <script src="js/experience-detail.js?v=2"></script>
+</body>
+</html>
