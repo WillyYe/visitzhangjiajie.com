@@ -387,6 +387,7 @@ document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
 
 // ==================== DASHBOARD ====================
 
+function renderDashboard() {
   document.getElementById('dashboardStats').innerHTML =
     '<div class="stat-card"><div class="stat-num">'+newsData.length+'</div><div class="stat-label">新闻</div></div>'+
     '<div class="stat-card"><div class="stat-num">'+scenicData.length+'</div><div class="stat-label">景区</div></div>'+
