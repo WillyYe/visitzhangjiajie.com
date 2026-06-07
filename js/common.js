@@ -56,22 +56,23 @@ function closeModal() {
 // 生成 Modal 图片上传 HTML 片段
 // modalImgId 由调用方在调用前设置，调用后恢复
 // TODO: 重构为通过参数传入 modalImgId，消除隐式全局依赖
-function imgUploadHtml(currentPath, previewStyle) {
+function imgUploadHtml(currentPath, previewStyle, noWrapper) {
   var ps = previewStyle || '';
   var previewSrc = currentPath ? ('../' + currentPath + '?t=' + Date.now()) : '';
   var previewImg = currentPath
     ? '<img src="' + previewSrc + '" alt="preview" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div style=color:#e53935;font-size:12px;padding:8px;background:#ffebee;border-radius:6px>⚠️ 图片加载失败，请检查路径或点击下方「上传图片」重新上传</div>\'">'
     : '<div style="color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center">暂无图片<br><span style="font-size:11px">点击下方「上传图片」按钮添加</span></div>';
-  return '<div class="form-group"><label>图片路径</label>' +
+  var inner = '<label>图片路径</label>' +
     '<div class="img-upload-wrap">' +
-      '<input id="' + modalImgId + '" value="' + esc(currentPath) + '">' +
-      '<button type="button" class="img-upload-btn" onclick="triggerUpload(\'' + modalImgId + '\')">📁 上传图片</button>' +
+      '<input type="text" id="' + modalImgId + '" value="' + esc(currentPath) + '">' +
+      '<button type="button" class="img-upload-btn" style="flex-shrink:0" onclick="triggerUpload(\'' + modalImgId + '\')">📁 上传图片</button>' +
       (currentPath
-        ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350" onclick="document.getElementById(\'' + modalImgId + '\').value=\'\';document.getElementById(\'prev_' + modalImgId + '\').innerHTML=\'<div style=color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center>暂无图片<br><span style=font-size:11px>点击下方「上传图片」按钮添加</span></div>\'">✕ 清除</button>'
+        ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350;flex-shrink:0" onclick="document.getElementById(\'' + modalImgId + '\').value=\'\';document.getElementById(\'prev_' + modalImgId + '\').innerHTML=\'<div style=color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center>暂无图片<br><span style=font-size:11px>点击下方「上传图片」按钮添加</span></div>\'">✕ 清除</button>'
         : '') +
     '</div>' +
-    '<div class="img-preview" id="prev_' + modalImgId + '">' + previewImg + '</div>' +
-  '</div>';
+    '<div class="img-preview" id="prev_' + modalImgId + '">' + previewImg + '</div>';
+  if (noWrapper) return inner;
+  return '<div class="form-group">' + inner + '</div>';
 }
 
 // ==================== IMAGE COMPRESS ====================

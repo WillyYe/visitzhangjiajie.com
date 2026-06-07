@@ -23,14 +23,14 @@ function renderScenic() {
 function imgUploadHtml2(currentPath) {
   var old = modalImgId;
   modalImgId = 'fImg1';
-  var html = imgUploadHtml(currentPath);
+  var html = imgUploadHtml(currentPath, '', true);
   modalImgId = old;
   return html;
 }
 function imgUploadHtml3(currentPath) {
   var old = modalImgId;
   modalImgId = 'fImg2';
-  var html = imgUploadHtml(currentPath);
+  var html = imgUploadHtml(currentPath, '', true);
   modalImgId = old;
   return html;
 }

@@ -1,155 +1,268 @@
-// ========== EXPERIENCE MANAGEMENT ==========
-// 后台体验管理模块 - 从 admin/index.html 提取并扩展
+// ==================== EXPERIENCE ADMIN ====================
+// 体验管理模块 — 供 admin/index.html 调用
+// 依赖：js/common.js（esc, showToast, ghFetch, friendlyError, deleteFileFromGitHub 等）
 
-// ========== RENDER EXPERIENCE TABLE ==========
+// ==================== RENDER ====================
 function renderExp() {
   var h = '';
   expData.forEach(function(e, i) {
     var title = e.title || e.titleEn || '';
-    var descShort = (e.desc || e.descEn || '').substring(0, 30) + '...';
     var imgPreview = e.img
-      ? '<img src="../' + esc(e.img) + '" style="width:60px;height:40px;object-fit:cover;border-radius:4px">'
-      : '—';
-
-    h += '<tr><td>' + esc(e.id) + '</td><td>' + esc(title) + '</td><td title="' + esc(e.desc || e.descEn || '') + '">' + esc(descShort) + '</td><td style="text-align:center">' + imgPreview + '</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal(' + i + ')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteExp(' + i + ')">删除</button></td></tr>';
+      ? '<img src="../' + e.img + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">'
+      : '<span style="color:#aaa;font-size:11px">未上传</span>';
+    var descShort = (e.desc || e.descEn || '').length > 30 ? (e.desc || e.descEn || '').substring(0, 30) + '...' : (e.desc || e.descEn || '—');
+    var validImages = (e.images || []).filter(function(x) { return x; });
+    var detailIcon = (validImages.length > 1) || (e.info && e.info.length) || (e.tips && e.tips.length) ? ' 🖼️' : '';
+    h += '<tr><td>' + esc(e.id) + '</td><td>' + esc(title) + detailIcon + '</td><td title="' + esc(e.desc || e.descEn || '') + '">' + esc(descShort) + '</td><td style="text-align:center">' + imgPreview + '</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openExpModal(' + i + ')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceExpImage(' + i + ')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteExp(' + i + ')">删除</button></td></tr>';
   });
   document.getElementById('expTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
 
-// ========== OPEN EXPERIENCE MODAL ==========
-function openExpModal(idx) {
-  editingIndex = idx !== undefined ? idx : -1;
-  var e = editingIndex >= 0 ? expData[editingIndex] : {
-    id: '',
-    title: '',
-    titleEn: '',
-    desc: '',
-    descEn: '',
-    img: '',
-    images: ['', '', ''],
-    info: [
-      {icon: '⏱️', label: '建议时长', value: ''},
-      {icon: '📊', label: '难度', value: ''},
-      {icon: '🌦️', label: '最佳季节', value: ''},
-      {icon: '👟', label: '装备建议', value: ''}
-    ],
-    tips: ['', '', '']
-  };
-
-  // 确保数组存在
-  if (!e.images || !Array.isArray(e.images)) e.images = ['', '', ''];
-  while (e.images.length < 3) e.images.push('');
-
-  if (!e.info || !Array.isArray(e.info)) e.info = [
-    {icon: '⏱️', label: '建议时长', value: ''},
-    {icon: '📊', label: '难度', value: ''},
-    {icon: '🌦️', label: '最佳季节', value: ''},
-    {icon: '👟', label: '装备建议', value: ''}
-  ];
-
-  if (!e.tips || !Array.isArray(e.tips)) e.tips = ['', '', ''];
-
-  // 构建弹窗内容
-  var html = '';
-
-  // 基础信息卡片
-  html += '<div class="editor-card">';
-  html += '<div class="editor-card-header">';
-  html += '<div class="editor-card-badge">1</div>';
-  html += '<div class="editor-card-title">基础信息</div>';
-  html += '</div>';
-  html += '<div class="editor-card-body">';
-  html += '<div class="form-group"><label>ID（唯一标识）</label><input id="fExpId" value="' + esc(e.id) + '"></div>';
-  html += '<div class="form-group"><label>中文标题</label><input id="fExpTitle" value="' + esc(e.title || '') + '"></div>';
-  html += '<div class="form-group"><label>英文标题</label><input id="fExpTitleEn" value="' + esc(e.titleEn || '') + '"></div>';
-  html += '<div class="form-group"><label>中文描述</label><textarea id="fExpDesc" rows="3">' + esc(e.desc || '') + '</textarea></div>';
-  html += '<div class="form-group"><label>英文描述</label><textarea id="fExpDescEn" rows="2">' + esc(e.descEn || '') + '</textarea></div>';
-  html += '</div></div>';
-
-  // 轮播图卡片
-  html += '<div class="editor-card">';
-  html += '<div class="editor-card-header">';
-  html += '<div class="editor-card-badge">2</div>';
-  html += '<div class="editor-card-title">轮播图（3张）</div>';
-  html += '</div>';
-  html += '<div class="editor-card-body">';
-  html += imgUploadHtml(e.img, 'width:100%;height:120px;object-fit:cover;border-radius:8px');
-  html += '<p style="font-size:12px;color:#888;margin:8px 0 4px;">轮播图 2：</p>';
-  html += '<input id="fExpImg1" value="' + esc(e.images[1] || '') + '" placeholder="assets/images/xxx.jpg" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-  html += '<p style="font-size:12px;color:#888;margin:8px 0 4px;">轮播图 3：</p>';
-  html += '<input id="fExpImg2" value="' + esc(e.images[2] || '') + '" placeholder="assets/images/xxx.jpg" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-  html += '</div></div>';
-
-  // 信息卡片
-  html += '<div class="editor-card">';
-  html += '<div class="editor-card-header">';
-  html += '<div class="editor-card-badge">3</div>';
-  html += '<div class="editor-card-title">信息卡片</div>';
-  html += '<button type="button" style="margin-left:auto;padding:4px 10px;font-size:12px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:4px;cursor:pointer" onclick="addInfoCard()">+ 添加</button>';
-  html += '</div>';
-  html += '<div class="editor-card-body" id="infoCardsContainer">';
-
-  (e.info || []).forEach(function(item, i) {
-    html += '<div class="editor-card info-row" style="margin-bottom:12px;padding:12px;background:#f9f9f9;border-radius:8px">';
-    html += '<div style="display:flex;gap:8px;margin-bottom:8px">';
-    html += '<input value="' + esc(item.icon || '') + '" placeholder="图标" style="width:50px;padding:8px;text-align:center;border:1px solid #ddd;border-radius:6px;font-size:18px">';
-    html += '<input value="' + esc(item.label || '') + '" placeholder="标签" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-    html += '<input value="' + esc(item.value || '') + '" placeholder="值" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-    html += '<button type="button" onclick="removeInfoCard(this)" style="padding:4px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9e;border-radius:4px;cursor:pointer">🗑️</button>';
-    html += '</div>';
-    html += '</div>';
-  });
-
-  html += '</div></div>';
-
-  // 旅行贴士卡片
-  html += '<div class="editor-card">';
-  html += '<div class="editor-card-header">';
-  html += '<div class="editor-card-badge">4</div>';
-  html += '<div class="editor-card-title">旅行贴士</div>';
-  html += '<button type="button" style="margin-left:auto;padding:4px 10px;font-size:12px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:4px;cursor:pointer" onclick="addTip()">+ 添加</button>';
-  html += '</div>';
-  html += '<div class="editor-card-body" id="tipsContainer">';
-
-  (e.tips || []).forEach(function(tip, i) {
-    html += '<div class="tip-row" style="display:flex;gap:8px;margin-bottom:8px">';
-    html += '<input value="' + esc(tip || '') + '" placeholder="贴士内容" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-    html += '<button type="button" onclick="removeTip(this)" style="padding:4px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9e;border-radius:4px;cursor:pointer">🗑️</button>';
-    html += '</div>';
-  });
-
-  html += '</div></div>';
-
-  // 操作按钮
-  html += '<div class="form-actions">';
-  html += '<button class="btn btn-outline" onclick="closeModal()">取消</button>';
-  html += '<button class="btn btn-primary" onclick="saveExp()">保存</button>';
-  html += '</div>';
-
-  showModal(editingIndex >= 0 ? '编辑体验' : '新增体验', html);
+// ==================== IMG UPLOAD HELPERS ====================
+// 为 openExpModal 生成"轮播图 2 / 3"的上传 HTML
+function imgUploadHtml2(currentPath) {
+  var old = modalImgId;
+  modalImgId = 'fExpImg1';
+  var html = imgUploadHtml(currentPath, '', true);
+  modalImgId = old;
+  return html;
+}
+function imgUploadHtml3(currentPath) {
+  var old = modalImgId;
+  modalImgId = 'fExpImg2';
+  var html = imgUploadHtml(currentPath, '', true);
+  modalImgId = old;
+  return html;
 }
 
-// ========== SAVE EXPERIENCE ==========
-function saveExp() {
-  var obj = {
-    id: document.getElementById('fExpId').value,
-    title: document.getElementById('fExpTitle').value,
-    titleEn: document.getElementById('fExpTitleEn').value,
-    desc: document.getElementById('fExpDesc').value,
-    descEn: document.getElementById('fExpDescEn').value,
-    img: document.getElementById(modalImgId).value,
-    images: [
-      document.getElementById('fExpImg1').value,
-      document.getElementById('fExpImg2').value
+// ==================== INFO CARDS (二级页面) ====================
+function addInfoCard() {
+  var container = document.getElementById('infoCardsEdit');
+  if (!container) return;
+  var count = container.querySelectorAll('.info-row').length;
+  if (count >= 8) return;
+  var idx = Date.now();
+  var num = count + 1;
+  var div = document.createElement('div');
+  div.className = 'editor-card info-row';
+  div.id = 'infoRow_' + idx;
+  div.innerHTML =
+    '<div class="editor-card-header">' +
+    '<div style="display:flex;align-items:center;"><span class="editor-card-num">' + num + '</span><span class="editor-card-title">Info Card</span></div>' +
+    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateInfoAddBtn()">Remove</button>' +
+    '</div>' +
+    '<div class="editor-row">' +
+    '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="⏱️" id="fInfoIcon_' + idx + '"></div>' +
+    '<div class="editor-field"><label>Label</label><input placeholder="e.g. Duration" id="fInfoLabel_' + idx + '"></div>' +
+    '<div class="editor-field"><label>Value</label><input placeholder="e.g. 4-6 hours" id="fInfoValue_' + idx + '"></div>' +
+    '</div>' +
+    '</div>';
+  container.appendChild(div);
+  updateInfoAddBtn();
+}
+function removeInfoCard(id) {
+  var el = document.getElementById('infoRow' + id);
+  if (el) el.remove();
+  updateInfoAddBtn();
+}
+function updateInfoAddBtn() {
+  var container = document.getElementById('infoCardsEdit');
+  if (!container) return;
+  var count = container.querySelectorAll('.info-row').length;
+  var btn = document.getElementById('addInfoBtn');
+  if (btn) btn.disabled = (count >= 8);
+}
+
+// ==================== TIPS (二级页面) ====================
+function addTip() {
+  var container = document.getElementById('tipsEdit');
+  if (!container) return;
+  var count = container.querySelectorAll('.tip-row').length;
+  if (count >= 6) return;
+  var idx = Date.now();
+  var num = count + 1;
+  var div = document.createElement('div');
+  div.className = 'editor-card tip-row';
+  div.id = 'tipRow_' + idx;
+  div.innerHTML =
+    '<div class="editor-card-header">' +
+    '<div style="display:flex;align-items:center;"><span class="editor-card-num">' + num + '</span><span class="editor-card-title">Travel Tip</span></div>' +
+    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateTipAddBtn()">Remove</button>' +
+    '</div>' +
+    '<div class="editor-field"><label>Content</label><textarea placeholder="Enter travel tip..." id="fTip_' + idx + '"></textarea></div>' +
+    '</div>';
+  container.appendChild(div);
+  updateTipAddBtn();
+}
+function removeTip(id) {
+  var el = document.getElementById('tipRow' + id);
+  if (el) el.remove();
+  updateTipAddBtn();
+}
+function updateTipAddBtn() {
+  var container = document.getElementById('tipsEdit');
+  if (!container) return;
+  var count = container.querySelectorAll('.tip-row').length;
+  var btn = document.getElementById('addTipBtn');
+  if (btn) btn.disabled = (count >= 6);
+}
+
+// ==================== READ DOM ====================
+function readInfoCards() {
+  var container = document.getElementById('infoCardsEdit');
+  if (!container) return [];
+  var arr = [];
+  container.querySelectorAll('.info-row').forEach(function(row) {
+    var icon = (row.querySelector('[id^="fInfoIcon"]') || {}).value || '';
+    var label = (row.querySelector('[id^="fInfoLabel"]') || {}).value || '';
+    var value = (row.querySelector('[id^="fInfoValue"]') || {}).value || '';
+    if (label) arr.push({ icon: icon.trim(), label: label.trim(), value: value.trim() });
+  });
+  while (arr.length < 4) arr.push({ icon: '⏱️', label: '', value: '' });
+  return arr.slice(0, 8);
+}
+function readTips() {
+  var container = document.getElementById('tipsEdit');
+  if (!container) return [];
+  var arr = [];
+  container.querySelectorAll('.tip-row').forEach(function(row) {
+    var val = (row.querySelector('[id^="fTip"]') || {}).value || '';
+    if (val) arr.push(val.trim());
+  });
+  while (arr.length < 3) arr.push('');
+  return arr.slice(0, 6);
+}
+
+// ==================== MODAL ====================
+function openExpModal(idx) {
+  editingIndex = (idx !== undefined) ? idx : -1;
+  var e = editingIndex >= 0 ? expData[editingIndex] : {
+    id: '', img: '',
+    title: '', titleEn: '', desc: '', descEn: '',
+    images: ['', '', ''],
+    infoEn: [
+      { icon: '⏱️', label: 'Duration', value: '' },
+      { icon: '📊', label: 'Difficulty', value: '' },
+      { icon: '🌦️', label: 'Best Season', value: '' },
+      { icon: '👟', label: 'Gear', value: '' }
     ],
-    info: readInfoCards(),
-    tips: readTips()
+    tipsEn: ['', '', '']
   };
 
-  // 确保 images[0] = img
-  obj.images.unshift(obj.img);
-  // 去除末尾空值
-  while (obj.images.length > 1 && !obj.images[obj.images.length - 1]) obj.images.pop();
+  // 确保数组存在并补全到所需长度（不丢失已有数据）
+  if (!e.images || !Array.isArray(e.images)) e.images = [];
+  while (e.images.length < 3) e.images.push('');
+  // 统一使用 infoEn / tipsEn 作为唯一数据源（前台只显示英文）
+  if (!e.infoEn || !Array.isArray(e.infoEn)) e.infoEn = [
+    { icon: '⏱️', label: 'Duration', value: '' },
+    { icon: '📊', label: 'Difficulty', value: '' },
+    { icon: '🌦️', label: 'Best Season', value: '' },
+    { icon: '👟', label: 'Gear', value: '' }
+  ];
+  if (!e.tipsEn || !Array.isArray(e.tipsEn)) e.tipsEn = ['', '', ''];
+  // 构建 Info Cards HTML（纯英文）
+  var infoHtml = '<div class="editor-section-title">📊 Info Cards <span class="editor-section-hint">4–8 items</span></div><div id="infoCardsEdit">';
+  e.infoEn.forEach(function(item, i) {
+    if (i >= 8) return;
+    infoHtml += '<div class="editor-card info-row" id="infoRow' + i + '">' +
+      '<div class="editor-card-header">' +
+      '<div style="display:flex;align-items:center;"><span class="editor-card-num">' + (i + 1) + '</span><span class="editor-card-title">Info Card</span></div>' +
+      (i >= 4 ? '<button class="editor-card-remove" onclick="removeInfoCard(' + i + ')">Remove</button>' : '') +
+      '</div>' +
+      '<div class="editor-row">' +
+      '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="⏱️" value="' + esc(item.icon || '') + '" id="fInfoIcon' + i + '"></div>' +
+      '<div class="editor-field"><label>Label</label><input placeholder="e.g. Duration" value="' + esc(item.label || '') + '" id="fInfoLabel' + i + '"></div>' +
+      '<div class="editor-field"><label>Value</label><input placeholder="e.g. 4-6 hours" value="' + esc(item.value || '') + '" id="fInfoValue' + i + '"></div>' +
+      '</div>' +
+      '</div>';
+  });
+  infoHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addInfoCard()" id="addInfoBtn"' + (e.infoEn.length >= 8 ? ' disabled' : '') + '>➕ Add Info Card</button>';
+
+  // 构建 Tips HTML（纯英文）
+  var tipsHtml = '<div class="editor-section-title">💡 Travel Tips <span class="editor-section-hint">3–6 items</span></div><div id="tipsEdit">';
+  e.tipsEn.forEach(function(tip, i) {
+    if (i >= 6) return;
+    tipsHtml += '<div class="editor-card tip-row" id="tipRow' + i + '">' +
+      '<div class="editor-card-header">' +
+      '<div style="display:flex;align-items:center;"><span class="editor-card-num">' + (i + 1) + '</span><span class="editor-card-title">Travel Tip</span></div>' +
+      (i >= 3 ? '<button class="editor-card-remove" onclick="removeTip(' + i + ')">Remove</button>' : '') +
+      '</div>' +
+      '<div class="editor-field"><label>Content</label><textarea placeholder="Enter travel tip..." id="fTip' + i + '">' + esc(tip || '') + '</textarea></div>' +
+      '</div>';
+  });
+  tipsHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addTip()" id="addTipBtn"' + (e.tipsEn.length >= 6 ? ' disabled' : '') + '>➕ Add Travel Tip</button>';
+
+  // 轮播图 2、3
+  var img1 = (e.images && e.images[1]) || '';
+  var img2 = (e.images && e.images[2]) || '';
+
+  showModal(
+    editingIndex >= 0 ? '编辑体验' : '新增体验',
+    // 基本信息
+    '<div class="form-section"><h4>📋 基本信息（首页卡片）</h4>' +
+    '<div class="form-group"><label>ID（唯一标识）</label><input id="fExpId" value="' + esc(e.id) + '"></div>' +
+    '<div class="form-group"><label>中文标题</label><input id="fExpTitle" value="' + esc(e.title || '') + '"></div>' +
+    '<div class="form-group"><label>英文标题</label><input id="fExpTitleEn" value="' + esc(e.titleEn || '') + '"></div>' +
+    '<div class="form-group"><label>中文描述</label><textarea id="fExpDesc">' + esc(e.desc || '') + '</textarea></div>' +
+    '<div class="form-group"><label>英文描述</label><textarea id="fExpDescEn">' + esc(e.descEn || '') + '</textarea></div>' +
+    imgUploadHtml(e.img) +
+    '</div>' +
+    // 轮播图
+    '<div class="form-section"><h4>🖼️ 轮播图（二级页面）</h4>' +
+    '<div class="form-group"><label>轮播图 2（可选）</label>' + imgUploadHtml2(img1) + '</div>' +
+    '<div class="form-group"><label>轮播图 3（可选）</label>' + imgUploadHtml3(img2) + '</div></div>' +
+    // 详情字段
+    infoHtml + tipsHtml +
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">💾 保存并同步到 GitHub</button></div>'
+  );
+}
+
+// ==================== SAVE ====================
+function saveExp() {
+  var id = (document.getElementById('fExpId') || {}).value || '';
+  id = id.trim();
+  var title = (document.getElementById('fExpTitle') || {}).value || '';
+  title = title.trim();
+  var img = (document.getElementById(modalImgId) || {}).value || '';
+  img = img.trim();
+  var img1 = (document.getElementById('fExpImg1') || {}).value || '';
+  img1 = img1.trim();
+  var img2 = (document.getElementById('fExpImg2') || {}).value || '';
+  img2 = img2.trim();
+
+  if (!id) { showToast('❌ ID 不能为空', 'error'); return; }
+  if (!title) { showToast('❌ 中文标题不能为空', 'error'); return; }
+  if (!img) { showToast('❌ 请上传封面图片', 'error'); return; }
+
+  // ID 重复检查
+  var duplicateIdx = -1;
+  for (var i = 0; i < expData.length; i++) {
+    if (expData[i].id === id) { duplicateIdx = i; break; }
+  }
+  if (editingIndex < 0 && duplicateIdx >= 0) {
+    showToast('❌ ID "' + id + '" 已存在，请使用其他 ID', 'error'); return;
+  }
+  if (editingIndex >= 0 && duplicateIdx >= 0 && duplicateIdx !== editingIndex) {
+    showToast('❌ ID "' + id + '" 已被其他体验使用，请使用其他 ID', 'error'); return;
+  }
+
+  var images = [img, img1 || '', img2 || ''];
+  // 去除末尾空字符串（保留非末尾的空占位，维持顺序）
+  while (images.length > 1 && !images[images.length - 1]) images.pop();
+
+  var obj = {
+    id: id,
+    img: img,
+    title: title,
+    titleEn: ((document.getElementById('fExpTitleEn') || {}).value || '').trim(),
+    desc: ((document.getElementById('fExpDesc') || {}).value || '').trim(),
+    descEn: ((document.getElementById('fExpDescEn') || {}).value || '').trim(),
+    images: images,
+    info: readInfoCards(),
+    infoEn: readInfoCards(),
+    tips: readTips(),
+    tipsEn: readTips()
+  };
 
   if (editingIndex >= 0) {
     expData[editingIndex] = obj;
@@ -160,133 +273,152 @@ function saveExp() {
   closeModal();
   renderExp();
   renderDashboard();
-  showToast('体验已保存 ✅', 'success');
-
-  // 自动同步到 GitHub
+  showToast('✅ 体验已保存，正在同步到 GitHub...', 'success');
   saveExpToGitHub();
 }
 
-// ========== DELETE EXPERIENCE ==========
+// ==================== DELETE ====================
 function deleteExp(i) {
-  if (confirm('确定删除 "' + expData[i].title + '" 吗？')) {
-    var e = expData[i];
-    // 删除关联的图片
-    if (e.img) deleteFileFromGitHub(e.img, 'Delete: ' + e.img).catch(function() {});
-    if (e.images) {
-      var seen = {};
-      e.images.forEach(function(img) {
-        if (img && img !== e.img && !seen[img]) {
-          seen[img] = true;
-          deleteFileFromGitHub(img, 'Delete: ' + img).catch(function() {});
-        }
-      });
-    }
+  if (expData.length <= 2) { showToast('至少保留 2 个体验，不可删除', 'error'); return; }
+  if (!confirm('确定删除 "' + (expData[i].title || expData[i].titleEn || '') + '" 吗？')) return;
 
-    expData.splice(i, 1);
-    renderExp();
-    renderDashboard();
-    showToast('已删除', 'success');
+  // 删除关联的图片文件（最佳努力，失败不阻塞主流程）
+  var e = expData[i];
+  if (e.img) deleteFileFromGitHub(e.img, 'Delete: ' + e.img).catch(function() {});
+  if (e.images) {
+    var seen = {};
+    e.images.forEach(function(img) {
+      if (img && img !== e.img && !seen[img]) {
+        seen[img] = true;
+        deleteFileFromGitHub(img, 'Delete: ' + img).catch(function() {});
+      }
+    });
   }
+
+  expData.splice(i, 1);
+  renderExp();
+  renderDashboard();
+  showToast('✅ 已删除，正在同步到 GitHub...', 'success');
+  saveExpToGitHub();
 }
 
-// ========== READ INFO CARDS ==========
-function readInfoCards() {
-  var container = document.getElementById('infoCardsContainer');
-  if (!container) return [];
-  var cards = [];
-  container.querySelectorAll('.info-row').forEach(function(row) {
-    var inputs = row.querySelectorAll('input');
-    if (inputs.length >= 3) {
-      cards.push({
-        icon: inputs[0].value,
-        label: inputs[1].value,
-        value: inputs[2].value
+// ==================== REPLACE IMAGE ====================
+// 快速替换 Experience 封面图片（表格行内操作，一步完成上传+保存+同步）
+function replaceExpImage(i) {
+  var fi = document.getElementById('fileInput');
+  fi.onchange = function() {
+    var file = fi.files[0];
+    if (!file) return;
+    var oldImg = expData[i].img;
+    var btns = (document.querySelectorAll('#expTableBody tr') || [])[i];
+    btns = btns ? btns.querySelectorAll('button') : [];
+    var btn = btns[1] || null;
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ 压缩中...'; }
+    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
+      var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
+      var path = 'assets/images/' + cleanName;
+      if (btn) { btn.textContent = '⏳ 上传中...'; }
+      ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(fileInfo) {
+        return ghFetch(path, 'PUT', {
+          content: base64,
+          message: 'Replace experience image: ' + file.name,
+          sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+        });
+      }).then(function(r) {
+        if (!r.ok) return r.json().then(function(d) { throw new Error(d.message); });
+        if (oldImg && oldImg !== path) {
+          deleteFileFromGitHub(oldImg, 'Delete old image: ' + oldImg).catch(function() {});
+        }
+        expData[i].img = path;
+        // 同步更新 images[0]（轮播图第一张），避免再次编辑时显示旧图
+        if (!expData[i].images) expData[i].images = [];
+        if (expData[i].images.length < 1) expData[i].images.push(path);
+        else expData[i].images[0] = path;
+        renderExp();
+        showToast('✅ 图片已替换，正在同步体验数据...', 'success');
+        saveExpToGitHub();
+      }).catch(function(err) {
+        var msg = friendlyError(err.message || '');
+        showToast('❌ 替换失败：' + msg, 'error');
+      }).finally(function() {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
       });
-    }
-  });
-  return cards;
+    });
+  };
+  fi.value = '';
+  fi.click();
 }
 
-// ========== ADD/REMOVE INFO CARD ==========
-function addInfoCard() {
-  var container = document.getElementById('infoCardsContainer');
-  if (!container) return;
-  var html = '<div class="editor-card info-row" style="margin-bottom:12px;padding:12px;background:#f9f9f9;border-radius:8px">';
-  html += '<div style="display:flex;gap:8px;margin-bottom:8px">';
-  html += '<input value="⏱️" placeholder="图标" style="width:50px;padding:8px;text-align:center;border:1px solid #ddd;border-radius:6px;font-size:18px">';
-  html += '<input value="" placeholder="标签" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-  html += '<input value="" placeholder="值" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-  html += '<button type="button" onclick="removeInfoCard(this)" style="padding:4px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9e;border-radius:4px;cursor:pointer">🗑️</button>';
-  html += '</div>';
-  html += '</div>';
-  container.insertAdjacentHTML('beforeend', html);
+// ==================== SYNC STATUS ====================
+var expSyncLock = false;
+
+function updateExpSyncStatus(state, message) {
+  var el = document.getElementById('expSyncStatus');
+  if (!el) return;
+  var dot = el.querySelector('.sync-dot');
+  var text = el.querySelector('.sync-text');
+  var states = {
+    idle:    { color: '#aaa', label: '未同步' },
+    saving:  { color: '#f9a825', label: '同步中...' },
+    success: { color: '#43a047', label: '已同步 ✓' },
+    error:   { color: '#e53935', label: '同步失败 ✕' }
+  };
+  var s = states[state] || states.idle;
+  if (dot) dot.style.background = s.color;
+  if (text) text.textContent = message || s.label;
 }
 
-function removeInfoCard(btn) {
-  var row = btn.closest('.info-row');
-  if (row) row.remove();
-}
-
-// ========== READ TIPS ==========
-function readTips() {
-  var container = document.getElementById('tipsContainer');
-  if (!container) return [];
-  var tips = [];
-  container.querySelectorAll('.tip-row').forEach(function(row) {
-    var input = row.querySelector('input');
-    if (input && input.value.trim()) {
-      tips.push(input.value.trim());
-    }
-  });
-  return tips;
-}
-
-// ========== ADD/REMOVE TIP ==========
-function addTip() {
-  var container = document.getElementById('tipsContainer');
-  if (!container) return;
-  var html = '<div class="tip-row" style="display:flex;gap:8px;margin-bottom:8px">';
-  html += '<input value="" placeholder="贴士内容" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
-  html += '<button type="button" onclick="removeTip(this)" style="padding:4px 8px;background:#ffebee;color:#c62828;border:1px solid #ef9a9e;border-radius:4px;cursor:pointer">🗑️</button>';
-  html += '</div>';
-  container.insertAdjacentHTML('beforeend', html);
-}
-
-function removeTip(btn) {
-  var row = btn.closest('.tip-row');
-  if (row) row.remove();
-}
-
-// ========== SAVE TO GITHUB ==========
+// ==================== SAVE TO GITHUB ====================
 function saveExpToGitHub() {
-  showToast('正在同步到 GitHub...', 'info');
+  if (expSyncLock) {
+    showToast('⏳ 正在同步中，请稍候...', '');
+    return;
+  }
+  expSyncLock = true;
+  updateExpSyncStatus('saving');
 
+  showToast('⏳ 第 1 步：正在同步 experience.json 到 GitHub...', '');
   var content = JSON.stringify(expData, null, 2);
   var path = 'data/experience.json';
+  var retryCount = 0;
 
-  ghFetch(path)
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var sha = data.sha;
-      ghFetch(path, {
-        method: 'PUT',
-        body: JSON.stringify({
-          message: 'Update: experience.json (auto sync)',
-          content: utf8ToBase64(content),
-          sha: sha,
-          branch: 'main'
-        })
-      })
-      .then(function() {
-        showToast('✅ 已同步到 GitHub', 'success');
-      })
-      .catch(function(err) {
-        console.error('GitHub 同步失败:', err);
-        showToast('⚠️ 自动同步失败，请手动点击「同步到 GitHub」', 'error');
+  function doSync() {
+    ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; }).then(function(fileInfo) {
+      // UTF-8 safe base64 encode
+      function utf8ToBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+      var base64Content = utf8ToBase64(content);
+      return ghFetch(path, 'PUT', {
+        content: base64Content,
+        message: 'Admin: Update experience.json',
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
       });
-    })
-    .catch(function(err) {
-      console.error('获取文件 SHA 失败:', err);
-      showToast('⚠️ 同步失败，请检查 Token 权限', 'error');
+    }).then(function(r) {
+      if (r.ok) {
+        expSyncLock = false;
+        updateExpSyncStatus('success');
+        showToast('✅ 第 2 步：体验已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
+        return;
+      }
+      return r.json().then(function(d) {
+        var msg = d.message || '';
+        if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
+          retryCount++;
+          showToast('🔄 检测到文件冲突，正在自动重试...', '');
+          updateExpSyncStatus('saving', '冲突重试中...');
+          return doSync();
+        }
+        throw new Error(msg);
+      });
+    }).catch(function(err) {
+      expSyncLock = false;
+      var msg = friendlyError(err.message || '');
+      updateExpSyncStatus('error', msg.slice(0, 30));
+      showToast('❌ 同步失败：' + msg, 'error');
     });
+  }
+
+  doSync();
 }
