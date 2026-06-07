@@ -87,7 +87,7 @@ function compressImage(file, maxW, quality, callback) {
     canvas.toBlob(function(blob) {
       var reader = new FileReader();
       reader.onload = function(e) {
-        callback(e.target.result.split(',')[1], blob.size);
+        callback(e.target.result.split(',')[1], file.size);
       };
       reader.readAsDataURL(blob);
     }, 'image/jpeg', quality);
@@ -244,5 +244,5 @@ function formatBytes(bytes) {
 // 用法：btoa(Array.from(new TextEncoder().encode(str), b => String.fromCharCode(b)).join('')
 // 为兼容旧代码，导出此辅助函数
 function utf8ToBase64(str) {
-  return btoa(Array.from(new TextEncoder().encode(str), function(b) { return String.fromCharCode(b); }).join(''));
+  return btoa(unescape(encodeURIComponent(str)));
 }

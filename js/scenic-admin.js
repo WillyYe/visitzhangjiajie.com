@@ -450,7 +450,10 @@ function saveScenicToGitHub() {
   function doSync() {
     ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; }).then(function(fileInfo) {
       // UTF-8 safe base64 encode
-      var base64Content = btoa(Array.from(new TextEncoder().encode(content), function(b) { return String.fromCharCode(b); }).join(''));
+      function utf8ToBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+      var base64Content = utf8ToBase64(content);
       return ghFetch(path, 'PUT', {
         content: base64Content,
         message: 'Admin: Update scenic.json',
