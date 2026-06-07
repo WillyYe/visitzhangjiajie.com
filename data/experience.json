@@ -12,16 +12,48 @@
       "assets/images/jinbianxi.jpg"
     ],
     "info": [
-      {"icon": "⏱️", "label": "建议时长", "value": "4-6小时"},
-      {"icon": "📊", "label": "难度", "value": "中等"},
-      {"icon": "🌦️", "label": "最佳季节", "value": "春秋两季"},
-      {"icon": "👟", "label": "装备建议", "value": "防滑鞋、饮用水、雨具"}
+      {
+        "icon": "⏱️",
+        "label": "建议时长",
+        "value": "4-6小时"
+      },
+      {
+        "icon": "📊",
+        "label": "难度",
+        "value": "中等"
+      },
+      {
+        "icon": "🌦️",
+        "label": "最佳季节",
+        "value": "春秋两季"
+      },
+      {
+        "icon": "👟",
+        "label": "装备建议",
+        "value": "防滑鞋、饮用水、雨具"
+      }
     ],
     "infoEn": [
-      {"icon": "⏱️", "label": "Duration", "value": "4-6 hours"},
-      {"icon": "📊", "label": "Difficulty", "value": "Moderate"},
-      {"icon": "🌦️", "label": "Best Season", "value": "Spring & Autumn"},
-      {"icon": "👟", "label": "Gear", "value": "Non-slip shoes, water, rain gear"}
+      {
+        "icon": "⏱️",
+        "label": "Duration",
+        "value": "4-6 hours"
+      },
+      {
+        "icon": "📊",
+        "label": "Difficulty",
+        "value": "Moderate"
+      },
+      {
+        "icon": "🌦️",
+        "label": "Best Season",
+        "value": "Spring & Autumn"
+      },
+      {
+        "icon": "👟",
+        "label": "Gear",
+        "value": "Non-slip shoes, water, rain gear"
+      }
     ],
     "tips": [
       "建议穿着防滑徒步鞋",
@@ -51,16 +83,48 @@
       "assets/images/tianzishan.jpg"
     ],
     "info": [
-      {"icon": "📷", "label": "最佳机位", "value": "袁家界、天子山"},
-      {"icon": "🌅", "label": "最佳时间", "value": "日出日落"},
-      {"icon": "🎒", "label": "建议器材", "value": "广角、三脚架"},
-      {"icon": "☁️", "label": "天气选择", "value": "雨后晴天最适合"}
+      {
+        "icon": "📷",
+        "label": "最佳机位",
+        "value": "袁家界、天子山"
+      },
+      {
+        "icon": "🌅",
+        "label": "最佳时间",
+        "value": "日出日落"
+      },
+      {
+        "icon": "🎒",
+        "label": "建议器材",
+        "value": "广角、三脚架"
+      },
+      {
+        "icon": "☁️",
+        "label": "天气选择",
+        "value": "雨后晴天最适合"
+      }
     ],
     "infoEn": [
-      {"icon": "📷", "label": "Best Spots", "value": "Yuanjiajie, Tianzi Mountain"},
-      {"icon": "🌅", "label": "Best Time", "value": "Sunrise & Sunset"},
-      {"icon": "🎒", "label": "Gear", "value": "Wide-angle, Tripod"},
-      {"icon": "☁️", "label": "Weather", "value": "After rain, clear sky"}
+      {
+        "icon": "📷",
+        "label": "Best Spots",
+        "value": "Yuanjiajie, Tianzi Mountain"
+      },
+      {
+        "icon": "🌅",
+        "label": "Best Time",
+        "value": "Sunrise & Sunset"
+      },
+      {
+        "icon": "🎒",
+        "label": "Gear",
+        "value": "Wide-angle, Tripod"
+      },
+      {
+        "icon": "☁️",
+        "label": "Weather",
+        "value": "After rain, clear sky"
+      }
     ],
     "tips": [
       "日出前1小时到达拍摄点",
@@ -90,16 +154,48 @@
       "assets/images/gal-yuanjiajie.jpg"
     ],
     "info": [
-      {"icon": "🎓", "label": "适合年龄", "value": "8岁以上"},
-      {"icon": "⏰", "label": "课程时长", "value": "2-3小时"},
-      {"icon": "👨‍🏫", "label": "讲解语言", "value": "中文/英文"},
-      {"icon": "📜", "label": "证书", "value": "颁发研学证书"}
+      {
+        "icon": "🎓",
+        "label": "适合年龄",
+        "value": "8岁以上"
+      },
+      {
+        "icon": "⏰",
+        "label": "课程时长",
+        "value": "2-3小时"
+      },
+      {
+        "icon": "👨‍🏫",
+        "label": "讲解语言",
+        "value": "中文/英文"
+      },
+      {
+        "icon": "📜",
+        "label": "证书",
+        "value": "颁发研学证书"
+      }
     ],
     "infoEn": [
-      {"icon": "🎓", "label": "Age", "value": "8+ years"},
-      {"icon": "⏰", "label": "Duration", "value": "2-3 hours"},
-      {"icon": "👨‍🏫", "label": "Language", "value": "Chinese/English"},
-      {"icon": "📜", "label": "Certificate", "value": "Issued upon completion"}
+      {
+        "icon": "🎓",
+        "label": "Age",
+        "value": "8+ years"
+      },
+      {
+        "icon": "⏰",
+        "label": "Duration",
+        "value": "2-3 hours"
+      },
+      {
+        "icon": "👨‍🏫",
+        "label": "Language",
+        "value": "Chinese/English"
+      },
+      {
+        "icon": "📜",
+        "label": "Certificate",
+        "value": "Issued upon completion"
+      }
     ],
     "tips": [
       "提前预约专业讲解员",
@@ -118,27 +214,66 @@
   },
   {
     "id": "stargazing",
+    "img": "assets/images/exp-stargaze.jpg",
     "title": "观云海星空",
     "titleEn": "Sea of Clouds & Stargazing",
     "desc": "见证日出、云海和星空。张家界的云海被誉为'仙境'，冬季和早春是最佳观赏季节。当云海翻涌、日出金光穿透云层，您将感受到大自然的震撼之美。",
     "descEn": "Witness sunrise, sea of clouds, and starry skies",
-    "img": "assets/images/exp-stargaze.jpg",
     "images": [
       "assets/images/exp-stargaze.jpg",
-      "assets/images/scenic-shadao.jpg",
+      "assets/images/《迎接朝阳》 杨昌伟 摄.jpg",
       "assets/images/exp-photo.jpg"
     ],
-    "info": [
-      {"icon": "🌄", "label": "最佳观赏点", "value": "天子山、袁家界"},
-      {"icon": "🌤️", "label": "最佳季节", "value": "冬季、早春"},
-      {"icon": "🌌", "label": "星空观测", "value": "远离光污染区域"},
-      {"icon": "🏨", "label": "住宿建议", "value": "山上酒店方便观景"}
-    ],
     "infoEn": [
-      {"icon": "🌄", "label": "Best Spots", "value": "Tianzi Mountain, Yuanjiajie"},
-      {"icon": "🌤️", "label": "Best Season", "value": "Winter, Early Spring"},
-      {"icon": "🌌", "label": "Stargazing", "value": "Away from light pollution"},
-      {"icon": "🏨", "label": "Accommodation", "value": "Mountain hotels recommended"}
+      {
+        "icon": "🌄",
+        "label": "Best Spots",
+        "value": "Tianzi Mountain, Yuanjiajie"
+      },
+      {
+        "icon": "🌤️",
+        "label": "Best Season",
+        "value": "Winter, Early Spring"
+      },
+      {
+        "icon": "🌌",
+        "label": "Stargazing",
+        "value": "Away from light pollution"
+      },
+      {
+        "icon": "🏨",
+        "label": "Accommodation",
+        "value": "Mountain hotels recommended"
+      }
+    ],
+    "tipsEn": [
+      "Highest chance of sea of clouds in winter",
+      "Sunrise around 6:30-7:00 (winter)",
+      "Bring warm clothes (mountain temps are low)",
+      "Choose a clear moonless night for stargazing",
+      "Stay on the mountain for multiple viewing opportunities."
+    ],
+    "info": [
+      {
+        "icon": "🌄",
+        "label": "最佳观赏点",
+        "value": "天子山、袁家界"
+      },
+      {
+        "icon": "🌤️",
+        "label": "最佳季节",
+        "value": "冬季、早春"
+      },
+      {
+        "icon": "🌌",
+        "label": "星空观测",
+        "value": "远离光污染区域"
+      },
+      {
+        "icon": "🏨",
+        "label": "住宿建议",
+        "value": "山上酒店方便观景"
+      }
     ],
     "tips": [
       "冬季云海出现概率最高",
@@ -146,13 +281,6 @@
       "携带保暖衣物（山上温度低）",
       "星空观测需选择晴朗无月夜",
       "建议住山上，方便多次观景"
-    ],
-    "tipsEn": [
-      "Highest chance of sea of clouds in winter",
-      "Sunrise around 6:30-7:00 (winter)",
-      "Bring warm clothes (mountain temps are low)",
-      "Choose a clear moonless night for stargazing",
-      "Stay on the mountain for multiple viewing opportunities"
     ]
   }
 ]
