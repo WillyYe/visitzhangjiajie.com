@@ -109,13 +109,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .toast.error { background: #ef5350; }
 
 /* Gallery Grid (admin) */
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-.gallery-item { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; }
-.gallery-item img { width: 100%; height: 140px; object-fit: cover; }
-.gallery-item .gallery-info { padding: 10px; font-size: 12px; }
-.gallery-item .gallery-actions { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
-.gallery-item:hover .gallery-actions { opacity: 1; }
-.gallery-item .gallery-actions button { background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; padding: 4px; }
+.gallery-grid.gal-dragover { background: #e8f5e9; border-radius: var(--radius); outline: 2px dashed #43a047; outline-offset: 4px; }
+.gal-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; transition: transform 0.15s, box-shadow 0.15s; }
+.gal-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.gal-card-img-wrap { position: relative; width: 100%; height: 160px; background: #f5f5f5; overflow: hidden; }
+.gal-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gal-card-placeholder { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 13px; color: #999; }
+.gal-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+.gal-card:hover .gal-card-actions { opacity: 1; }
+.gal-btn { background: rgba(255,255,255,0.95); border: none; border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.1s; }
+.gal-btn:hover { transform: scale(1.08); }
+.gal-btn-danger:hover { background: #ffebee; }
+.gal-card-title { padding: 10px 12px; font-size: 12px; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid var(--border); }
+.gal-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 22px; background: rgba(0,0,0,0.6); display: flex; align-items: center; padding: 0 8px; }
+.gal-progress-bar { height: 3px; background: #4caf50; border-radius: 2px; transition: width 0.3s; flex-shrink: 0; }
+.gal-progress-text { color: #fff; font-size: 10px; margin-left: 6px; white-space: nowrap; }
+.gal-card-add { cursor: pointer; border: 2px dashed var(--border); background: transparent; box-shadow: none; }
+.gal-card-add:hover { border-color: var(--pink); background: var(--pink-light); }
+.gal-card-add-inner { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-light); gap: 4px; }
+.gal-add-icon { font-size: 32px; font-weight: 300; color: var(--pink); }
+.gal-add-text { font-size: 14px; font-weight: 500; }
+.gal-add-hint { font-size: 11px; color: #aaa; }
+.gal-empty { grid-column: 1 / -1; text-align: center; color: #999; padding: 48px 20px; font-size: 14px; line-height: 1.6; }
+.gal-empty span { font-size: 12px; color: #bbb; }
 
 /* Hero Card Grid */
 .hero-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
@@ -189,6 +206,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 <script src="../js/common.js?v=4"></script>
 <script src="../js/scenic-admin.js?v=4"></script>
 <script src="../js/experience-admin.js?v=4"></script>
+<script src="../js/gallery-admin.js?v=1"></script>
 </head>
 <body>
 
@@ -271,7 +289,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
   <!-- Gallery -->
   <div class="content-section" id="sec-gallery">
-    <div class="main-header" style="margin-bottom:16px"><h2>图库管理</h2><button class="btn btn-primary" onclick="openGalleryModal()">+ 新增图片</button></div>
+    <div class="main-header" style="margin-bottom:16px">
+      <h2>图库管理 <span id="galleryCount" style="font-size:13px;font-weight:400;color:#999;margin-left:6px">0 张</span></h2>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="sync-status" id="gallerySyncStatus"><span class="sync-dot"></span><span class="sync-text">未同步</span></div>
+        <button class="btn btn-primary" onclick="triggerGalleryAdd()">+ 新增图片</button>
+      </div>
+    </div>
+    <div class="info-banner" style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#2e7d32;font-size:12px">
+      <strong>操作说明：</strong>点击「新增图片」或拖放图片到下方区域，自动上传并生成响应式尺寸。上传后点击「💾 保存到 GitHub」同步。
+    </div>
     <div class="gallery-grid" id="galleryGrid"></div>
   </div>
 
@@ -385,7 +412,7 @@ document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
     if (section === 'news') renderNews();
     if (section === 'scenic') renderScenic();
     if (section === 'experience') renderExp();
-    if (section === 'gallery') renderGallery();
+    if (section === 'gallery') renderGalleryAdmin();
     if (section === 'hero') renderHero();
     if (section === 'dashboard') renderDashboard();
   });
@@ -409,14 +436,6 @@ function renderNews() {
     h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceNewsImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
   });
   document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
-}
-
-function renderGallery() {
-  var h = '';
-  galleryData.forEach(function(g,i){
-    h += '<div class="gallery-item"><img src="../'+g.img+'" alt=""><div class="gallery-actions"><button onclick="editGallery('+i+')">✏️</button><button onclick="deleteGallery('+i+')">🗑️</button></div><div class="gallery-info"><b>'+esc(g.titleEn)+'</b><br>'+esc(g.cat)+'</div></div>';
-  });
-  document.getElementById('galleryGrid').innerHTML = h || '<p style="color:#999;text-align:center">暂无图片</p>';
 }
 
 function renderHero() {
@@ -678,33 +697,6 @@ function replaceNewsImage(i) {
 // 快速替换 Scenic 图片（表格行内操作，一步完成上传+保存+同步）
 // --- Experience Modal (moved to js/experience-admin.js) ---
 
-// --- Gallery Modal ---
-function openGalleryModal() {
-  showModal('新增图片',
-    '<div class="form-group"><label>标题</label><input id="fTitle" value=""></div>'+
-    '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic">scenic</option><option value="culture">culture</option><option value="season">season</option></select></div>'+
-    imgUploadHtml('')+
-    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveGallery()">保存</button></div>');
-}
-function saveGallery() {
-  galleryData.push({img:document.getElementById(modalImgId).value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value});
-  closeModal(); renderGallery(); renderDashboard(); showToast('图片已添加 ✅','success');
-}
-function editGallery(i) {
-  var g = galleryData[i];
-  editingIndex = i;
-  showModal('编辑图片',
-    '<div class="form-group"><label>标题</label><input id="fTitle" value="'+esc(g.titleEn)+'"></div>'+
-    '<div class="form-group"><label>分类</label><select id="fCat"><option value="scenic" '+(g.cat==='scenic'?'selected':'')+'>scenic</option><option value="culture" '+(g.cat==='culture'?'selected':'')+'>culture</option><option value="season" '+(g.cat==='season'?'selected':'')+'>season</option></select></div>'+
-    imgUploadHtml(g.img)+
-    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="updateGallery('+i+')">保存</button></div>');
-}
-function updateGallery(i) {
-  galleryData[i] = {img:document.getElementById(modalImgId).value,titleEn:document.getElementById('fTitle').value,cat:document.getElementById('fCat').value};
-  closeModal(); renderGallery(); showToast('已更新 ✅','success');
-}
-function deleteGallery(i) { if(confirm('确定删除此图片吗？')){galleryData.splice(i,1); renderGallery(); renderDashboard(); showToast('已删除','success');} }
-
 // --- Hero Modal (add or edit) ---
 function openHeroModal(idx) {
   editingIndex = idx !== undefined ? idx : -1;
@@ -902,6 +894,7 @@ function saveAllToGitHub() {
   updateNewsSyncStatus('saving');
   updateHeroSyncStatus('saving');
   updateScenicSyncStatus('saving');
+  updateGallerySyncStatus('saving');
 
   var files = {
     'data/news.json': JSON.stringify(newsData, null, 2),
@@ -946,18 +939,21 @@ function saveAllToGitHub() {
       updateHeroSyncStatus('success');
       updateNewsSyncStatus('success');
       updateScenicSyncStatus('success');
+      updateGallerySyncStatus('success');
     } else {
       var firstErr = friendlyError(failed[0].err);
       showToast('⚠️ ' + completed + ' 个文件成功，' + failed.length + ' 个失败：' + firstErr, 'error');
       updateHeroSyncStatus('error', '部分失败');
       updateNewsSyncStatus('error', '部分失败');
       updateScenicSyncStatus('error', '部分失败');
+      updateGallerySyncStatus('error');
     }
   }).catch(function(err) {
     allSyncLock = false;
     updateHeroSyncStatus('error');
     updateNewsSyncStatus('error');
     updateScenicSyncStatus('error');
+    updateGallerySyncStatus('error');
     showToast('❌ 保存失败：' + friendlyError(err.message), 'error');
   });
 }
@@ -1021,7 +1017,8 @@ function initApp() {
     renderNews();
     renderScenic();
     renderExp();
-    renderGallery();
+    renderGalleryAdmin();
+    initGalleryDropZone();
     renderHero();
   }).catch(function(err) {
     showToast('数据加载失败: ' + err.message, 'error');
