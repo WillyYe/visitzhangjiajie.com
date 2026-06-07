@@ -67,7 +67,7 @@ function renderHeroSlider() {
   var images = currentExp.images || [currentExp.img || ''];
   images.forEach(function(img, idx) {
     slidesHtml += '<div class="hero-slide' + (idx === 0 ? ' active' : '') + '">';
-    slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + img + '\')"></div>';
+    slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + img + '?t=' + Date.now() + '\')"></div>';
     slidesHtml += '<div class="hero-overlay"></div>';
     slidesHtml += '<div class="hero-content">';
     slidesHtml += '<div class="hero-badge">Experience</div>';

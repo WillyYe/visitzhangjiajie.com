@@ -197,23 +197,23 @@ function openExpModal(idx) {
   var img2 = (e.images && e.images[2]) || '';
 
   showModal(
-    editingIndex >= 0 ? '编辑体验' : '新增体验',
+    editingIndex >= 0 ? 'Edit Experience' : 'New Experience',
     // 基本信息
-    '<div class="form-section"><h4>📋 基本信息（首页卡片）</h4>' +
-    '<div class="form-group"><label>ID（唯一标识）</label><input id="fExpId" value="' + esc(e.id) + '"></div>' +
-    '<div class="form-group"><label>中文标题</label><input id="fExpTitle" value="' + esc(e.title || '') + '"></div>' +
-    '<div class="form-group"><label>英文标题</label><input id="fExpTitleEn" value="' + esc(e.titleEn || '') + '"></div>' +
-    '<div class="form-group"><label>中文描述</label><textarea id="fExpDesc">' + esc(e.desc || '') + '</textarea></div>' +
-    '<div class="form-group"><label>英文描述</label><textarea id="fExpDescEn">' + esc(e.descEn || '') + '</textarea></div>' +
+    '<div class="form-section"><h4>📋 Basic Info (Home Card)</h4>' +
+    '<div class="form-group"><label>ID (unique identifier)</label><input id="fExpId" value="' + esc(e.id) + '"></div>' +
+    '<div class="form-group"><label>Chinese Title</label><input id="fExpTitle" value="' + esc(e.title || '') + '"></div>' +
+    '<div class="form-group"><label>English Title</label><input id="fExpTitleEn" value="' + esc(e.titleEn || '') + '"></div>' +
+    '<div class="form-group"><label>Chinese Description</label><textarea id="fExpDesc">' + esc(e.desc || '') + '</textarea></div>' +
+    '<div class="form-group"><label>English Description</label><textarea id="fExpDescEn">' + esc(e.descEn || '') + '</textarea></div>' +
     imgUploadHtml(e.img) +
     '</div>' +
     // 轮播图
-    '<div class="form-section"><h4>🖼️ 轮播图（二级页面）</h4>' +
-    '<div class="form-group"><label>轮播图 2（可选）</label>' + imgUploadHtml2(img1) + '</div>' +
-    '<div class="form-group"><label>轮播图 3（可选）</label>' + imgUploadHtml3(img2) + '</div></div>' +
+    '<div class="form-section"><h4>🖼️ Carousel Images (Detail Page)</h4>' +
+    '<div class="form-group"><label>Carousel Image 2 (optional)</label>' + imgUploadHtml2(img1) + '</div>' +
+    '<div class="form-group"><label>Carousel Image 3 (optional)</label>' + imgUploadHtml3(img2) + '</div></div>' +
     // 详情字段
     infoHtml + tipsHtml +
-    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveExp()">💾 保存并同步到 GitHub</button></div>'
+    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveExp()">💾 Save & Sync to GitHub</button></div>'
   );
 }
 
