@@ -55,6 +55,7 @@ function closeModal() {
 // ==================== IMAGE UPLOAD HTML ====================
 // 生成 Modal 图片上传 HTML 片段
 // modalImgId 由调用方在调用前设置，调用后恢复
+// TODO: 重构为通过参数传入 modalImgId，消除隐式全局依赖
 function imgUploadHtml(currentPath, previewStyle) {
   var ps = previewStyle || '';
   var previewSrc = currentPath ? ('../' + currentPath + '?t=' + Date.now()) : '';
@@ -86,9 +87,10 @@ function compressImage(file, maxW, quality, callback) {
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, w, h);
     canvas.toBlob(function(blob) {
+      var compressedSize = blob.size;
       var reader = new FileReader();
       reader.onload = function(e) {
-        callback(e.target.result.split(',')[1], file.size);
+        callback(e.target.result.split(',')[1], compressedSize);
       };
       reader.readAsDataURL(blob);
     }, 'image/jpeg', quality);
@@ -240,10 +242,3 @@ function formatBytes(bytes) {
   return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
-// ==================== BTOA (UTF-8 safe) ====================
-// GitHub API 需要 base64 编码的内容，原生 btoa 不支持 Unicode
-// 用法：btoa(Array.from(new TextEncoder().encode(str), b => String.fromCharCode(b)).join('')
-// 为兼容旧代码，导出此辅助函数
-function utf8ToBase64(str) {
-  return btoa(unescape(encodeURIComponent(str)));
-}

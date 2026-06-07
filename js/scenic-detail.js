@@ -38,6 +38,11 @@ function renderAll() {
   // Clear previous slides
   var slider = document.getElementById('heroSlider');
   slider.querySelectorAll('.hero-slide').forEach(function(s) { s.remove(); });
+  // Clear previously rendered dynamic content (prevent bfcache duplication)
+  var content = document.getElementById('scenicContent');
+  if (content) {
+    content.querySelectorAll('.info-grid, .section, .tip-box').forEach(function(el) { el.remove(); });
+  }
 
   renderHeroSlider();
   renderInfoCards();
@@ -70,7 +75,7 @@ function renderHeroSlider() {
     slidesHtml += '<div class="hero-badge">' + escHtml(currentScenic.tag) + '</div>';
     slidesHtml += '<h1 class="hero-title">' + escHtml(currentScenic.name) + '</h1>';
     slidesHtml += '<p class="hero-subtitle">' + escHtml(currentScenic.subTitle) + '</p>';
-    slidesHtml += '<p class="hero-desc">' + escHtml(currentScenic.desc.substring(0, 150)) + '...</p>';
+    slidesHtml += '<p class="hero-desc">' + escHtml((currentScenic.desc || '').substring(0, 150)) + '...</p>';
     slidesHtml += '</div></div>';
 
     dotsHtml += '<button class="indicator-dot' + (idx === 0 ? ' active' : '') + '" onclick="goToSlide(' + idx + ')"></button>';
@@ -179,7 +184,7 @@ function renderAttractions() {
   });
   html += '</ul></div>';
   var descSection = container.querySelector('.section');
-  descSection.insertAdjacentHTML('afterend', html);
+  if (descSection) descSection.insertAdjacentHTML('afterend', html);
 }
 
 // ========== RENDER TIPS ==========

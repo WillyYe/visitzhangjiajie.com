@@ -320,7 +320,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 // ==================== CONFIG ====================
 var ADMIN_PWD = 'zhangjiajie2026';
 var AUTH_KEY = 'zjj_admin_auth';
-var GH_REPO = localStorage.getItem('gh_repo') || 'WillyYe/visitzhangjiajie.com';
+var GH_REPO = localStorage.getItem('gh_repo') || 'WillyYe/zhangjiajie-park-website-B';
 var GH_BRANCH = 'main';
 
 // ==================== AUTH ====================
@@ -954,29 +954,7 @@ function saveAllToGitHub() {
 // ==================== IMAGE COMPRESS ====================
 // ==================== PROGRESS BAR ====================
 // ==================== IMAGE UPLOAD ====================
-var pendingUploads = {};
-function triggerUpload(inputId) {
-  var fi = document.getElementById('fileInput');
-  pendingUploads._targetInput = inputId;
-  fi.onchange = function() {
-    var file = fi.files[0];
-    if (!file) return;
-    var origSize = (file.size / 1024 / 1024).toFixed(1);
-    showProgressBar(inputId);
-    animateProgress(inputId, 0, 15, 400, '图片压缩中', '原始 ' + origSize + 'MB → 压缩中...', function(){
-      compressImage(file, 1920, 0.85, function(base64, compressedSize) {
-        var newSize = (compressedSize / 1024 / 1024).toFixed(1);
-        animateProgress(inputId, 15, 30, 200, '压缩完成', origSize + 'MB → ' + newSize + 'MB (压缩 ' + Math.round((1 - compressedSize/file.size)*100) + '%)', function(){
-          var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
-          var path = 'assets/images/' + cleanName;
-          uploadToGitHub(path, base64, file.name, inputId);
-        });
-      });
-    });
-  };
-  fi.value = '';
-  fi.click();
-}
+// triggerUpload / pendingUploads 已移至 js/common.js，此处不再重复定义
 
 // ==================== SETTINGS ====================
 function saveGitHubConfig() {
