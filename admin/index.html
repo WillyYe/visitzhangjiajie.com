@@ -203,10 +203,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
      getGhToken()/ghFetch() 在调用时才读取 GH_REPO/GH_BRANCH，
      所以即使这两个变量在页面后面才定义，也不会报错。*/
 </style>
-<script src="../js/common.js?v=4"></script>
-<script src="../js/scenic-admin.js?v=4"></script>
-<script src="../js/experience-admin.js?v=4"></script>
-<script src="../js/gallery-admin.js?v=2"></script>
+<script src="../js/common.js?v=5"></script>
+<script src="../js/scenic-admin.js?v=5"></script>
+<script src="../js/experience-admin.js?v=5"></script>
+<script src="../js/gallery-admin.js?v=3"></script>
 </head>
 <body>
 
@@ -432,7 +432,7 @@ function renderDashboard() {
 function renderNews() {
   var h = '';
   newsData.forEach(function(n,i){
-    var imgPreview = n.img ? '<img src="../'+n.img+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
+    var imgPreview = n.img ? '<img src="../'+n.img.replace('assets/images/','assets/images/thumb/')+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" loading="lazy" onerror="this.onerror=null;this.src=\'../'+n.img+'\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
     h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceNewsImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
   });
   document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
@@ -447,7 +447,7 @@ function renderHero() {
     var hasImg = s.img && s.img.trim();
     h += '<div class="hero-card">' +
       '<div class="hero-img-wrap">' +
-        (hasImg ? '<img src="../' + esc(s.img) + '" alt="" onerror="this.style.display=\'none\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' : '') +
+        (hasImg ? '<img src="../' + esc(s.img.replace('assets/images/','assets/images/thumb/')) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'../' + esc(s.img) + '\';var p=this.parentElement.querySelector(\'.hero-img-placeholder\');if(p)p.style.display=\'flex\'">' : '') +
         '<div class="hero-img-placeholder" style="' + (hasImg ? 'display:none' : 'display:flex') + '"><span style="font-size:14px;text-align:center;line-height:1.4">图片未上传<br><span style="font-size:11px;color:#aaa">点击下方「替换图片」上传</span></span></div>' +
         '<div class="hero-progress" id="heroProg_' + i + '" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(0,0,0,0.1);border-radius:0 0 8px 8px;overflow:hidden">' +
           '<div class="hero-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#43a047,#66bb6a);transition:width 0.3s"></div>' +
