@@ -8,8 +8,8 @@
     "img": "assets/images/exp-hiking.jpg",
     "images": [
       "assets/images/exp-hiking.jpg",
-      "assets/images/gal-stream.jpg",
-      "assets/images/jinbianxi.jpg"
+      "assets/images/exp-hiking-2.jpg",
+      "assets/images/exp-hiking-3.jpg"
     ],
     "info": [
       {
@@ -79,8 +79,8 @@
     "img": "assets/images/exp-photo.jpg",
     "images": [
       "assets/images/exp-photo.jpg",
-      "assets/images/yuanjiajie.jpg",
-      "assets/images/tianzishan.jpg"
+      "assets/images/exp-photo-2.jpg",
+      "assets/images/exp-photo-3.jpg"
     ],
     "info": [
       {
@@ -150,8 +150,8 @@
     "img": "assets/images/exp-eco.jpg",
     "images": [
       "assets/images/exp-eco.jpg",
-      "assets/images/hero-pillars.jpg",
-      "assets/images/gal-yuanjiajie.jpg"
+      "assets/images/exp-eco-2.jpg",
+      "assets/images/exp-eco-3.jpg"
     ],
     "info": [
       {
@@ -214,15 +214,15 @@
   },
   {
     "id": "stargazing",
-    "img": "assets/images/30(2).jpg",
+    "img": "assets/images/exp-stargazing.jpg",
     "title": "观云海星空",
     "titleEn": "Sea of Clouds & Stargazing",
     "desc": "见证日出、云海和星空。张家界的云海被誉为'仙境'，冬季和早春是最佳观赏季节。当云海翻涌、日出金光穿透云层，您将感受到大自然的震撼之美。",
     "descEn": "Witness sunrise, sea of clouds, and starry skies",
     "images": [
-      "assets/images/30(2).jpg",
-      "assets/images/《迎接朝阳》 杨昌伟 摄.jpg",
-      "assets/images/jingmitianhu.jpg"
+      "assets/images/exp-stargazing.jpg",
+      "assets/images/exp-stargazing-2.jpg",
+      "assets/images/exp-stargazing-3.jpg"
     ],
     "infoEn": [
       {

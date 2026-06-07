@@ -8,6 +8,9 @@
   <meta name="theme-color" content="#1a4a30" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
+  <!-- Preload critical data for faster initial render -->
+  <link rel="preload" as="fetch" href="data/experience.json" crossorigin="anonymous" />
+  <link rel="preload" as="fetch" href="data/scenic.json" crossorigin="anonymous" />
   <meta http-equiv="Expires" content="0" />
 
   <!-- DNS Prefetch for faster DNS resolution -->
@@ -399,6 +402,8 @@
       padding: 80px 24px;
       max-width: 1200px;
       margin: 0 auto;
+      content-visibility: auto;
+      contain-intrinsic-size: auto 500px;
     }
     .section-header {
       text-align: center;
@@ -1684,8 +1689,15 @@
       var html = '';
       
       expData.forEach(function(item) {
+        var thumb = item.img.replace('assets/images/', 'assets/images/thumb/');
+        var mid = item.img.replace('assets/images/', 'assets/images/md/');
+        var full = item.img;
         html += '<a href="exp-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
-        html += '<div class="exp-img"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.titleEn) + '" loading="lazy"></div>';
+        html += '<div class="exp-img"><img src="' + escapeHtml(thumb) + '" ' +
+                'srcset="' + escapeHtml(thumb) + ' 400w, ' + escapeHtml(mid) + ' 1200w, ' + escapeHtml(full) + ' 2400w" ' +
+                'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" ' +
+                'alt="' + escapeHtml(item.titleEn) + '" ' +
+                'loading="lazy" decoding="async" width="400" height="267"></div>';
         html += '<div class="exp-body">';
         html += '<h4 class="exp-title">' + escapeHtml(item.titleEn) + '</h4>';
         html += '<p class="exp-desc">' + escapeHtml(item.descEn) + '</p>';
@@ -1825,8 +1837,14 @@
       var html = '';
       
       galleryData.forEach(function(item, index) {
+        var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
+        var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
         html += '<div class="gallery-item" data-category="' + escapeHtml(item.cat) + '" onclick="openLightbox(' + index + ')">';
-        html += '<img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.titleEn) + '" loading="lazy" decoding="async">';
+        html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
+                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w" ' +
+                'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
+                'alt="' + escapeHtml(item.titleEn) + '" ' +
+                'loading="lazy" decoding="async" width="400" height="267">';
         html += '<div class="gallery-overlay">';
         html += '<span class="gallery-title">' + escapeHtml(item.titleEn) + '</span>';
         html += '</div></div>';

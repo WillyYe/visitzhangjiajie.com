@@ -66,8 +66,19 @@ function renderHeroSlider() {
 
   var images = currentExp.images || [currentExp.img || ''];
   images.forEach(function(img, idx) {
-    slidesHtml += '<div class="hero-slide' + (idx === 0 ? ' active' : '') + '">';
-    slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + img + '?t=' + Date.now() + '\')"></div>';
+    // Use medium-size (1200px) image for faster initial load
+    var mdImg = img.replace('assets/images/', 'assets/images/md/');
+    var isActive = idx === 0;
+    slidesHtml += '<div class="hero-slide' + (isActive ? ' active' : '') + '">';
+    // Active slide: init with medium image, full-res loads on retina via CSS
+    // Inactive slides: deferred via data-bg (lazy loaded by IntersectionObserver or on slide switch)
+    if (isActive) {
+      slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + mdImg + '\')" ' +
+        'data-full="' + img + '" data-loaded="true"></div>';
+    } else {
+      slidesHtml += '<div class="hero-bg" data-bg="' + mdImg + '" ' +
+        'data-full="' + img + '" data-loaded="false"></div>';
+    }
     slidesHtml += '<div class="hero-overlay"></div>';
     slidesHtml += '<div class="hero-content">';
     slidesHtml += '<div class="hero-badge">Experience</div>';
@@ -76,13 +87,51 @@ function renderHeroSlider() {
     slidesHtml += '<p class="hero-desc">' + escHtml((currentExp.descEn || '').substring(0, 150)) + '...</p>';
     slidesHtml += '</div></div>';
 
-    dotsHtml += '<button class="indicator-dot' + (idx === 0 ? ' active' : '') + '" onclick="goToSlide(' + idx + ')"></button>';
+    dotsHtml += '<button class="indicator-dot' + (isActive ? ' active' : '') + '" onclick="goToSlide(' + idx + ')"></button>';
   });
 
   prevBtn.insertAdjacentHTML('beforebegin', slidesHtml);
   indicator.innerHTML = dotsHtml;
   currentSlide = 0;
+  
+  // Deferred loading for other slides
+  loadDeferredSlides();
 }
+
+// ========== DEFERRED SLIDE LOADING ==========
+function loadDeferredSlides() {
+  var deferred = document.querySelectorAll('.hero-bg[data-loaded="false"]');
+  deferred.forEach(function(el, i) {
+    var bg = el.getAttribute('data-bg');
+    if (bg && !el.style.backgroundImage) {
+      // Stagger loading: 500ms apart per slide
+      setTimeout(function() {
+        el.style.backgroundImage = 'url(\'' + bg + '\')';
+        el.setAttribute('data-loaded', 'true');
+      }, 500 * (i + 1));
+    }
+  });
+}
+
+// ========== RETINA UPGRADE ==========
+// Replace medium images with full-res for 2x+ displays
+function upgradeToRetina() {
+  if (!window.devicePixelRatio || window.devicePixelRatio < 2) return;
+  var allBgs = document.querySelectorAll('.hero-bg[data-full]');
+  allBgs.forEach(function(el) {
+    var fullSrc = el.getAttribute('data-full');
+    if (fullSrc) {
+      var img = new Image();
+      img.onload = function() {
+        el.style.backgroundImage = 'url(\'' + fullSrc + '\')';
+        el.classList.add('retina-loaded');
+      };
+      img.src = fullSrc;
+    }
+  });
+}
+// Run after page render
+setTimeout(upgradeToRetina, 1000);
 
 // ========== SLIDE NAVIGATION ==========
 function goToSlide(idx) {

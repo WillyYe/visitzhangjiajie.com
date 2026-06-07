@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
+  <!-- Preload experience data for faster hero render -->
+  <link rel="preload" as="fetch" href="data/experience.json" crossorigin="anonymous" />
+
   <style>
     /* ========== RESET & BASE ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -98,6 +101,10 @@
       inset: 0;
       background-size: cover;
       background-position: center;
+      will-change: opacity;
+    }
+    .hero-bg.retina-loaded {
+      transition: opacity 0.4s;
     }
     .hero-overlay {
       position: absolute;
