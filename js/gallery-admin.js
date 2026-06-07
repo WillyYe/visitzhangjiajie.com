@@ -313,7 +313,9 @@
     var h = '<div class="gal-card" data-idx="' + idx + '">';
     h += '  <div class="gal-card-img-wrap">';
     if (imgPath) {
-      h += '    <img src="../' + esc(imgPath) + '?t=' + Date.now() + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
+      // Use thumbnail for admin preview (fast load); fallback to full-size if thumb missing
+      var thumbPath = imgPath.replace('assets/images/', 'assets/images/thumb/');
+      h += '    <img src="../' + esc(thumbPath) + '?t=' + Date.now() + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'../' + esc(imgPath) + '\';" style="display:block">';
     }
     h += '    <div class="gal-card-placeholder" style="display:' + (imgPath ? 'none' : 'flex') + '"><span>待上传</span></div>';
     if (progressVisible !== true) {
