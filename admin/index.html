@@ -1017,8 +1017,8 @@ function initApp() {
     renderNews();
     renderScenic();
     renderExp();
-    renderGalleryAdmin();
-    initGalleryDropZone();
+    try { renderGalleryAdmin(); } catch(e) { console.error('gallery render error:', e); }
+    try { initGalleryDropZone(); } catch(e) { console.error('gallery dropzone error:', e); }
     renderHero();
   }).catch(function(err) {
     showToast('数据加载失败: ' + err.message, 'error');

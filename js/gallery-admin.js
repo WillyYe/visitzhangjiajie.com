@@ -13,8 +13,10 @@
 (function() {
   'use strict';
 
-  // Reference to shared global data (set by admin/index.html)
-  var dataRef = window.galleryData;
+  // Note: do NOT cache window.galleryData in a closure — the variable is
+  // declared later in the page, so it's undefined at module-load time.
+  // Always read it dynamically via _galData().
+  function _galData() { return window.galleryData || []; }
   var isUploading = false;
 
   // ========== RENDER ==========
@@ -23,7 +25,7 @@
     if (!grid) return;
 
     var h = '';
-    dataRef.forEach(function(item, i) {
+    _galData().forEach(function(item, i) {
       var imgPath = item.img || '';
       var title = item.titleEn || item.title || _autoTitle(imgPath);
       h += '<div class="gal-card" data-idx="' + i + '">';
@@ -52,7 +54,7 @@
     h += '  </div>';
     h += '</div>';
 
-    if (dataRef.length === 0) {
+    if (_galData().length === 0) {
       grid.innerHTML = '<div class="gal-empty">暂无图片<br><span>点击「新增图片」或拖放图片到此处</span></div>';
     } else {
       grid.innerHTML = h;
@@ -60,7 +62,7 @@
 
     // Update count
     var countEl = document.getElementById('galleryCount');
-    if (countEl) countEl.textContent = dataRef.length + ' 张';
+    if (countEl) countEl.textContent = _galData().length + ' 张';
   };
 
   // ========== ADD IMAGES ==========
@@ -98,9 +100,9 @@
           fi.value = '';
           return;
         }
-        var oldPath = dataRef[index] && dataRef[index].img;
+        var oldPath = _galData()[index] && _galData()[index].img;
         // Update data
-        dataRef[index] = _makeGalleryItem(newPath, file.name);
+        _galData()[index] = _makeGalleryItem(newPath, file.name);
         _hideCardProgress(index);
         renderGalleryAdmin();
         _updateGallerySyncStatus('unsaved');
@@ -119,12 +121,12 @@
   // ========== DELETE IMAGE ==========
   window.deleteGalleryImage = function(index) {
     if (isUploading) { showToast('⏳ 正在上传中，请稍候', ''); return; }
-    var item = dataRef[index];
+    var item = _galData()[index];
     if (!item) return;
     if (!confirm('确定删除「' + (item.titleEn || '此图片') + '」吗？')) return;
 
     var imgPath = item.img;
-    dataRef.splice(index, 1);
+    _galData().splice(index, 1);
     renderGalleryAdmin();
     _updateGallerySyncStatus('unsaved');
     showToast('已删除', 'success');
@@ -140,7 +142,7 @@
       _updateGallerySyncStatus('saving');
 
       var content = btoa(Array.from(
-        new TextEncoder().encode(JSON.stringify(dataRef, null, 2)),
+        new TextEncoder().encode(JSON.stringify(_galData(), null, 2)),
         function(b) { return String.fromCharCode(b); }
       ).join(''));
 
@@ -218,7 +220,7 @@
       }
 
       var file = files[idx];
-      var tempIdx = dataRef.length + idx; // temporary index for progress bar
+      var tempIdx = _galData().length + idx; // temporary index for progress bar
 
       _setCardProgress(tempIdx, 5, '压缩中...');
 
@@ -230,7 +232,7 @@
           console.error('Gallery upload failed for', file.name, err);
         } else {
           completed++;
-          dataRef.push(_makeGalleryItem(newPath, file.name));
+          _galData().push(_makeGalleryItem(newPath, file.name));
         }
         // Continue to next file
         processNext(idx + 1);
