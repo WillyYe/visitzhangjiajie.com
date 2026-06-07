@@ -188,6 +188,18 @@ function animateProgress(inputId, from, to, duration, label, stage, callback) {
 // ==================== IMAGE UPLOAD (GitHub) ====================
 var pendingUploads = {};
 
+// 静默上传（不操作进度条），用于缩略图上传
+function ghUploadSilent(path, base64Content) {
+  return ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; })
+  .then(function(fileInfo) {
+    return ghFetch(path, 'PUT', {
+      content: base64Content,
+      message: 'Upload: ' + path,
+      sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+    });
+  });
+}
+
 function triggerUpload(inputId) {
   var fi = document.getElementById('fileInput');
   pendingUploads._targetInput = inputId;
@@ -195,14 +207,67 @@ function triggerUpload(inputId) {
     var file = fi.files[0];
     if (!file) return;
     var origSize = (file.size / 1024 / 1024).toFixed(1);
+    var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
+    var fullPath = 'assets/images/' + cleanName;
+    var mdPath = 'assets/images/md/' + cleanName;
+    var thumbPath = 'assets/images/thumb/' + cleanName;
+    
     showProgressBar(inputId);
-    animateProgress(inputId, 0, 15, 400, '图片压缩中', '原始 ' + origSize + 'MB → 压缩中...', function() {
-      compressImage(file, 1920, 0.85, function(base64, compressedSize) {
-        var newSize = (compressedSize / 1024 / 1024).toFixed(1);
-        animateProgress(inputId, 15, 30, 200, '压缩完成', origSize + 'MB → ' + newSize + 'MB (压缩 ' + Math.round((1 - compressedSize / file.size) * 100) + '%)', function() {
-          var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
-          var path = 'assets/images/' + cleanName;
-          uploadToGitHub(path, base64, file.name, inputId);
+    
+    // Stage 1: Full size (1920px) → upload to assets/images/
+    animateProgress(inputId, 0, 20, 500, '压缩主图', '原始 ' + origSize + 'MB → 1920px', function() {
+      compressImage(file, 1920, 0.85, function(fullB64, fullSize) {
+        var fullMB = (fullSize / 1024 / 1024).toFixed(1);
+        animateProgress(inputId, 20, 55, 500, '上传主图', '1920px (' + fullMB + 'MB) → ' + fullPath, function() {
+          uploadToGitHub(fullPath, fullB64, file.name, inputId, function() {
+            // Stage 2: MD (1200px) → upload to assets/images/md/
+            updateProgressBar(inputId, 55, '压缩中图', '→ 1200px');
+            compressImage(file, 1200, 0.85, function(mdB64, mdSize) {
+              var mdKB = (mdSize / 1024).toFixed(0);
+              updateProgressBar(inputId, 62, '上传中图', '1200px (' + mdKB + 'KB) → md/' + cleanName);
+              ghUploadSilent(mdPath, mdB64).then(function() {
+                // Stage 3: Thumb (400px) → upload to assets/images/thumb/
+                updateProgressBar(inputId, 75, '压缩缩略图', '→ 400px');
+                compressImage(file, 400, 0.80, function(thumbB64, thumbSize) {
+                  var thumbKB = (thumbSize / 1024).toFixed(0);
+                  updateProgressBar(inputId, 82, '上传缩略图', '400px (' + thumbKB + 'KB) → thumb/' + cleanName);
+                  ghUploadSilent(thumbPath, thumbB64).then(function() {
+                    // All done
+                    updateProgressBar(inputId, 100, '上传完成', '1920/1200/400 三级响应式图片');
+                    var previewDiv = document.getElementById('prev_' + inputId);
+                    document.getElementById(inputId).value = fullPath;
+                    previewDiv.innerHTML = '<img src="../' + fullPath + '?t=' + Date.now() + '" alt="preview">';
+                    showToast('图片上传成功 ✅ (含响应式缩略图)', 'success');
+                  }).catch(function(err) {
+                    // Thumb upload failed - non-critical, still show success for main image
+                    updateProgressBar(inputId, 95, '缩略图失败', '400px 上传失败(不影响使用)');
+                    var previewDiv = document.getElementById('prev_' + inputId);
+                    document.getElementById(inputId).value = fullPath;
+                    previewDiv.innerHTML = '<img src="../' + fullPath + '?t=' + Date.now() + '" alt="preview">';
+                    showToast('主图上传成功，缩略图生成失败(非关键)', 'warning');
+                  });
+                });
+              }).catch(function(err) {
+                // MD upload failed - still proceed with thumb
+                updateProgressBar(inputId, 75, '中图失败', '1200px 上传失败');
+                compressImage(file, 400, 0.80, function(thumbB64, thumbSize) {
+                  ghUploadSilent(thumbPath, thumbB64).then(function() {
+                    updateProgressBar(inputId, 95, '部分完成', '主图+缩略图已上传(中图缺失)');
+                    var previewDiv = document.getElementById('prev_' + inputId);
+                    document.getElementById(inputId).value = fullPath;
+                    previewDiv.innerHTML = '<img src="../' + fullPath + '?t=' + Date.now() + '" alt="preview">';
+                    showToast('主图上传成功，1200px中图失败(非关键)', 'warning');
+                  }).catch(function() {
+                    updateProgressBar(inputId, 90, '仅主图', '缩略图生成失败');
+                    var previewDiv = document.getElementById('prev_' + inputId);
+                    document.getElementById(inputId).value = fullPath;
+                    previewDiv.innerHTML = '<img src="../' + fullPath + '?t=' + Date.now() + '" alt="preview">';
+                    showToast('主图上传成功，缩略图生成失败', 'warning');
+                  });
+                });
+              });
+            });
+          });
         });
       });
     });
@@ -211,12 +276,10 @@ function triggerUpload(inputId) {
   fi.click();
 }
 
-function uploadToGitHub(path, base64Content, fileName, inputId) {
+function uploadToGitHub(path, base64Content, fileName, inputId, onComplete) {
   var previewDiv = document.getElementById('prev_' + inputId);
-  animateProgress(inputId, 30, 40, 300, '检查仓库', '查询 ' + path + ' ...');
   ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; })
   .then(function(fileInfo) {
-    animateProgress(inputId, 40, 60, 200, '正在上传', '通过 GitHub API 上传中...');
     return ghFetch(path, 'PUT', {
       content: base64Content,
       message: 'Upload image: ' + fileName,
@@ -224,11 +287,7 @@ function uploadToGitHub(path, base64Content, fileName, inputId) {
     });
   }).then(function(r) {
     if (!r.ok) return r.json().then(function(d) { throw new Error(d.message); });
-    animateProgress(inputId, 60, 100, 300, '上传成功', '图片已写入 GitHub 仓库', function() {
-      document.getElementById(inputId).value = path;
-      previewDiv.innerHTML = '<img src="../' + path + '?t=' + Date.now() + '" alt="preview">';
-      showToast('图片上传成功 ✅', 'success');
-    });
+    if (onComplete) { onComplete(); }
   }).catch(function(err) {
     var msg = friendlyError(err.message || '');
     markProgressError(inputId, '上传失败', msg);

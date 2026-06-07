@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zhangjiajie National Forest Park | Official Website</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <meta name="description" content="Official website of Zhangjiajie National Forest Park — UNESCO World Natural Heritage, filming location of Avatar, China's first national forest park." />
   <meta name="theme-color" content="#1a4a30" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -231,6 +233,7 @@
       inset: 0;
       background-size: cover;
       background-position: center;
+      will-change: background-image;
     }
     /* Hero slide backgrounds are set dynamically via inline styles in renderHero() */
     .hero-overlay {
@@ -1490,10 +1493,11 @@
       var slides = heroData.slides || [];
       if (slides.length === 0) return;
       
-      // Generate slides
+      // Generate slides: use md/ for instant load, data-full for retina upgrade
       container.innerHTML = slides.map(function(s, i) {
+        var mdSrc = (s.img || '').replace('assets/images/', 'assets/images/md/');
         return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + '">' +
-          '<div class="hero-slide-bg" style="background-image:url(\'' + (s.img || '') + '\')"></div>' +
+          '<div class="hero-slide-bg" style="background-image:url(\'' + mdSrc + '\')" data-full="' + (s.img || '') + '"></div>' +
           '</div>';
       }).join('');
       
@@ -1507,6 +1511,22 @@
       
       // Reset slider state
       AppState.currentSlide = 0;
+      
+      // Defer full-res upgrade: md/ loads instantly, full-res loads after 2s
+      setTimeout(function() {
+        var allBgs = container.querySelectorAll('.hero-slide-bg[data-full]');
+        allBgs.forEach(function(bg) {
+          var fullSrc = bg.dataset.full;
+          if (fullSrc) {
+            var preloader = new Image();
+            preloader.onload = function() {
+              bg.style.backgroundImage = 'url(\'' + fullSrc + '\')';
+              bg.classList.add('retina-loaded');
+            };
+            preloader.src = fullSrc;
+          }
+        });
+      }, 2000);
     }
     
     function updateHeroText(index) {
@@ -1841,7 +1861,7 @@
         var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
         html += '<div class="gallery-item" data-category="' + escapeHtml(item.cat) + '" onclick="openLightbox(' + index + ')">';
         html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
-                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w" ' +
+                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(item.img) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
                 'loading="lazy" decoding="async" width="400" height="267">';
@@ -1937,15 +1957,20 @@
       var img = document.getElementById('lightboxImg');
       if (!img) return;
       
-      // Transition effect
-      img.classList.add('changing');
-      setTimeout(function() {
-        img.src = galleryData[index].img;
-        img.alt = AppState.currentLang === 'zh' 
-          ? galleryData[index].title 
-          : galleryData[index].titleEn;
-        img.classList.remove('changing');
-      }, 150);
+      // Load md version first for instant preview, then upgrade to full-res
+      var mdSrc = galleryData[index].img.replace('assets/images/', 'assets/images/md/');
+      var fullSrc = galleryData[index].img;
+      img.src = mdSrc;
+      img.alt = AppState.currentLang === 'zh' 
+        ? galleryData[index].title 
+        : galleryData[index].titleEn;
+      
+      // Preload full-res in background
+      var preloader = new Image();
+      preloader.onload = function() {
+        if (lightboxIndex === index) img.src = fullSrc;
+      };
+      preloader.src = fullSrc;
       
       document.getElementById('lightbox').classList.add('open');
       document.documentElement.style.overflow = 'hidden';
