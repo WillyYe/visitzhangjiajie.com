@@ -483,14 +483,16 @@ function replaceHeroImage(idx) {
       showToast('⏳ 压缩完成 ' + newSize + 'MB，准备上传...', '');
       var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
       var path = 'assets/images/' + cleanName;
-      directHeroUpload(path, base64, file.name, idx);
+      var mdPath = 'assets/images/md/' + cleanName;
+      var thumbPath = 'assets/images/thumb/' + cleanName;
+      directHeroUpload(path, base64, file.name, idx, file, mdPath, thumbPath);
     });
   };
   fi.value = '';
   fi.click();
 }
 
-function directHeroUpload(path, base64Content, fileName, idx) {
+function directHeroUpload(path, base64Content, fileName, idx, originalFile, mdPath, thumbPath) {
   var prog = document.getElementById('heroProg_' + idx);
   var fill = prog ? prog.querySelector('.hero-progress-fill') : null;
   if (fill) fill.style.width = '40%';
@@ -507,13 +509,27 @@ function directHeroUpload(path, base64Content, fileName, idx) {
     });
   }).then(function(r){
     if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
-    if (fill) fill.style.width = '100%';
-    heroData.slides[idx].img = path;
-    renderHero();
-    showToast('✅ 图片已替换，正在同步 Hero 数据...', 'success');
-    // 隐藏进度条（等一小段时间让用户体验完成）
-    setTimeout(function(){ if (prog) prog.style.display = 'none'; }, 1200);
-    saveHeroToGitHub();
+    if (fill) fill.style.width = '80%';
+    showToast('📤 生成响应式图片...', '');
+    // Generate and upload md/ and thumb/ versions (non-blocking)
+    var mdPromise = new Promise(function(resolve) {
+      compressImage(originalFile, 1200, 0.85, function(mdB64) {
+        ghUploadSilent(mdPath, mdB64).then(resolve).catch(resolve);
+      });
+    });
+    var thumbPromise = new Promise(function(resolve) {
+      compressImage(originalFile, 400, 0.80, function(thumbB64) {
+        ghUploadSilent(thumbPath, thumbB64).then(resolve).catch(resolve);
+      });
+    });
+    Promise.all([mdPromise, thumbPromise]).then(function() {
+      if (fill) fill.style.width = '100%';
+      heroData.slides[idx].img = path;
+      renderHero();
+      showToast('✅ 图片已替换(含响应式尺寸)，正在同步 Hero 数据...', 'success');
+      setTimeout(function(){ if (prog) prog.style.display = 'none'; }, 1200);
+      saveHeroToGitHub();
+    });
   }).catch(function(err){
     if (prog) { prog.querySelector('.hero-progress-fill').style.background = '#e53935'; }
     setTimeout(function(){ if (prog) prog.style.display = 'none'; }, 2000);
@@ -616,6 +632,8 @@ function replaceNewsImage(i) {
     compressImage(file, 1920, 0.85, function(base64, compressedSize) {
       var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
       var path = 'assets/images/' + cleanName;
+      var mdPath = 'assets/images/md/' + cleanName;
+      var thumbPath = 'assets/images/thumb/' + cleanName;
       if (btn) { btn.textContent = '⏳ 上传中...'; }
       ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
       .then(function(fileInfo){
@@ -626,9 +644,23 @@ function replaceNewsImage(i) {
         });
       }).then(function(r){
         if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+        if (btn) { btn.textContent = '⏳ 生成响应式图片...'; }
+        // Generate md/ and thumb/ (non-blocking)
+        var mdPromise = new Promise(function(resolve) {
+          compressImage(file, 1200, 0.85, function(mdB64) {
+            ghUploadSilent(mdPath, mdB64).then(resolve).catch(resolve);
+          });
+        });
+        var thumbPromise = new Promise(function(resolve) {
+          compressImage(file, 400, 0.80, function(thumbB64) {
+            ghUploadSilent(thumbPath, thumbB64).then(resolve).catch(resolve);
+          });
+        });
+        return Promise.all([mdPromise, thumbPromise]);
+      }).then(function() {
         newsData[i].img = path;
         renderNews();
-        showToast('✅ 图片已替换，正在同步新闻数据...', 'success');
+        showToast('✅ 图片已替换(含响应式尺寸)，正在同步新闻数据...', 'success');
         saveNewsToGitHub();
         if (btn) { btn.disabled = false; btn.textContent = '🔄 替换图片'; }
       }).catch(function(err){

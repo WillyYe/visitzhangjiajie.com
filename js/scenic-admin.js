@@ -380,6 +380,8 @@ function deleteScenic(i) {
 
 // ==================== REPLACE IMAGE ====================
 // 快速替换 Scenic 封面图片（表格行内操作，一步完成上传+保存+同步）
+// 快速替换 Scenic 图片（表格行内操作，一步完成上传+保存+同步）
+// 自动生成三级响应式图片：1920px(全尺寸)、1200px(md)、400px(thumb)
 function replaceScenicImage(i) {
   var fi = document.getElementById('fileInput');
   fi.onchange = function() {
@@ -393,7 +395,9 @@ function replaceScenicImage(i) {
     compressImage(file, 1920, 0.85, function(base64, compressedSize) {
       var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
       var path = 'assets/images/' + cleanName;
-      if (btn) { btn.textContent = '⏳ 上传中...'; }
+      var mdPath = 'assets/images/md/' + cleanName;
+      var thumbPath = 'assets/images/thumb/' + cleanName;
+      if (btn) { btn.textContent = '⏳ 上传主图...'; }
       ghFetch(path, 'GET').then(function(r) { return r.ok ? r.json() : null; })
       .then(function(fileInfo) {
         return ghFetch(path, 'PUT', {
@@ -403,6 +407,33 @@ function replaceScenicImage(i) {
         });
       }).then(function(r) {
         if (!r.ok) return r.json().then(function(d) { throw new Error(d.message); });
+        if (btn) { btn.textContent = '⏳ 生成中图...'; }
+        // Stage 2: Generate and upload 1200px medium image
+        return new Promise(function(resolve, reject) {
+          compressImage(file, 1200, 0.85, function(mdB64) {
+            ghUploadSilent(mdPath, mdB64).then(function() {
+              if (btn) { btn.textContent = '⏳ 生成缩略图...'; }
+              // Stage 3: Generate and upload 400px thumbnail
+              compressImage(file, 400, 0.80, function(thumbB64) {
+                ghUploadSilent(thumbPath, thumbB64).then(function() {
+                  resolve();
+                }).catch(function() {
+                  resolve();
+                });
+              });
+            }).catch(function() {
+              // MD failure is non-critical, continue with thumb
+              compressImage(file, 400, 0.80, function(thumbB64) {
+                ghUploadSilent(thumbPath, thumbB64).then(function() {
+                  resolve();
+                }).catch(function() {
+                  resolve();
+                });
+              });
+            });
+          });
+        });
+      }).then(function() {
         if (oldImg && oldImg !== path) {
           deleteFileFromGitHub(oldImg, 'Delete old image: ' + oldImg).catch(function() {});
         }
@@ -412,7 +443,7 @@ function replaceScenicImage(i) {
         if (scenicData[i].images.length < 1) scenicData[i].images.push(path);
         else scenicData[i].images[0] = path;
         renderScenic();
-        showToast('✅ 图片已替换，正在同步景区数据...', 'success');
+        showToast('✅ 图片已替换(含响应式尺寸)，正在同步景区数据...', 'success');
         saveScenicToGitHub();
       }).catch(function(err) {
         var msg = friendlyError(err.message || '');
