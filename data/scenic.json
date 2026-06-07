@@ -98,7 +98,7 @@
     "subTitle": "Essential Zhangjiajie",
     "desc": "Known as \"The Eyes of Zhangjiajie\", Huangshijia is the largest aerial viewing platform in the park. It offers 360-degree panoramic views of the pillar formations.",
     "images": [
-      "assets/images/gal-yuanjiajie.jpg",
+      "assets/images/scenic-huangshijia.jpg",
       "assets/images/gal-clouds.jpg",
       "assets/images/gal-sunrise.jpg"
     ],
@@ -128,7 +128,7 @@
     "subTitle": "Natural Stone Bridge",
     "desc": "A natural stone bridge formed between two towering quartz sandstone peaks, standing 387 meters above the valley floor - a geological wonder.",
     "images": [
-      "assets/images/gal-clouds.jpg",
+      "assets/images/scenic-firstbridge.jpg",
       "assets/images/gal-yuanjiajie.jpg",
       "assets/images/gal-sunrise.jpg"
     ],
@@ -158,7 +158,7 @@
     "subTitle": "Tujia Cultural Center",
     "desc": "A well-preserved Tujia ancient town where you can experience authentic Tujia culture, architecture, and traditional customs.",
     "images": [
-      "assets/images/gal-culture.jpg",
+      "assets/images/scenic-yongding.jpg",
       "assets/images/gal-village.jpg",
       "assets/images/gal-culture.jpg"
     ],
@@ -188,7 +188,7 @@
     "subTitle": "Adventurer's Paradise",
     "desc": "A dramatic valley with unique landscapes, perfect for adventurous travelers seeking wilderness experiences and off-the-beaten-path scenery.",
     "images": [
-      "assets/images/gal-sunrise.jpg",
+      "assets/images/scenic-shadao.jpg",
       "assets/images/gal-autumn.jpg",
       "assets/images/gal-spring.jpg"
     ],
@@ -218,7 +218,7 @@
     "subTitle": "Facing Peaks",
     "desc": "Two towering stone peaks facing each other, forming a unique natural gateway. This spot offers perfect photo opportunities.",
     "images": [
-      "assets/images/gal-spring.jpg",
+      "assets/images/scenic-twinpeaks.jpg",
       "assets/images/gal-autumn.jpg",
       "assets/images/gal-winter.jpg"
     ],
@@ -248,7 +248,7 @@
     "subTitle": "Underground Wonderland",
     "desc": "A typical karst cave system featuring diverse stalactites, stalagmites and stone formations. The underground wonderland is breathtaking.",
     "images": [
-      "assets/images/gal-autumn.jpg",
+      "assets/images/scenic-wulong.jpg",
       "assets/images/gal-spring.jpg",
       "assets/images/gal-sunrise.jpg"
     ],
@@ -278,7 +278,7 @@
     "subTitle": "Best Sunrise Viewpoint",
     "desc": "At 1,200 meters elevation, Tianping Mountain is one of the best spots for sunrise views and sea of clouds in Zhangjiajie.",
     "images": [
-      "assets/images/gal-winter.jpg",
+      "assets/images/scenic-tianping.jpg",
       "assets/images/gal-autumn.jpg",
       "assets/images/gal-sunrise.jpg"
     ],
