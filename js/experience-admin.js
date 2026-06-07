@@ -8,7 +8,7 @@ function renderExp() {
   expData.forEach(function(e, i) {
     var title = e.title || e.titleEn || '';
     var imgPreview = e.img
-      ? '<img src="../' + e.img + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">'
+      ? '<img src="../' + e.img.replace('assets/images/','assets/images/thumb/') + '?t=' + Date.now() + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" loading="lazy" onerror="this.onerror=null;this.src=\'../' + e.img + '\'">'
       : '<span style="color:#aaa;font-size:11px">未上传</span>';
     var descShort = (e.descEn || '').length > 30 ? (e.descEn || '').substring(0, 30) + '...' : (e.descEn || '—');
     var validImages = (e.images || []).filter(function(x) { return x; });
