@@ -5,6 +5,7 @@
 function esc(s) {
   return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+var escHtml = esc; // 别名：scenic-detail.js 使用 escHtml()
 
 // ==================== TOAST ====================
 function showToast(msg, type) {
