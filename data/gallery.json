@@ -43,5 +43,23 @@
     "img": "assets/images/gal-test-09.jpg",
     "title": "Gal Test 09",
     "cat": "scenic"
+  },
+  {
+    "img": "assets/images/冬-黄石寨-天桥遗墩-钟高慧(2).jpg",
+    "titleEn": "冬 黄石寨 天桥遗墩 钟高慧(2)",
+    "title": "冬 黄石寨 天桥遗墩 钟高慧(2)",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/秋-天子山-御笔峰-张德平01.jpg",
+    "titleEn": "秋 天子山 御笔峰 张德平",
+    "title": "秋 天子山 御笔峰 张德平",
+    "cat": "scenic"
+  },
+  {
+    "img": "assets/images/春-金鞭溪-《春满金鞭溪》-蔡康.jpg",
+    "titleEn": "春 金鞭溪 《春满金鞭溪》 蔡康",
+    "title": "春 金鞭溪 《春满金鞭溪》 蔡康",
+    "cat": "scenic"
   }
 ]
