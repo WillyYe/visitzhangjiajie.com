@@ -782,27 +782,6 @@
       max-width: 1200px;
       margin: 0 auto;
     }
-    .gallery-filter {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 32px;
-    }
-    .gallery-filter button {
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--text-mid);
-      background: var(--white);
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-    .gallery-filter button.active,
-    .gallery-filter button:hover {
-      background: var(--green-accent);
-      color: var(--white);
-    }
     .gallery-masonry {
       columns: 3;
       column-gap: 16px;
@@ -1109,8 +1088,6 @@
       .info-inner { flex-direction: column; gap: 16px; }
       .btn { padding: 10px 20px; font-size: 14px; }
     }
-    .gallery-item.hidden { display: none; }
-
     /* ========== SKELETON ========== */
     @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; }
@@ -1293,12 +1270,6 @@
         <div class="section-tag">GALLERY</div>
         <h2 class="section-title">Photo Gallery</h2>
         <p class="section-desc">Capturing the stunning beauty of Zhangjiajie</p>
-      </div>
-      <div class="gallery-filter">
-        <button class="active" onclick="filterGallery('all', this)">All</button>
-        <button onclick="filterGallery('scenic', this)">Scenic</button>
-        <button onclick="filterGallery('culture', this)">Culture</button>
-        <button onclick="filterGallery('season', this)">Season</button>
       </div>
       <div class="gallery-masonry" id="galleryMasonry">
         <!-- Gallery items will be rendered by JS -->
@@ -1859,7 +1830,7 @@
       galleryData.forEach(function(item, index) {
         var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
         var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
-        html += '<div class="gallery-item" data-category="' + escapeHtml(item.cat) + '" onclick="openLightbox(' + index + ')">';
+        html += '<div class="gallery-item" onclick="openLightbox(' + index + ')">';
         html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
                 'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(item.img) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
@@ -1871,22 +1842,6 @@
       });
       
       masonry.innerHTML = html;
-    }
-
-    /* ========== GALLERY FILTER ========== */
-    function filterGallery(cat, btn) {
-      document.querySelectorAll('.gallery-filter button').forEach(function(b) {
-        b.classList.remove('active');
-      });
-      if (btn) btn.classList.add('active');
-      
-      document.querySelectorAll('.gallery-item').forEach(function(item) {
-        if (cat === 'all' || item.dataset.category === cat) {
-          item.classList.remove('hidden');
-        } else {
-          item.classList.add('hidden');
-        }
-      });
     }
 
     /* ========== HERO SLIDER ========== */
