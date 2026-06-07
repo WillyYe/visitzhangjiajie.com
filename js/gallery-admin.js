@@ -8,7 +8,9 @@
 //   - Each card: preview + replace button + delete button
 //   - 3-tier responsive upload: 1920px / 1200px / 400px
 //   - Auto-generate title from filename
-//   - Inline progress bar on each card during upload
+//   - In-line progress bar on each card during upload
+//   - Duplicate detection: skip files already in galleryData
+//   - Limit: 1-9 images per upload batch
 
 (function() {
   'use strict';
@@ -73,6 +75,13 @@
     fi.onchange = function() {
       var file = fi.files[0];
       if (!file) { fi.value = ''; return; }
+
+      // Check duplicate for replace too
+      if (_isDuplicate(file.name)) {
+        showToast('⚠️ 图片「' + file.name + '」已存在，无需重复上传', 'warning');
+        fi.value = '';
+        return;
+      }
 
       _setCardProgress(index, 5, '压缩中...');
       _uploadGalleryFile(file, function(pct, label) {
@@ -177,11 +186,51 @@
 
   // ========== INTERNAL HELPERS ==========
 
+  // Check if a file (by filename) is already in galleryData
+  function _isDuplicate(filename) {
+    var cleanName = filename.replace(/[\\/*?:"<>|]/g, '_');
+    if (!/\.(jpe?g|png|webp|gif)$/i.test(cleanName)) {
+      cleanName += '.jpg';
+    }
+    var fullPath = 'assets/images/' + cleanName;
+    return _galData().some(function(item) {
+      return item.img === fullPath;
+    });
+  }
+
   function _handleGalleryFiles(files) {
     if (isUploading) return;
-    isUploading = true;
 
-    var total = files.length;
+    var fileArr = Array.from(files);
+
+    // Limit to 9 files max
+    if (fileArr.length > 9) {
+      showToast('⚠️ 一次最多上传 9 张图片，已自动选取前 9 张', 'warning');
+      fileArr = fileArr.slice(0, 9);
+    }
+
+    // Filter out duplicates
+    var duplicates = [];
+    var toUpload = [];
+    fileArr.forEach(function(file) {
+      if (_isDuplicate(file.name)) {
+        duplicates.push(file.name);
+      } else {
+        toUpload.push(file);
+      }
+    });
+
+    if (duplicates.length > 0) {
+      showToast('⚠️ ' + duplicates.length + ' 张图片已存在，已跳过：' + duplicates.slice(0, 3).join('、') + (duplicates.length > 3 ? ' 等' : ''), 'warning');
+    }
+
+    if (toUpload.length === 0) {
+      showToast('⚠️ 所有图片均已存在，无需上传', 'warning');
+      return;
+    }
+
+    isUploading = true;
+    var total = toUpload.length;
     var completed = 0;
     var failed = 0;
     var startLen = _galData().length;
@@ -196,7 +245,7 @@
       h += _renderCard(i, imgPath, title, false);
     });
     // Temp upload cards
-    Array.from(files).forEach(function(file, i) {
+    toUpload.forEach(function(file, i) {
       var tempIdx = startLen + i;
       h += _renderCard(tempIdx, '', _autoTitle(file.name), true);
     });
@@ -211,7 +260,7 @@
     if (grid) grid.innerHTML = h;
 
     // Show initial progress on all temp cards
-    Array.from(files).forEach(function(file, i) {
+    toUpload.forEach(function(file, i) {
       _setCardProgress(startLen + i, 2, '等待上传...');
     });
 
@@ -219,7 +268,7 @@
 
     // Process files sequentially to avoid overwhelming GitHub API
     function processNext(idx) {
-      if (idx >= files.length) {
+      if (idx >= toUpload.length) {
         isUploading = false;
         if (failed > 0) {
           showToast('⚠️ 上传完成：' + completed + ' 成功，' + failed + ' 失败', 'warning');
@@ -232,7 +281,7 @@
         return;
       }
 
-      var file = files[idx];
+      var file = toUpload[idx];
       var tempIdx = startLen + idx;
 
       _setCardProgress(tempIdx, 5, '正在压缩主图...');
@@ -244,7 +293,6 @@
           failed++;
           _setCardProgress(tempIdx, 100, '上传失败');
           console.error('Gallery upload failed for', file.name, err);
-          // Mark the temp card as failed
           var bar = document.getElementById('galProgBar_' + tempIdx);
           if (bar) bar.style.background = '#e53935';
         } else {
