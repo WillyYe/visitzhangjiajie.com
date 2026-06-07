@@ -9,8 +9,8 @@
     "desc": "The prototype of Hallelujah Mountain in Avatar, where the floating peaks of Pandora were inspired. Misty and magical.",
     "images": [
       "assets/images/yuanjiajie.jpg",
-      "assets/images/yuanjiajie.jpg",
-      "assets/images/yuanjiajie.jpg"
+      "assets/images/news-eco.jpg",
+      "assets/images/scenic-firstbridge.jpg"
     ],
     "info": [
       {
@@ -67,8 +67,8 @@
     "desc": "Famous from Avatar, known as the \"Miniature Fairyland\". Spectacular sunrise and sea of clouds.",
     "images": [
       "assets/images/tianzishan.jpg",
-      "assets/images/tianzishan.jpg",
-      "assets/images/tianzishan.jpg"
+      "assets/images/scenic-firstbridge.jpg",
+      "assets/images/scenic-huangshijia.jpg"
     ],
     "info": [
       {
@@ -125,8 +125,8 @@
     "desc": "7.5km of crystal-clear streams and towering peaks. The most classic hiking route in the park.",
     "images": [
       "assets/images/jinbianxi.jpg",
-      "assets/images/jinbianxi.jpg",
-      "assets/images/jinbianxi.jpg"
+      "assets/images/scenic-huangshijia.jpg",
+      "assets/images/scenic-shadao.jpg"
     ],
     "info": [
       {
@@ -183,8 +183,8 @@
     "desc": "Known as \"The Eyes of Zhangjiajie\", Huangshijia is the largest aerial viewing platform in the park. It offers 360-degree panoramic views of the pillar formations.",
     "images": [
       "assets/images/scenic-huangshijia.jpg",
-      "assets/images/scenic-huangshijia.jpg",
-      "assets/images/scenic-huangshijia.jpg"
+      "assets/images/hero-pillars.jpg",
+      "assets/images/exp-stargaze.jpg"
     ],
     "info": [
       {
@@ -241,8 +241,8 @@
     "desc": "A natural stone bridge formed between two towering quartz sandstone peaks, standing 387 meters above the valley floor - a geological wonder.",
     "images": [
       "assets/images/scenic-firstbridge.jpg",
-      "assets/images/scenic-firstbridge.jpg",
-      "assets/images/scenic-firstbridge.jpg"
+      "assets/images/exp-stargaze.jpg",
+      "assets/images/news-overview.jpg"
     ],
     "info": [
       {
@@ -299,8 +299,8 @@
     "desc": "A well-preserved Tujia ancient town where you can experience authentic Tujia culture, architecture, and traditional customs.",
     "images": [
       "assets/images/scenic-yongding.jpg",
-      "assets/images/scenic-yongding.jpg",
-      "assets/images/scenic-yongding.jpg"
+      "assets/images/exp-stargaze.jpg",
+      "assets/images/news-overview.jpg"
     ],
     "info": [
       {
@@ -357,8 +357,8 @@
     "desc": "A dramatic valley with unique landscapes, perfect for adventurous travelers seeking wilderness experiences and off-the-beaten-path scenery.",
     "images": [
       "assets/images/scenic-shadao.jpg",
-      "assets/images/scenic-shadao.jpg",
-      "assets/images/scenic-shadao.jpg"
+      "assets/images/28.jpg",
+      "assets/images/news-geo.jpg"
     ],
     "info": [
       {
@@ -415,8 +415,8 @@
     "desc": "Two towering stone peaks facing each other, forming a unique natural gateway. This spot offers perfect photo opportunities.",
     "images": [
       "assets/images/scenic-twinpeaks.jpg",
-      "assets/images/scenic-twinpeaks.jpg",
-      "assets/images/scenic-twinpeaks.jpg"
+      "assets/images/28.jpg",
+      "assets/images/news-geo.jpg"
     ],
     "info": [
       {
@@ -473,8 +473,8 @@
     "desc": "A typical karst cave system featuring diverse stalactites, stalagmites and stone formations. The underground wonderland is breathtaking.",
     "images": [
       "assets/images/scenic-wulong.jpg",
-      "assets/images/scenic-wulong.jpg",
-      "assets/images/scenic-wulong.jpg"
+      "assets/images/news-geo.jpg",
+      "assets/images/yuanjiajie.jpg"
     ],
     "info": [
       {
@@ -531,8 +531,8 @@
     "desc": "At 1,200 meters elevation, Tianping Mountain is one of the best spots for sunrise views and sea of clouds in Zhangjiajie.",
     "images": [
       "assets/images/scenic-tianping.jpg",
-      "assets/images/scenic-tianping.jpg",
-      "assets/images/scenic-tianping.jpg"
+      "assets/images/yuanjiajie.jpg",
+      "assets/images/news-honor.jpg"
     ],
     "info": [
       {
