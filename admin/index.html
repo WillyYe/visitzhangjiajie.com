@@ -179,7 +179,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
   .upload-progress-bar-wrap.error .pb-pct { color:#ef5350; }
   .upload-progress-bar-wrap.error .pb-label { color:#ef5350; }
 
+  /* ---- 外部 JS ---- */
+  /* 必须在 admin.js 之前加载；common.js 不依赖任何全局变量，
+     getGhToken()/ghFetch() 在调用时才读取 GH_REPO/GH_BRANCH，
+     所以即使这两个变量在页面后面才定义，也不会报错。*/
 </style>
+<script src="../js/common.js"></script>
+<script src="../js/scenic-admin.js"></script>
 </head>
 <body>
 
@@ -317,26 +323,6 @@ var AUTH_KEY = 'zjj_admin_auth';
 var GH_REPO = localStorage.getItem('gh_repo') || 'WillyYe/visitzhangjiajie.com';
 var GH_BRANCH = 'main';
 
-function getGhToken() { return localStorage.getItem('gh_token'); }
-
-// 直接调用 GitHub API（CORS 已支持），建议使用 Fine-Grained Token（仅限当前仓库权限）
-function ghFetch(path, method, body) {
-  var token = getGhToken();
-  if (!token) { return Promise.reject(new Error('GitHub Token 未配置，请在「设置」中配置')); }
-  var url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + path;
-  if (!method || method === 'GET') url += '?ref=' + GH_BRANCH;
-  var opts = {
-    method: method || 'GET',
-    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }
-  };
-  if (body) {
-    var payload = { message: body.message, content: body.content, branch: GH_BRANCH };
-    if (body.sha) payload.sha = body.sha;
-    opts.body = JSON.stringify(payload);
-  }
-  return fetch(url, opts);
-}
-
 // ==================== AUTH ====================
 
 function doLogin() {
@@ -399,15 +385,8 @@ document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
   });
 });
 
-// ==================== TOAST ====================
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + (type||'') + ' show';
-  setTimeout(function(){t.classList.remove('show')}, 2500);
-}
+// ==================== DASHBOARD ====================
 
-// ==================== RENDER FUNCTIONS ====================
-function renderDashboard() {
   document.getElementById('dashboardStats').innerHTML =
     '<div class="stat-card"><div class="stat-num">'+newsData.length+'</div><div class="stat-label">新闻</div></div>'+
     '<div class="stat-card"><div class="stat-num">'+scenicData.length+'</div><div class="stat-label">景区</div></div>'+
@@ -423,18 +402,6 @@ function renderNews() {
     h += '<tr><td>'+n.date.day+' '+n.date.month+' '+n.date.year+'</td><td><span style="background:#fce4ec;color:#c2185b;padding:2px 8px;border-radius:10px;font-size:11px">'+n.tag+'</span></td><td>'+esc(n.titleEn)+'</td><td style="text-align:center">'+imgPreview+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openNewsModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceNewsImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteNews('+i+')">删除</button></td></tr>';
   });
   document.getElementById('newsTableBody').innerHTML = h || '<tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr>';
-}
-
-function renderScenic() {
-  var h = '';
-  scenicData.forEach(function(s,i){
-    var imgPreview = s.img ? '<img src="../'+s.img+'?t='+Date.now()+'" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:4px;display:block" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#aaa;font-size:11px>图片未上传</span>\'">' : '<span style="color:#aaa;font-size:11px">未上传</span>';
-    var subTitleShort = (s.subTitle||'').length > 20 ? (s.subTitle||'').substring(0,20)+'...' : (s.subTitle||'—');
-    var descShort = (s.desc||'').length > 30 ? (s.desc||'').substring(0,30)+'...' : (s.desc||'—');
-    var detailIcon = (s.images&&s.images.length>1) || (s.info&&s.info.length) || (s.attractions&&s.attractions.length) ? ' 🖼️' : '';
-    h += '<tr><td>'+esc(s.id)+'</td><td>'+esc(s.name)+detailIcon+'</td><td>'+esc(s.tag)+'</td><td title="'+esc(s.subTitle)+'">'+esc(subTitleShort)+'</td><td title="'+esc(s.desc)+'">'+esc(descShort)+'</td><td style="text-align:center">'+imgPreview+'</td><td>'+(s.large?'✅':'—')+'</td><td class="table-actions"><button class="btn btn-outline btn-sm" onclick="openScenicModal('+i+')">编辑</button><button class="btn btn-outline btn-sm" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7" onclick="replaceScenicImage('+i+')">🔄 替换图片</button><button class="btn btn-danger btn-sm" onclick="deleteScenic('+i+')">删除</button></td></tr>';
-  });
-  document.getElementById('scenicTableBody').innerHTML = h || '<tr><td colspan="8" style="text-align:center;color:#999">暂无数据</td></tr>';
 }
 
 function renderExp() {
@@ -560,185 +527,12 @@ function directHeroUpload(path, base64Content, fileName, idx) {
 var editingIndex = -1;
 var modalImgId = 'fImg_modal'; // 统一图片输入框 ID
 
-function showModal(title, bodyHtml) {
-  document.getElementById('modalContent').innerHTML = '<h3>'+title+'</h3>'+bodyHtml;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
 // 生成 Modal 图片上传 HTML 片段
-function imgUploadHtml(currentPath, previewStyle) {
-  var ps = previewStyle || '';
-  var previewSrc = currentPath ? ('../' + currentPath + '?t=' + Date.now()) : '';
-  var previewImg = currentPath ? '<img src="'+previewSrc+'" alt="preview" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div style=color:#e53935;font-size:12px;padding:8px;background:#ffebee;border-radius:6px>⚠️ 图片加载失败，请检查路径或点击下方「上传图片」重新上传</div>\'">' : '<div style="color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center">暂无图片<br><span style="font-size:11px">点击下方「上传图片」按钮添加</span></div>';
-  return '<div class="form-group"><label>图片路径</label>'+
-    '<div class="img-upload-wrap">'+
-      '<input id="'+modalImgId+'" value="'+esc(currentPath)+'">'+
-      '<button type="button" class="img-upload-btn" onclick="triggerUpload(\''+modalImgId+'\')">📁 上传图片</button>'+
-      (currentPath ? '<button type="button" class="img-upload-btn" style="background:#ffebee;color:#ef5350;border-color:#ef5350" onclick="document.getElementById(\''+modalImgId+'\').value=\'\';document.getElementById(\'prev_'+modalImgId+'\').innerHTML=\'<div style=color:#999;font-size:12px;padding:8px;background:#f5f5f5;border-radius:6px;text-align:center>暂无图片<br><span style=font-size:11px>点击下方「上传图片」按钮添加</span></div>\'">✕ 清除</button>' : '')+
-    '</div>'+
-    '<div class="img-preview" id="prev_'+modalImgId+'">'+previewImg+'</div>'+
-  '</div>';
-}
-
-
-function imgUploadHtml2(currentPath) {
-  var old = modalImgId;
-  modalImgId = 'fImg1';
-  var html = imgUploadHtml(currentPath);
-  modalImgId = old;
-  return html;
-}
-function imgUploadHtml3(currentPath) {
-  var old = modalImgId;
-  modalImgId = 'fImg2';
-  var html = imgUploadHtml(currentPath);
-  modalImgId = old;
-  return html;
-}
-
 // ===== Scenic 二级页面字段管理 =====
-function addInfoCard() {
-  var container = document.getElementById('infoCardsEdit');
-  var count = container.querySelectorAll('.info-row').length;
-  if (count >= 8) return;
-  var idx = Date.now();
-  var num = count + 1;
-  var div = document.createElement('div');
-  div.className = 'editor-card info-row';
-  div.id = 'infoRow_' + idx;
-  div.innerHTML =
-    '<div class="editor-card-header">'+
-    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Info Card</span></div>'+
-    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateInfoAddBtn()">删除</button>'+
-    '</div>'+
-    '<div class="editor-row">'+
-    '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🏔️" id="fInfoIcon_' + idx + '"></div>'+
-    '<div class="editor-field"><label>Label</label><input placeholder="例如：Elevation" id="fInfoLabel_' + idx + '"></div>'+
-    '<div class="editor-field"><label>Value</label><input placeholder="例如：1,074m" id="fInfoValue_' + idx + '"></div>'+
-    '</div>';
-  container.appendChild(div);
-  updateInfoAddBtn();
-}
-function removeInfoCard(id) {
-  var el = document.getElementById('infoRow' + id);
-  if (el) el.remove();
-  updateInfoAddBtn();
-}
-function updateInfoAddBtn() {
-  var container = document.getElementById('infoCardsEdit');
-  var count = container.querySelectorAll('.info-row').length;
-  var btn = document.getElementById('addInfoBtn');
-  if (btn) btn.disabled = (count >= 8);
-}
-
-function addAttraction() {
-  var container = document.getElementById('attrEdit');
-  var count = container.querySelectorAll('.attr-row').length;
-  if (count >= 6) return;
-  var idx = Date.now();
-  var num = count + 1;
-  var div = document.createElement('div');
-  div.className = 'editor-card attr-row';
-  div.id = 'attrRow_' + idx;
-  div.innerHTML =
-    '<div class="editor-card-header">'+
-    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Attraction</span></div>'+
-    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateAttrAddBtn()">删除</button>'+
-    '</div>'+
-    '<div class="editor-row">'+
-    '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🗿" id="fAttrIcon_' + idx + '"></div>'+
-    '<div class="editor-field"><label>Name</label><input placeholder="景点名称" id="fAttrName_' + idx + '"></div>'+
-    '</div>'+
-    '<div class="editor-field"><label>Description</label><textarea placeholder="景点描述..." id="fAttrDesc_' + idx + '"></textarea></div>';
-  container.appendChild(div);
-  updateAttrAddBtn();
-}
-function removeAttraction(id) {
-  var el = document.getElementById('attrRow' + id);
-  if (el) el.remove();
-  updateAttrAddBtn();
-}
-function updateAttrAddBtn() {
-  var container = document.getElementById('attrEdit');
-  var count = container.querySelectorAll('.attr-row').length;
-  var btn = document.getElementById('addAttrBtn');
-  if (btn) btn.disabled = (count >= 6);
-}
-
-function addTip() {
-  var container = document.getElementById('tipsEdit');
-  var count = container.querySelectorAll('.tip-row').length;
-  if (count >= 6) return;
-  var idx = Date.now();
-  var num = count + 1;
-  var div = document.createElement('div');
-  div.className = 'editor-card tip-row';
-  div.id = 'tipRow_' + idx;
-  div.innerHTML =
-    '<div class="editor-card-header">'+
-    '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+num+'</span><span class="editor-card-title">Travel Tip</span></div>'+
-    '<button class="editor-card-remove" onclick="this.parentElement.parentElement.remove(); updateTipAddBtn()">删除</button>'+
-    '</div>'+
-    '<div class="editor-field"><label>Content</label><textarea placeholder="输入旅行贴士..." id="fTip_' + idx + '"></textarea></div>';
-  container.appendChild(div);
-  updateTipAddBtn();
-}
-function removeTip(id) {
-  var el = document.getElementById('tipRow' + id);
-  if (el) el.remove();
-  updateTipAddBtn();
-}
-function updateTipAddBtn() {
-  var container = document.getElementById('tipsEdit');
-  var count = container.querySelectorAll('.tip-row').length;
-  var btn = document.getElementById('addTipBtn');
-  if (btn) btn.disabled = (count >= 6);
-}
-
-function readInfoCards() {
-  var container = document.getElementById('infoCardsEdit');
-  if (!container) return [];
-  var arr = [];
-  container.querySelectorAll('.info-row').forEach(function(row) {
-    var icon = row.querySelector('[id^="fInfoIcon"]').value.trim();
-    var label = row.querySelector('[id^="fInfoLabel"]').value.trim();
-    var value = row.querySelector('[id^="fInfoValue"]').value.trim();
-    if (label) arr.push({icon:icon, label:label, value:value});
-  });
-  while (arr.length < 4) arr.push({icon:'🏔️', label:'', value:''});
-  return arr.slice(0, 8);
-}
-function readAttractions() {
-  var container = document.getElementById('attrEdit');
-  if (!container) return [];
-  var arr = [];
-  container.querySelectorAll('.attr-row').forEach(function(row) {
-    var icon = row.querySelector('[id^="fAttrIcon"]').value.trim();
-    var name = row.querySelector('[id^="fAttrName"]').value.trim();
-    var desc = row.querySelector('[id^="fAttrDesc"]').value.trim();
-    if (name) arr.push({icon:icon, name:name, desc:desc});
-  });
-  while (arr.length < 3) arr.push({icon:'🗿', name:'', desc:''});
-  return arr.slice(0, 6);
-}
-function readTips() {
-  var container = document.getElementById('tipsEdit');
-  if (!container) return [];
-  var arr = [];
-  container.querySelectorAll('.tip-row').forEach(function(row) {
-    var val = row.querySelector('[id^="fTip"]').value.trim();
-    if (val) arr.push(val);
-  });
-  while (arr.length < 3) arr.push('');
-  return arr.slice(0, 6);
-}
-
 // --- News Modal ---
 function openNewsModal(idx) {
   editingIndex = idx !== undefined ? idx : -1;
@@ -850,194 +644,7 @@ function replaceNewsImage(i) {
 }
 
 // --- Scenic Modal ---
-function openScenicModal(idx) {
-  editingIndex = idx !== undefined ? idx : -1;
-  var s = editingIndex >= 0 ? scenicData[editingIndex] : {
-    id:'', img:'', large:false,
-    tag:'', name:'', subTitle:'', desc:'',
-    images:['','',''],
-    info:[{icon:'🏔️',label:'Elevation',value:''},{icon:'📏',label:'Area',value:''},{icon:'⏱️',label:'Best Time',value:''},{icon:'🎫',label:'Ticket',value:''}],
-    attractions:[{icon:'🗿',name:'',desc:''},{icon:'🌉',name:'',desc:''},{icon:'⛩️',name:'',desc:''}],
-    tips:['','','']
-  };
-  // 确保数组存在
-  if (!s.images || s.images.length < 3) s.images = [s.images?.[0]||'','',''];
-  if (!s.info || !Array.isArray(s.info)) s.info = [{icon:'🏔️',label:'Elevation',value:''},{icon:'📏',label:'Area',value:''},{icon:'⏱️',label:'Best Time',value:''},{icon:'🎫',label:'Ticket',value:''}];
-  if (!s.attractions || !Array.isArray(s.attractions)) s.attractions = [{icon:'🗿',name:'',desc:''},{icon:'🌉',name:'',desc:''},{icon:'⛩️',name:'',desc:''}];
-  if (!s.tips || !Array.isArray(s.tips)) s.tips = ['','',''];
-
-  // 构建 Info Cards HTML
-  var infoHtml = '<div class="editor-section-title">📊 Info Cards <span class="editor-section-hint">4–8 个</span></div><div id="infoCardsEdit">';
-  s.info.forEach(function(item, i) {
-    if (i >= 8) return;
-    infoHtml += '<div class="editor-card info-row" id="infoRow'+i+'">'+
-      '<div class="editor-card-header">'+
-      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Info Card</span></div>'+
-      (i >= 4 ? '<button class="editor-card-remove" onclick="removeInfoCard('+i+')">删除</button>' : '')+
-      '</div>'+
-      '<div class="editor-row">'+
-      '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🏔️" value="'+esc(item.icon||'')+'" id="fInfoIcon'+i+'"></div>'+
-      '<div class="editor-field"><label>Label</label><input placeholder="例如：Elevation" value="'+esc(item.label||'')+'" id="fInfoLabel'+i+'"></div>'+
-      '<div class="editor-field"><label>Value</label><input placeholder="例如：1,074m" value="'+esc(item.value||'')+'" id="fInfoValue'+i+'"></div>'+
-      '</div>'+
-      '</div>';
-  });
-  infoHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addInfoCard()" id="addInfoBtn"'+(s.info.length>=8?'disabled':'')+'>➕ 添加 Info Card</button>';
-
-  // 构建 Attractions HTML
-  var attrHtml = '<div class="editor-section-title">🗿 Key Attractions <span class="editor-section-hint">3–6 个</span></div><div id="attrEdit">';
-  s.attractions.forEach(function(item, i) {
-    if (i >= 6) return;
-    attrHtml += '<div class="editor-card attr-row" id="attrRow'+i+'">'+
-      '<div class="editor-card-header">'+
-      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Attraction</span></div>'+
-      (i >= 3 ? '<button class="editor-card-remove" onclick="removeAttraction('+i+')">删除</button>' : '')+
-      '</div>'+
-      '<div class="editor-row">'+
-      '<div class="editor-field icon-field"><label>Icon</label><input class="icon-input" placeholder="🗿" value="'+esc(item.icon||'')+'" id="fAttrIcon'+i+'"></div>'+
-      '<div class="editor-field"><label>Name</label><input placeholder="景点名称" value="'+esc(item.name||'')+'" id="fAttrName'+i+'"></div>'+
-      '</div>'+
-      '<div class="editor-field"><label>Description</label><textarea placeholder="景点描述..." id="fAttrDesc'+i+'">'+esc(item.desc||'')+'</textarea></div>'+
-      '</div>';
-  });
-  attrHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addAttraction()" id="addAttrBtn"'+(s.attractions.length>=6?'disabled':'')+'>➕ 添加 Attraction</button>';
-
-  // 构建 Tips HTML
-  var tipsHtml = '<div class="editor-section-title">💡 Travel Tips <span class="editor-section-hint">3–6 条</span></div><div id="tipsEdit">';
-  s.tips.forEach(function(tip, i) {
-    if (i >= 6) return;
-    tipsHtml += '<div class="editor-card tip-row" id="tipRow'+i+'">'+
-      '<div class="editor-card-header">'+
-      '<div style="display:flex;align-items:center;"><span class="editor-card-num">'+(i+1)+'</span><span class="editor-card-title">Travel Tip</span></div>'+
-      (i >= 3 ? '<button class="editor-card-remove" onclick="removeTip('+i+')">删除</button>' : '')+
-      '</div>'+
-      '<div class="editor-field"><label>Content</label><textarea placeholder="输入旅行贴士..." id="fTip'+i+'">'+esc(tip||'')+'</textarea></div>'+
-      '</div>';
-  });
-  tipsHtml += '</div><button class="btn btn-outline btn-sm editor-add-btn" onclick="addTip()" id="addTipBtn"'+(s.tips.length>=6?'disabled':'')+'>➕ 添加 Travel Tip</button>';
-
-  // 轮播图2、3
-  var img1 = (s.images&&s.images[1])||'';
-  var img2 = (s.images&&s.images[2])||'';
-
-  showModal(editingIndex>=0?'编辑景区':'新增景区',
-    // 基本信息
-    '<div class="form-section"><h4>📋 基本信息（首页卡片）</h4>'+
-    '<div class="form-group"><label>ID</label><input id="fId" value="'+esc(s.id)+'"></div>'+
-    '<div class="form-group"><label>名称 (Name)</label><input id="fName" value="'+esc(s.name||'')+'"></div>'+
-    '<div class="form-group"><label>标签 (Tag)</label><input id="fTag" value="'+esc(s.tag||'')+'"></div>'+
-    '<div class="form-group"><label>副标题 (Subtitle)</label><input id="fSub" value="'+esc(s.subTitle||'')+'"></div>'+
-    '<div class="form-group"><label>描述 (Description)</label><textarea id="fDesc">'+esc(s.desc||'')+'</textarea></div>'+
-    imgUploadHtml(s.img)+
-    '<div class="form-group"><label><input type="checkbox" id="fLarge" '+(s.large?'checked':'')+'> 大图显示</label></div></div>'+
-    // 轮播图
-    '<div class="form-section"><h4>🖼️ 轮播图（二级页面）</h4>'+
-    '<div class="form-group"><label>轮播图 2（可选）</label>'+imgUploadHtml2(img1)+'</div>'+
-    '<div class="form-group"><label>轮播图 3（可选）</label>'+imgUploadHtml3(img2)+'</div></div>'+
-    // 详情字段
-    infoHtml + attrHtml + tipsHtml +
-    '<div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveScenic()">💾 保存并同步到 GitHub</button></div>');
-}
-
-function saveScenic() {
-  var id = document.getElementById('fId').value.trim();
-  var name = document.getElementById('fName').value.trim();
-  var img = document.getElementById(modalImgId).value.trim();
-  var img1 = (document.getElementById('fImg1')||{}).value.trim();
-  var img2 = (document.getElementById('fImg2')||{}).value.trim();
-  if (!id) { showToast('❌ ID 不能为空', 'error'); return; }
-  if (!name) { showToast('❌ 名称不能为空', 'error'); return; }
-  if (!img) { showToast('❌ 请上传封面图片', 'error'); return; }
-
-  // ID 重复检查
-  var duplicateIdx = -1;
-  for (var i = 0; i < scenicData.length; i++) {
-    if (scenicData[i].id === id) { duplicateIdx = i; break; }
-  }
-  if (editingIndex < 0 && duplicateIdx >= 0) {
-    showToast('❌ ID "' + id + '" 已存在，请使用其他 ID', 'error'); return;
-  }
-  if (editingIndex >= 0 && duplicateIdx >= 0 && duplicateIdx !== editingIndex) {
-    showToast('❌ ID "' + id + '" 已被其他景区使用，请使用其他 ID', 'error'); return;
-  }
-
-  var images = [img];
-  if (img1) images.push(img1);
-  if (img2) images.push(img2);
-
-  var obj = {
-    id: id,
-    img: img,
-    large: document.getElementById('fLarge').checked,
-    tag: document.getElementById('fTag').value.trim(),
-    name: name,
-    subTitle: document.getElementById('fSub').value.trim(),
-    desc: document.getElementById('fDesc').value.trim(),
-    images: images,
-    info: readInfoCards(),
-    attractions: readAttractions(),
-    tips: readTips()
-  };
-  if (editingIndex >= 0) scenicData[editingIndex] = obj; else scenicData.push(obj);
-  closeModal(); renderScenic(); renderDashboard();
-  showToast('✅ 景区已保存，正在同步到 GitHub...', 'success');
-  saveScenicToGitHub();
-}
-function deleteScenic(i) {
-  if (scenicData.length <= 3) { showToast('至少保留 3 个景区，不可删除', 'error'); return; }
-  if (confirm('确定删除 "'+scenicData[i].name+'") 吗？')) {
-    // 删除关联的图片文件（最佳努力，失败不阻塞）
-    var s = scenicData[i];
-    if (s.img) deleteFileFromGitHub(s.img, 'Delete: ' + s.img).catch(function(){});
-    if (s.images) s.images.forEach(function(img) {
-      if (img && img !== s.img) deleteFileFromGitHub(img, 'Delete: ' + img).catch(function(){});
-    });
-    scenicData.splice(i,1); renderScenic(); renderDashboard();
-    showToast('✅ 已删除，正在同步到 GitHub...', 'success');
-    saveScenicToGitHub();
-  }
-}
-
 // 快速替换 Scenic 图片（表格行内操作，一步完成上传+保存+同步）
-function replaceScenicImage(i) {
-  var fi = document.getElementById('fileInput');
-  fi.onchange = function() {
-    var file = fi.files[0];
-    if (!file) return;
-    var oldImg = scenicData[i].img; // 保存旧图片路径
-    var btns = document.querySelectorAll('#scenicTableBody tr')[i].querySelectorAll('button');
-    var btn = btns[1]; // 替换图片按钮
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ 压缩中...'; }
-    compressImage(file, 1920, 0.85, function(base64, compressedSize) {
-      var cleanName = file.name.replace(/[\\/*?:"<>|]/g, '_');
-      var path = 'assets/images/' + cleanName;
-      if (btn) { btn.textContent = '⏳ 上传中...'; }
-      ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(fileInfo){
-        return ghFetch(path, 'PUT', {
-          content: base64,
-          message: 'Replace scenic image: ' + file.name,
-          sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
-        });
-      }).then(function(r){
-        if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
-        // 删除旧图片（最佳努力，失败不阻塞）
-        if (oldImg && oldImg !== path) {
-          deleteFileFromGitHub(oldImg, 'Delete old image: ' + oldImg).catch(function(){});
-        }
-        scenicData[i].img = path;
-        renderScenic();
-        showToast('✅ 图片已替换，正在同步景区数据...', 'success');
-        saveScenicToGitHub();
-      }).catch(function(err){
-        var msg = friendlyError(err.message || '');
-        showToast('❌ 替换失败：' + msg, 'error');
-      });
-    });
-  };
-  fi.value = '';
-  fi.click();
-}
 
 // --- Experience Modal ---
 function openExpModal(idx) {
@@ -1197,84 +804,8 @@ function saveNewsToGitHub() {
 // ==================== SCENIC GITHUB SYNC ====================
 var scenicSyncLock = false;
 
-function updateScenicSyncStatus(state, message) {
-  var el = document.getElementById('scenicSyncStatus');
-  if (!el) return;
-  var dot = el.querySelector('.sync-dot');
-  var text = el.querySelector('.sync-text');
-  var states = {
-    idle:    { color: '#aaa', label: '未同步' },
-    saving:  { color: '#f9a825', label: '同步中...' },
-    success: { color: '#43a047', label: '已同步 ✓' },
-    error:   { color: '#e53935', label: '同步失败 ✕' }
-  };
-  var s = states[state] || states.idle;
-  dot.style.background = s.color;
-  text.textContent = message || s.label;
-}
-
-function saveScenicToGitHub() {
-  if (scenicSyncLock) {
-    showToast('⏳ 正在同步中，请稍候...', '');
-    return;
-  }
-  scenicSyncLock = true;
-  updateScenicSyncStatus('saving');
-
-  showToast('⏳ 第 1 步：正在同步 scenic.json 到 GitHub...', '');
-  var content = JSON.stringify(scenicData, null, 2);
-  var path = 'data/scenic.json';
-  var retryCount = 0;
-
-  function doSync() {
-    ghFetch(path, 'GET').then(function(r){return r.ok ? r.json() : null;}).then(function(fileInfo) {
-      return ghFetch(path, 'PUT', {
-        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
-        message: 'Admin: Update scenic.json',
-        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
-      });
-    }).then(function(r){
-      if (r.ok) {
-        scenicSyncLock = false;
-        updateScenicSyncStatus('success');
-        showToast('✅ 第 2 步：景区已同步到 GitHub！前台约 1-2 分钟后更新 🎉', 'success');
-        return;
-      }
-      return r.json().then(function(d){
-        var msg = d.message || '';
-        if ((msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) && retryCount === 0) {
-          retryCount++;
-          showToast('🔄 检测到文件冲突，正在自动重试...', '');
-          updateScenicSyncStatus('saving', '冲突重试中...');
-          return doSync();
-        }
-        throw new Error(msg);
-      });
-    }).catch(function(err){
-      scenicSyncLock = false;
-      var msg = friendlyError(err.message || '');
-      updateScenicSyncStatus('error', msg.slice(0, 30));
-      showToast('❌ 同步失败：' + msg, 'error');
-    });
-  }
-
-  doSync();
-}
-
 // ==================== DELETE FILE FROM GITHUB ====================
 // 从 GitHub 仓库删除文件（最佳努力，失败不阻塞主流程）
-function deleteFileFromGitHub(path, message) {
-  return ghFetch(path, 'GET').then(function(r) {
-    if (!r.ok) throw new Error('File not found');
-    return r.json();
-  }).then(function(fileInfo) {
-    return ghFetch(path, 'DELETE', {
-      message: message || 'Delete file: ' + path,
-      sha: fileInfo.sha
-    });
-  });
-}
-
 // ==================== HERO GITHUB SYNC ====================
 var heroSyncLock = false; // 防止并发同步
 
@@ -1420,85 +951,7 @@ function saveAllToGitHub() {
 
 
 // ==================== IMAGE COMPRESS ====================
-function compressImage(file, maxW, quality, callback) {
-  var img = new Image();
-  var url = URL.createObjectURL(file);
-  img.onload = function() {
-    URL.revokeObjectURL(url);
-    var w = img.width, h = img.height;
-    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-    var canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, w, h);
-    canvas.toBlob(function(blob) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        callback(e.target.result.split(',')[1], blob.size);
-      };
-      reader.readAsDataURL(blob);
-    }, 'image/jpeg', quality);
-  };
-  img.src = url;
-}
-
 // ==================== PROGRESS BAR ====================
-function showProgressBar(inputId) {
-  var previewDiv = document.getElementById('prev_' + inputId);
-  previewDiv.innerHTML = ''+
-    '<div class="upload-progress-bar-wrap active" id="pb_'+inputId+'">'+
-      '<div class="pb-info">'+
-        '<span class="pb-label">准备上传</span>'+
-        '<span class="pb-pct">0%</span>'+
-      '</div>'+
-      '<div class="pb-track"><div class="pb-fill" id="pbfill_'+inputId+'"></div></div>'+
-      '<div class="pb-stage">等待开始...</div>'+
-    '</div>';
-}
-
-function updateProgressBar(inputId, pct, label, stage) {
-  var wrap = document.getElementById('pb_'+inputId);
-  var fill = document.getElementById('pbfill_'+inputId);
-  if (!wrap || !fill) return;
-  var labelEl = wrap.querySelector('.pb-label');
-  var pctEl = wrap.querySelector('.pb-pct');
-  var stageEl = wrap.querySelector('.pb-stage');
-  fill.style.width = pct + '%';
-  pctEl.textContent = Math.round(pct) + '%';
-  if (label) labelEl.textContent = label;
-  if (stage) stageEl.textContent = stage;
-}
-
-function markProgressError(inputId, label, stage) {
-  var wrap = document.getElementById('pb_'+inputId);
-  var fill = document.getElementById('pbfill_'+inputId);
-  if (!wrap || !fill) return;
-  wrap.classList.add('error');
-  var labelEl = wrap.querySelector('.pb-label');
-  var pctEl = wrap.querySelector('.pb-pct');
-  var stageEl = wrap.querySelector('.pb-stage');
-  labelEl.textContent = label || '上传失败';
-  pctEl.textContent = '✕';
-  fill.style.width = '100%';
-  if (stage) stageEl.textContent = stage;
-}
-
-function animateProgress(inputId, from, to, duration, label, stage, callback) {
-  updateProgressBar(inputId, from, label, stage);
-  var start = Date.now();
-  function tick() {
-    var elapsed = Date.now() - start;
-    var pct = from + (to - from) * Math.min(elapsed / duration, 1);
-    updateProgressBar(inputId, pct, label, stage);
-    if (elapsed < duration) {
-      requestAnimationFrame(tick);
-    } else {
-      if (callback) callback();
-    }
-  }
-  requestAnimationFrame(tick);
-}
-
 // ==================== IMAGE UPLOAD ====================
 var pendingUploads = {};
 function triggerUpload(inputId) {
@@ -1522,52 +975,6 @@ function triggerUpload(inputId) {
   };
   fi.value = '';
   fi.click();
-}
-
-function friendlyError(errMsg) {
-  var msg = errMsg || '';
-  if (msg.indexOf('Bad credentials') !== -1 || msg.indexOf('401') !== -1) return 'GitHub Token 已失效，请在「设置」中重新配置 Token';
-  if (msg.indexOf('sha was supplied') !== -1 || msg.indexOf('does not match') !== -1) return '文件已被其他修改覆盖，请刷新页面后重试';
-  if (msg.indexOf('Not Found') !== -1 || msg.indexOf('404') !== -1) return '文件路径不存在，请检查仓库配置是否正确';
-  if (msg.indexOf('too large') !== -1 || msg.indexOf('too long') !== -1 || msg.indexOf('413') !== -1) return '图片体积过大（超过 100MB），请压缩后再上传';
-  if (msg.indexOf('NetworkError') !== -1 || msg.indexOf('Failed to fetch') !== -1) return '网络连接失败，请检查网络后重试';
-  if (msg.indexOf('timeout') !== -1) return '上传超时，请重试或检查网络速度';
-  if (msg.indexOf('CORS') !== -1) return '跨域请求被拦截，请检查 Token 权限';
-  if (msg.indexOf('403') !== -1) return 'Token 权限不足，请确保 Token 有 Contents 读写权限';
-  return msg || '未知错误，请重试或联系管理员';
-}
-
-function uploadToGitHub(path, base64Content, fileName, inputId) {
-  var previewDiv = document.getElementById('prev_' + inputId);
-
-  animateProgress(inputId, 30, 40, 300, '检查仓库', '查询 ' + path + ' ...');
-
-  ghFetch(path, 'GET').then(function(r){ return r.ok ? r.json() : null; })
-  .then(function(fileInfo){
-    animateProgress(inputId, 40, 60, 200, '正在上传', '通过 GitHub API 上传中...');
-    return ghFetch(path, 'PUT', {
-      content: base64Content,
-      message: 'Upload image: ' + fileName,
-      sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
-    });
-  }).then(function(r){
-    if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
-    animateProgress(inputId, 60, 100, 300, '上传成功', '图片已写入 GitHub 仓库', function(){
-      document.getElementById(inputId).value = path;
-      previewDiv.innerHTML = '<img src="../' + path + '?t=' + Date.now() + '" alt="preview">';
-      showToast('图片上传成功 ✅', 'success');
-    });
-  }).catch(function(err){
-    var msg = friendlyError(err.message || '');
-    markProgressError(inputId, '上传失败', msg);
-    showToast('❌ 上传失败：' + msg, 'error');
-  });
-}
-
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
 // ==================== SETTINGS ====================
@@ -1638,7 +1045,6 @@ function initApp() {
   header.appendChild(saveBtn);
 }
 
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // Init on load if already authed
 if (localStorage.getItem(AUTH_KEY) === '1') initApp();
