@@ -143,37 +143,15 @@
   },
   {
     "id": "eco",
+    "img": "assets/images/exp-eco.jpg",
     "title": "生态教育",
     "titleEn": "Eco Education",
     "desc": "了解地质奇观和生态系统。张家界是世界自然遗产，拥有独特的石英砂岩峰林地貌。通过专业讲解，您将深入了解地球的演变历史和生态保护的重要性。",
     "descEn": "Learn about geological wonders and ecosystems",
-    "img": "assets/images/exp-eco.jpg",
     "images": [
       "assets/images/exp-eco.jpg",
       "assets/images/exp-eco-2.jpg",
       "assets/images/exp-eco-3.jpg"
-    ],
-    "info": [
-      {
-        "icon": "🎓",
-        "label": "适合年龄",
-        "value": "8岁以上"
-      },
-      {
-        "icon": "⏰",
-        "label": "课程时长",
-        "value": "2-3小时"
-      },
-      {
-        "icon": "👨‍🏫",
-        "label": "讲解语言",
-        "value": "中文/英文"
-      },
-      {
-        "icon": "📜",
-        "label": "证书",
-        "value": "颁发研学证书"
-      }
     ],
     "infoEn": [
       {
@@ -197,19 +175,41 @@
         "value": "Issued upon completion"
       }
     ],
-    "tips": [
-      "提前预约专业讲解员",
-      "适合亲子家庭和研学团队",
-      "建议携带笔记本记录",
-      "部分区域需步行，注意体力",
-      "可结合环保志愿活动"
-    ],
     "tipsEn": [
       "Book a professional guide in advance",
       "Great for families and study groups",
       "Bring a notebook to take notes",
       "Some areas require walking, watch your stamina",
       "Can be combined with conservation activities"
+    ],
+    "info": [
+      {
+        "icon": "🎓",
+        "label": "适合年龄",
+        "value": "8岁以上"
+      },
+      {
+        "icon": "⏰",
+        "label": "课程时长",
+        "value": "2-3小时"
+      },
+      {
+        "icon": "👨‍🏫",
+        "label": "讲解语言",
+        "value": "中文/英文"
+      },
+      {
+        "icon": "📜",
+        "label": "证书",
+        "value": "颁发研学证书"
+      }
+    ],
+    "tips": [
+      "提前预约专业讲解员",
+      "适合亲子家庭和研学团队",
+      "建议携带笔记本记录",
+      "部分区域需步行，注意体力",
+      "可结合环保志愿活动"
     ]
   },
   {
