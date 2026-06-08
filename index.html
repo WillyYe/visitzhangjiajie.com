@@ -885,21 +885,33 @@
       background: var(--green-dark);
       color: var(--white);
       padding: 60px 24px 30px;
+      position: relative;
+    }
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, rgba(193,154,107,0.6) 30%, rgba(193,154,107,0.9) 50%, rgba(193,154,107,0.6) 70%, transparent 100%);
     }
     .footer-inner {
       max-width: 1200px;
       margin: 0 auto;
     }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+    .footer-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       gap: 40px;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
     .footer-brand {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
+      max-width: 380px;
     }
     .footer-logo {
       display: flex;
@@ -918,66 +930,73 @@
     .footer-social a {
       width: 36px;
       height: 36px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      transition: all 0.25s ease;
+      font-size: 14px;
     }
     .footer-social a:hover {
-      background: rgba(255,255,255,0.2);
+      background: rgba(193,154,107,0.2);
+      border-color: rgba(193,154,107,0.4);
+      transform: translateY(-2px);
     }
-    .footer-col h4 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      letter-spacing: 1px;
+    .footer-quick {
+      text-align: right;
+      padding-top: 4px;
     }
-    .footer-col ul li {
-      margin-bottom: 10px;
-    }
-    .footer-col ul li a {
+    .footer-quick h4 {
       font-size: 13px;
-      opacity: 0.7;
-      transition: opacity 0.2s;
+      font-weight: 600;
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.9;
     }
-    .footer-col ul li a:hover {
+    .footer-quick-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0;
+    }
+    .footer-quick-nav a {
+      font-size: 13px;
+      opacity: 0.65;
+      transition: all 0.25s ease;
+      padding: 4px 14px;
+      position: relative;
+    }
+    .footer-quick-nav a:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 14px;
+      background: rgba(255,255,255,0.15);
+    }
+    .footer-quick-nav a:hover {
       opacity: 1;
+      color: rgba(193,154,107,0.95);
+    }
+    .footer-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 80%, transparent 100%);
+      margin-bottom: 20px;
     }
     .footer-bottom {
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 24px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
     }
     .footer-copy {
-      font-size: 12px;
-      opacity: 0.6;
-    }
-    .footer-links {
-      display: flex;
-      gap: 20px;
-    }
-    .footer-links a {
-      font-size: 12px;
-      opacity: 0.6;
-      transition: opacity 0.2s;
-    }
-    .footer-links a:hover {
-      opacity: 1;
-    }
-    .footer-email {
-      color: rgba(255,255,255,0.6);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-email:hover {
-      color: #fff;
-      text-decoration: underline;
+      font-size: 11px;
+      opacity: 0.45;
+      letter-spacing: 0.5px;
     }
 
     /* ========== LIGHTBOX ========== */
@@ -1063,7 +1082,10 @@
       .exp-grid { grid-template-columns: repeat(2, 1fr); }
       .scenic-grid { grid-template-columns: repeat(2, 1fr); }
       .gallery-masonry { columns: 2; }
-      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-main { flex-direction: column; align-items: center; gap: 32px; }
+      .footer-brand { text-align: center; align-items: center; max-width: 100%; }
+      .footer-quick { text-align: center; }
+      .footer-quick-nav { justify-content: center; }
     }
     @media (max-width: 768px) {
       .nav { display: none; }
@@ -1079,7 +1101,8 @@
       .scenic-nav.prev { left: 8px; }
       .scenic-nav.next { right: 8px; }
       .transport-layout { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; }
+      .footer-main { flex-direction: column; gap: 28px; }
+      .footer-quick-nav a { padding: 4px 10px; font-size: 12px; }
       .info-inner { gap: 24px; }
     }
     @media (max-width: 480px) {
@@ -1332,7 +1355,7 @@
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-grid">
+      <div class="footer-main">
         <div class="footer-brand">
           <div class="footer-logo">
             <div class="logo-icon">🏔</div>
@@ -1348,41 +1371,20 @@
             <a href="#" aria-label="TikTok">🎵</a>
           </div>
         </div>
-        <div class="footer-col">
+        <div class="footer-quick">
           <h4>Quick Links</h4>
-          <ul>
-            <li><a href="#news">Park News</a></li>
-            <li><a href="#scenic">Core Scenic</a></li>
-            <li><a href="#experience">Experiences</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Support</h4>
-          <ul>
-            <li><a href="getting-here/">Getting Here</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="mailto:zjjpark@outlook.com" class="footer-email">(zjjpark@outlook.com)</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Park Info</h4>
-          <ul>
-            <li><a href="#">Book Tickets</a></li>
-            <li><a href="#">Visitor Guide</a></li>
-            <li><a href="#">Guided Tours</a></li>
-            <li><a href="#">Official Shop</a></li>
-          </ul>
+          <nav class="footer-quick-nav">
+            <a href="#news">Park News</a>
+            <a href="#scenic">Core Scenic</a>
+            <a href="#experience">Experiences</a>
+            <a href="#gallery">Gallery</a>
+            <a href="getting-here/">Getting Here</a>
+          </nav>
         </div>
       </div>
+      <div class="footer-divider"></div>
       <div class="footer-bottom">
         <p class="footer-copy">© 2024 Zhangjiajie National Forest Park</p>
-        <div class="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Use</a>
-          <a href="#">ICP XXXXXXXX-X</a>
-        </div>
       </div>
     </div>
   </footer>
