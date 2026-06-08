@@ -1547,7 +1547,11 @@
         for (var j = startIdx; j < endIdx; j++) {
           var item = newsData[j];
           html += '<a href="news-detail.html?id=' + j + '" class="news-carousel-card">';
-          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')">';
+          var newsImgSrc = (function(w){
+            if(w < 768) return wp(item.img.replace('assets/images/','assets/images/thumb/'));
+            return wp(item.img.replace('assets/images/','assets/images/md/'));
+          })(window.innerWidth);
+          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(newsImgSrc) + '\')">';
           html += '<div class="news-date">';
           html += '<div class="news-date-day">' + escapeHtml(item.date.day) + '</div>';
           html += '<div>' + escapeHtml(item.date.month) + '</div>';
@@ -1726,7 +1730,12 @@
         pageItems.forEach(function(item) {
           if (!item || !item.id) return;
           html += '<a href="scenic-detail.html?id=' + escapeHtml(item.id) + '" class="scenic-card fade-up">';
-          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(wp(item.img)) + '?v=2\')"></div>';
+          var scenicImgSrc = (function(w){
+            if(w < 768) return wp(item.img.replace('assets/images/','assets/images/thumb/'));
+            if(w <= 1024) return wp(item.img.replace('assets/images/','assets/images/md/'));
+            return wp(item.img);
+          })(window.innerWidth);
+          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(scenicImgSrc) + '\')"></div>';
           html += '<div class="scenic-overlay">';
           html += '<div class="scenic-tag">' + escapeHtml(item.tag || '') + '</div>';
           html += '<h3 class="scenic-name">' + escapeHtml(item.name || '') + '</h3>';
