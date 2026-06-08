@@ -22,7 +22,7 @@
   <!-- Preconnect for Fonts - with display=swap for faster rendering -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="image" href="assets/images/hero-pillars.jpg" />
+  <link rel="preload" as="image" href="assets/images/md/hero-pillars.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet" />
@@ -1483,8 +1483,12 @@
       // Reset slider state
       AppState.currentSlide = 0;
       
-      // Defer full-res upgrade: md/ loads instantly, full-res loads after 2s
+      // Defer full-res upgrade: only upgrade to full on large screens (>=1920px wide AND high DPR)
       setTimeout(function() {
+        // Only upgrade if screen is large enough to benefit from full-res
+        var shouldUpgrade = window.innerWidth >= 1920 && window.devicePixelRatio >= 2;
+        if (!shouldUpgrade) return;
+        
         var allBgs = container.querySelectorAll('.hero-slide-bg[data-full]');
         allBgs.forEach(function(bg) {
           var fullSrc = bg.dataset.full;
@@ -1545,8 +1549,9 @@
         var endIdx = Math.min(startIdx + cardsPerSlide, newsData.length);
         for (var j = startIdx; j < endIdx; j++) {
           var item = newsData[j];
+          var newsImgSrc = (item.img || '').replace('assets/images/', 'assets/images/md/');
           html += '<a href="news-detail.html?id=' + j + '" class="news-carousel-card">';
-          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')">';
+          html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(newsImgSrc) + '?v=4\')">';
           html += '<div class="news-date">';
           html += '<div class="news-date-day">' + escapeHtml(item.date.day) + '</div>';
           html += '<div>' + escapeHtml(item.date.month) + '</div>';
@@ -1725,7 +1730,7 @@
         pageItems.forEach(function(item) {
           if (!item || !item.id) return;
           html += '<a href="scenic-detail.html?id=' + escapeHtml(item.id) + '" class="scenic-card fade-up">';
-          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')"></div>';
+          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img).replace('assets/images/', 'assets/images/md/') + '?v=4\')"></div>';
           html += '<div class="scenic-overlay">';
           html += '<div class="scenic-tag">' + escapeHtml(item.tag || '') + '</div>';
           html += '<h3 class="scenic-name">' + escapeHtml(item.name || '') + '</h3>';
