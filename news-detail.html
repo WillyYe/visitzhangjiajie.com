@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window._webp=(function(){var c=document.createElement('canvas');c.width=1;c.height=1;return c.toDataURL&&c.toDataURL('image/webp').indexOf('data:image/webp')===0})();function wp(p){return window._webp?p.replace(/\.(jpe?g|png)$/i,'.webp'):p}document.addEventListener('error',function(e){if(e.target.tagName==='IMG'&&e.target.src&&/\.webp$/i.test(e.target.src)){e.target.src=e.target.src.replace(/\.webp$/i,'.jpg')}},true)</script>
   <title id="pageTitle">News Detail | Zhangjiajie National Forest Park</title>
   <meta name="description" id="metaDesc" content="Latest news from Zhangjiajie National Forest Park." />
   <meta name="theme-color" content="#1a4a30" />
@@ -377,7 +378,7 @@
         document.title = 'News | Zhangjiajie National Forest Park';
         return;
       }
-      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + news.img + '?v=2\')';
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + wp(news.img) + '?v=2\')';
       document.getElementById('heroBadge').textContent = news.tag.toUpperCase();
       document.getElementById('heroTitle').textContent = news.titleEn;
 
@@ -391,7 +392,7 @@
       document.getElementById('newsDateText').textContent = dateStr;
 
       var imgEl = document.getElementById('newsFeaturedImg');
-      imgEl.src = news.img + '?v=2';
+      imgEl.src = wp(news.img) + '?v=2';
       imgEl.alt = news.titleEn;
 
       document.getElementById('newsBody').innerHTML = news.contentEn || news.descEn;
@@ -410,7 +411,7 @@
         if (i === currentIndex) continue;
         var item = newsData[i];
         html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
-        html += '<div class="related-img" style="background-image: url(\'' + item.img + '?v=2\')"></div>';
+        html += '<div class="related-img" style="background-image: url(\'' + wp(item.img) + '?v=2\')"></div>';
         html += '<div class="related-body">';
         html += '<h4 class="related-card-title">' + item.titleEn + '</h4>';
         html += '<p class="related-card-date">' + item.date.day + ' ' + item.date.month + ' ' + item.date.year + '</p>';

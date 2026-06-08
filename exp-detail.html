@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window._webp=(function(){var c=document.createElement('canvas');c.width=1;c.height=1;return c.toDataURL&&c.toDataURL('image/webp').indexOf('data:image/webp')===0})();function wp(p){return window._webp?p.replace(/\.(jpe?g|png)$/i,'.webp'):p}document.addEventListener('error',function(e){if(e.target.tagName==='IMG'&&e.target.src&&/\.webp$/i.test(e.target.src)){e.target.src=e.target.src.replace(/\.webp$/i,'.jpg')}},true)</script>
   <title id="pageTitle">Experience Detail | Zhangjiajie National Forest Park</title>
   <meta name="description" id="metaDesc" content="Explore Zhangjiajie National Forest Park experiences." />
   <meta name="theme-color" content="#1a4a30" />
@@ -599,7 +600,7 @@
       var exp = getCurrentExp().data;
       
       // Set hero background image
-      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + exp.images[0] + '\')';
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + wp(exp.images[0]) + '\')';
       
       // Set badge
       document.getElementById('heroBadgeEn').textContent = exp.badge;

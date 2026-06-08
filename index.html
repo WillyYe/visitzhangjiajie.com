@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window._webp=(function(){var c=document.createElement('canvas');c.width=1;c.height=1;return c.toDataURL&&c.toDataURL('image/webp').indexOf('data:image/webp')===0})();function wp(p){return window._webp?p.replace(/\.(jpe?g|png)$/i,'.webp'):p}document.addEventListener('error',function(e){if(e.target.tagName==='IMG'&&e.target.src&&/\.webp$/i.test(e.target.src)){e.target.src=e.target.src.replace(/\.webp$/i,'.jpg')}},true)</script>
   <title>Zhangjiajie National Forest Park | Official Website</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="favicon.svg">
@@ -22,7 +23,7 @@
   <!-- Preconnect for Fonts - with display=swap for faster rendering -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="image" href="assets/images/hero-pillars.jpg" />
+  <link rel="preload" as="image" href="assets/images/hero-pillars.jpg" /><link rel="preload" as="image" href="assets/images/hero-pillars.webp" type="image/webp" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet" />
@@ -1466,9 +1467,9 @@
       
       // Generate slides: use md/ for instant load, data-full for retina upgrade
       container.innerHTML = slides.map(function(s, i) {
-        var mdSrc = (s.img || '').replace('assets/images/', 'assets/images/md/');
+        var mdSrc = wp((s.img || '').replace('assets/images/', 'assets/images/md/'));
         return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + '">' +
-          '<div class="hero-slide-bg" style="background-image:url(\'' + mdSrc + '\')" data-full="' + (s.img || '') + '"></div>' +
+          '<div class="hero-slide-bg" style="background-image:url(\'' + mdSrc + '\')" data-full="' + wp(s.img || '') + '"></div>' +
           '</div>';
       }).join('');
       
@@ -1680,9 +1681,9 @@
       var html = '';
       
       expData.forEach(function(item) {
-        var thumb = item.img.replace('assets/images/', 'assets/images/thumb/');
-        var mid = item.img.replace('assets/images/', 'assets/images/md/');
-        var full = item.img;
+        var thumb = wp(item.img.replace('assets/images/', 'assets/images/thumb/'));
+        var mid = wp(item.img.replace('assets/images/', 'assets/images/md/'));
+        var full = wp(item.img);
         html += '<a href="exp-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
         html += '<div class="exp-img"><img src="' + escapeHtml(thumb) + '" ' +
                 'srcset="' + escapeHtml(thumb) + ' 400w, ' + escapeHtml(mid) + ' 1200w, ' + escapeHtml(full) + ' 2400w" ' +
@@ -1725,7 +1726,7 @@
         pageItems.forEach(function(item) {
           if (!item || !item.id) return;
           html += '<a href="scenic-detail.html?id=' + escapeHtml(item.id) + '" class="scenic-card fade-up">';
-          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(item.img) + '?v=2\')"></div>';
+          html += '<div class="scenic-bg" style="background-image: url(\'' + escapeHtml(wp(item.img)) + '?v=2\')"></div>';
           html += '<div class="scenic-overlay">';
           html += '<div class="scenic-tag">' + escapeHtml(item.tag || '') + '</div>';
           html += '<h3 class="scenic-name">' + escapeHtml(item.name || '') + '</h3>';
@@ -1828,11 +1829,11 @@
       var html = '';
       
       galleryData.forEach(function(item, index) {
-        var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
-        var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
+        var thumbSrc = wp(item.img.replace('assets/images/', 'assets/images/thumb/'));
+        var mdSrc = wp(item.img.replace('assets/images/', 'assets/images/md/'));
         html += '<div class="gallery-item" onclick="openLightbox(' + index + ')">';
         html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
-                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(item.img) + ' 2400w" ' +
+                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(wp(item.img)) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
                 'loading="lazy" decoding="async" width="400" height="267">';
@@ -1913,8 +1914,8 @@
       if (!img) return;
       
       // Load md version first for instant preview, then upgrade to full-res
-      var mdSrc = galleryData[index].img.replace('assets/images/', 'assets/images/md/');
-      var fullSrc = galleryData[index].img;
+      var mdSrc = wp(galleryData[index].img.replace('assets/images/', 'assets/images/md/'));
+      var fullSrc = wp(galleryData[index].img);
       img.src = mdSrc;
       img.alt = AppState.currentLang === 'zh' 
         ? galleryData[index].title 

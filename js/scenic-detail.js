@@ -68,17 +68,18 @@ function renderHeroSlider() {
 
   var images = currentScenic.images || [currentScenic.img || ''];
   images.forEach(function(img, idx) {
-    var mdImg = img.replace('assets/images/', 'assets/images/md/');
+    var mdImg = wp(img.replace('assets/images/', 'assets/images/md/'));
+    var fullImg = wp(img);
     var isActive = idx === 0;
     slidesHtml += '<div class="hero-slide' + (isActive ? ' active' : '') + '">';
     // Active slide: init with medium image, full-res loads on retina via JS
     // Inactive slides: deferred via data-bg (lazy loaded by switch)
     if (isActive) {
       slidesHtml += '<div class="hero-bg" style="background-image:url(\'' + mdImg + '\')" ' +
-        'data-full="' + img + '" data-loaded="true"></div>';
+        'data-full="' + fullImg + '" data-loaded="true"></div>';
     } else {
       slidesHtml += '<div class="hero-bg" data-bg="' + mdImg + '" ' +
-        'data-full="' + img + '" data-loaded="false"></div>';
+        'data-full="' + fullImg + '" data-loaded="false"></div>';
     }
     slidesHtml += '<div class="hero-overlay"></div>';
     slidesHtml += '<div class="hero-content">';
