@@ -3,8 +3,13 @@
     "id": "hiking",
     "title": "徒步探险",
     "titleEn": "Hiking Adventure",
-    "desc": "穿越金鞭溪，探索原始森林，感受大自然的鬼斧神工。张家界的徒步路线被誉为'仙境之路'，沿途奇峰异石、溪流飞瀑，是户外爱好者的天堂。",
-    "descEn": "Trek through Jinbian Stream and explore primeval forests",
+    "subtitle": "穿越峰林之间，感受大自然的震撼力量",
+    "subtitleEn": "Trek through towering quartz-sandstone pillars",
+    "badge": "Most Popular",
+    "desc": "张家界国家森林公园拥有中国最壮观的徒步路线，串联金鞭溪、袁家界、天子山等核心景区。",
+    "descEn": "Trek through towering quartz-sandstone pillars and pristine mountain trails in China's most spectacular hiking destination.",
+    "fullDesc": "<p>张家界国家森林公园的徒步路线被誉为「世界上最美的山地徒步线路之一」。公园内拥有超过100公里精心维护的徒步道，串联起金鞭溪、袁家界、天子山、黄石寨等核心景区。</p><p>金鞭溪全长7.5公里，溪水潺潺，两岸奇峰耸立，是最适合家庭亲子的休闲步道。袁家界至天子山的漫步线则需要4-5小时，途经天下第一桥、迷魂台等经典景点，体力要求较高但风景绝美。</p><p>建议穿着防滑登山鞋，携带至少1.5L饮用水。雨季（4-6月）步道湿滑，需格外小心。秋季（9-11月）天高气爽，是徒步的最佳季节。</p>",
+    "fullDescEn": "<p>Zhangjiajie National Forest Park boasts over 100km of well-maintained hiking trails, connecting core scenic areas including Golden Whip Stream, Yuanjiajie, Tianzi Mountain, and Yellow Stone Village. It is widely regarded as one of the most spectacular mountain hiking destinations in the world.</p><p>Golden Whip Stream stretches 7.5km along a crystal-clear mountain stream, flanked by towering quartz-sandstone pillars. This gentle trail is perfect for families and casual hikers. The more challenging Yuanjiajie-to-Tianzi Mountain route takes 4-5 hours, passing iconic spots like the First Bridge Under Heaven and Mihun Terrace.</p><p>We recommend wearing anti-slip hiking shoes and carrying at least 1.5L of drinking water. Trails can be slippery during the rainy season (April–June). Autumn (September–November) offers the best hiking conditions with clear skies and comfortable temperatures.</p>",
     "img": "assets/images/exp-hiking.jpg",
     "images": [
       "assets/images/exp-hiking.jpg",
@@ -12,70 +17,107 @@
       "assets/images/exp-hiking-3.jpg"
     ],
     "info": [
-      {
-        "icon": "⏱️",
-        "label": "建议时长",
-        "value": "4-6小时"
-      },
-      {
-        "icon": "📊",
-        "label": "难度",
-        "value": "中等"
-      },
-      {
-        "icon": "🌦️",
-        "label": "最佳季节",
-        "value": "春秋两季"
-      },
-      {
-        "icon": "👟",
-        "label": "装备建议",
-        "value": "防滑鞋、饮用水、雨具"
-      }
+      {"icon": "🥾", "label": "难度", "value": "中等"},
+      {"icon": "⏱️", "label": "时长", "value": "4-6 小时"},
+      {"icon": "📍", "label": "起点", "value": "森林公园门票站"},
+      {"icon": "🏷️", "label": "标签", "value": "徒步 / 登山"}
     ],
     "infoEn": [
-      {
-        "icon": "⏱️",
-        "label": "Duration",
-        "value": "4-6 hours"
-      },
-      {
-        "icon": "📊",
-        "label": "Difficulty",
-        "value": "Moderate"
-      },
-      {
-        "icon": "🌦️",
-        "label": "Best Season",
-        "value": "Spring & Autumn"
-      },
-      {
-        "icon": "👟",
-        "label": "Gear",
-        "value": "Non-slip shoes, water, rain gear"
-      }
+      {"icon": "🥾", "label": "Difficulty", "value": "Moderate"},
+      {"icon": "⏱️", "label": "Duration", "value": "4-6 hours"},
+      {"icon": "📍", "label": "Start", "value": "Forest Park Gate"},
+      {"icon": "🏷️", "label": "Tags", "value": "Hiking / Mountain"}
+    ],
+    "highlights": [
+      "金鞭溪7.5公里溪谷步道，适合全家出游",
+      "袁家界至天子山线路，途经天下第一桥等标志性景点",
+      "黄石寨环线可360°俯瞰峰林全景",
+      "秋季（9-11月）天高气爽，徒步体验最佳"
+    ],
+    "highlightsEn": [
+      "7.5km Golden Whip Stream trail — perfect for families",
+      "Yuanjiajie to Tianzi Mountain route passes the iconic First Bridge Under Heaven",
+      "Yellow Stone Village loop offers 360° panoramic pillar views",
+      "Best season: September–November for clear skies and cool temperatures"
     ],
     "tips": [
-      "建议穿着防滑徒步鞋",
-      "携带足够饮用水（至少2L）",
-      "雨天路滑，注意安全",
-      "保护生态环境，不乱扔垃圾",
-      "建议请当地向导，避免迷路"
+      "穿着防滑登山鞋，携带足够饮用水（至少1.5L）",
+      "金鞭溪路段平坦，袁家界-天子山路段爬升较大",
+      "雨季步道湿滑，建议携带登山杖",
+      "景区内有多个补给点，可补充水和简餐"
     ],
     "tipsEn": [
-      "Wear non-slip hiking shoes",
-      "Bring enough drinking water (at least 2L)",
-      "Trails can be slippery in rain, stay safe",
-      "Protect the ecosystem, no littering",
-      "Hiring a local guide is recommended"
+      "Wear anti-slip hiking shoes; carry at least 1.5L water",
+      "Golden Whip Stream is flat; Yuanjiajie–Tianzi has significant elevation gain",
+      "Trails are slippery in rainy season (Apr–Jun); trekking poles recommended",
+      "Multiple supply stations along the route for water and light meals"
     ]
   },
   {
-    "id": "photography",
+    "id": "stargazing",
+    "title": "星空露营",
+    "titleEn": "Stargazing Camping",
+    "subtitle": "在海拔1200米的山顶，枕星空入眠",
+    "subtitleEn": "Sleep under the Milky Way at 1,200m",
+    "badge": "Top Pick",
+    "desc": "在张家界海拔1200米的山顶露营，远离城市光污染，仰望最纯净的银河星空。",
+    "descEn": "Camp at 1,200m above sea level, far from city lights, and witness the purest Milky Way visible in China.",
+    "fullDesc": "<p>张家界国家森林公园内有多处海拔超过1000米的观星点，其中鹞子寨和天子山山顶是公认的绝佳星空观测地。由于地处偏远山区，光污染等级达到 Bortle 2-3 级，是中国南方最暗的天空之一。</p><p>露营区提供帐篷租赁服务（限50顶，需提前预约），也可自带装备。夜间温度较日间低10-15°C，即使在夏季也需携带保暖睡袋。建议使用专业天文望远镜（可现场租赁），裸眼可见银河核心、木星四大卫星及土星环。</p><p>每年4-10月为最佳观星季，其中7-9月银河最为壮丽。新月期间的暗夜条件最佳，建议出行前查阅月相日历。</p>",
+    "fullDescEn": "<p>Zhangjiajie National Forest Park has several stargazing spots above 1,000m, with Yaozi Village and Tianzi Mountain summit being the most renowned. Thanks to its remote location, the light pollution level reaches Bortle Class 2–3, making it one of the darkest skies in southern China.</p><p>Tent rentals are available on-site (limited to 50 tents; advance reservation required). You may also bring your own gear. Night temperatures drop 10–15°C below daytime highs — even in summer, a warm sleeping bag is essential. Professional astronomical telescopes are available for rent. With the naked eye, you can see the Milky Way core, Jupiter's four Galilean moons, and Saturn's rings.</p><p>April–October is the best stargazing season, with July–September offering the most spectacular Milky Way views. New moon periods provide the darkest skies — check a lunar calendar before planning your trip.</p>",
+    "img": "assets/images/exp-stargazing.jpg",
+    "images": [
+      "assets/images/exp-stargazing.jpg",
+      "assets/images/exp-stargazing-2.jpg",
+      "assets/images/exp-stargazing-3.jpg"
+    ],
+    "info": [
+      {"icon": "🌌", "label": "海拔", "value": "1200m"},
+      {"icon": "🌡️", "label": "夜温", "value": "10-15°C"},
+      {"icon": "🔭", "label": "设备", "value": "望远镜租赁"},
+      {"icon": "🏷️", "label": "标签", "value": "露营 / 观星"}
+    ],
+    "infoEn": [
+      {"icon": "🌌", "label": "Elevation", "value": "1,200m"},
+      {"icon": "🌡️", "label": "Night Temp", "value": "10-15°C"},
+      {"icon": "🔭", "label": "Gear", "value": "Telescope Rental"},
+      {"icon": "🏷️", "label": "Tags", "value": "Camping / Stargazing"}
+    ],
+    "highlights": [
+      "Bortle 2-3级暗夜天空，中国南方最佳观星地之一",
+      "专业天文望远镜现场租赁，可观测木星卫星和土星环",
+      "夏季银河核心清晰可见，摄影爱好者天堂",
+      "限流管理（每日上限50顶帐篷），保证观星体验"
+    ],
+    "highlightsEn": [
+      "Bortle Class 2–3 dark sky — one of southern China's best stargazing spots",
+      "Professional telescope rentals available; observe Jupiter's moons and Saturn's rings",
+      "Summer Milky Way core clearly visible — a paradise for astrophotographers",
+      "Daily cap of 50 tents to preserve the stargazing experience"
+    ],
+    "tips": [
+      "即使夏季也需保暖睡袋，夜间温度骤降10-15°C",
+      "提前预约帐篷（限50顶/日），新月期最佳",
+      "7-9月银河最壮观，建议查阅月相日历选择出行日期",
+      "携带红光手电筒（白光会影响他人观星）"
+    ],
+    "tipsEn": [
+      "Bring a warm sleeping bag even in summer — night temps drop 10–15°C",
+      "Reserve tents in advance (cap: 50/night); new moon periods are best",
+      "July–September offers the most spectacular Milky Way; check lunar calendar",
+      "Use a red-light headlamp (white light disrupts others' night vision)"
+    ]
+  },
+  {
+    "id": "photo",
     "title": "摄影之旅",
-    "titleEn": "Photography Tour",
-    "desc": "用镜头捕捉大自然的杰作。张家界的峰林、云海、日出、星空都是摄影爱好者的绝佳素材。无论您是专业摄影师还是业余爱好者，这里都能拍出大片。",
-    "descEn": "Capture nature's masterpieces through your lens",
+    "titleEn": "Photography Expedition",
+    "subtitle": "捕捉云雾缭绕的仙境瞬间，创作大片级作品",
+    "subtitleEn": "Capture misty pillar landscapes like a pro",
+    "badge": "Pro Recommended",
+    "desc": "张家界是风光摄影师的圣地，云雾、日出、冬雪交织出一幅幅仙境画卷。",
+    "descEn": "A paradise for landscape photographers, where sea-of-clouds, golden sunrises, and winter snow create otherworldly masterpieces.",
+    "fullDesc": "<p>张家界国家森林公园是全世界风光摄影师最向往的目的地之一。独特的石英砂岩峰林地貌，配合变幻莫测的云海雾气，为摄影师提供了无穷的创作灵感。日出时分的晨雾、雨后的云海、冬日的雾凇，每个季节都有不同的视觉盛宴。</p><p>最佳拍摄点包括：黄石寨六奇阁（全景俯拍）、金鞭溪紫草潭（溪谷倒影）、袁家界天下第一桥（标志性机位）、天子山贺龙公园（日出首选）。建议携带广角镜头（14-24mm）拍摄大场景，长焦镜头（70-200mm）捕捉远山层次。</p><p>每年4-5月春雾和9-11月秋色是最佳拍摄季节。雨后初晴的清晨，云海出现概率最高。冬季（12-2月）雾凇挂满枝头，是区别于其他季节的独特题材。</p>",
+    "fullDescEn": "<p>Zhangjiajie National Forest Park is one of the world's most coveted destinations for landscape photographers. Its unique quartz-sandstone pillar formations, combined with ever-changing sea-of-clouds and mist, offer endless creative inspiration. Morning fog at sunrise, post-rain cloud seas, and winter rime ice create distinct visual feasts in every season.</p><p>Top shooting locations include: Liuqi Pavilion at Yellow Stone Village (panoramic overhead shots), Zicao Pool at Golden Whip Stream (stream reflections), First Bridge Under Heaven at Yuanjiajie (iconic composition), and Helong Park at Tianzi Mountain (sunrise prime spot). We recommend a wide-angle lens (14–24mm) for grand landscapes and a telephoto (70–200mm) to capture layered mountain depth.</p><p>April–May (spring mist) and September–November (autumn colors) are the best seasons. Early morning after a rainy day offers the highest chance of a cloud sea. Winter (December–February) brings rime-covered branches — a unique subject unlike any other season.</p>",
     "img": "assets/images/exp-photo.jpg",
     "images": [
       "assets/images/exp-photo.jpg",
@@ -83,204 +125,94 @@
       "assets/images/exp-photo-3.jpg"
     ],
     "info": [
-      {
-        "icon": "📷",
-        "label": "最佳机位",
-        "value": "袁家界、天子山"
-      },
-      {
-        "icon": "🌅",
-        "label": "最佳时间",
-        "value": "日出日落"
-      },
-      {
-        "icon": "🎒",
-        "label": "建议器材",
-        "value": "广角、三脚架"
-      },
-      {
-        "icon": "☁️",
-        "label": "天气选择",
-        "value": "雨后晴天最适合"
-      }
+      {"icon": "📷", "label": "最佳季节", "value": "春秋 / 冬季"},
+      {"icon": "🌅", "label": "黄金时段", "value": "日出 / 雨后"},
+      {"icon": "🎒", "label": "建议器材", "value": "广角+长焦"},
+      {"icon": "🏷️", "label": "标签", "value": "摄影 / 创作"}
     ],
     "infoEn": [
-      {
-        "icon": "📷",
-        "label": "Best Spots",
-        "value": "Yuanjiajie, Tianzi Mountain"
-      },
-      {
-        "icon": "🌅",
-        "label": "Best Time",
-        "value": "Sunrise & Sunset"
-      },
-      {
-        "icon": "🎒",
-        "label": "Gear",
-        "value": "Wide-angle, Tripod"
-      },
-      {
-        "icon": "☁️",
-        "label": "Weather",
-        "value": "After rain, clear sky"
-      }
+      {"icon": "📷", "label": "Best Season", "value": "Spring/Autumn/Winter"},
+      {"icon": "🌅", "label": "Golden Hours", "value": "Sunrise / Post-Rain"},
+      {"icon": "🎒", "label": "Gear", "value": "Wide + Tele"},
+      {"icon": "🏷️", "label": "Tags", "value": "Photography / Art"}
+    ],
+    "highlights": [
+      "黄石寨六奇阁全景机位，可俯拍峰林云海",
+      "袁家界天下第一桥为张家界标志性拍摄点",
+      "雨后初晴清晨云海出现概率最高",
+      "冬季雾凇题材独特，区别于常规山水摄影"
+    ],
+    "highlightsEn": [
+      "Liuqi Pavilion (Yellow Stone Village) — panoramic pillar-and-cloud-sea overhead shots",
+      "First Bridge Under Heaven (Yuanjiajie) — the iconic Zhangjiajie composition",
+      "Highest cloud-sea probability: early morning after rainfall",
+      "Winter rime ice offers a unique subject distinct from standard landscape photography"
     ],
     "tips": [
-      "日出前1小时到达拍摄点",
-      "携带三脚架和滤镜",
-      "雨后云海出现概率高",
-      "冬季雪景别有风味",
-      "注意保护相机设备"
+      "携带广角（14-24mm）和长焦（70-200mm）两支镜头",
+      "三脚架必备，日出拍摄需提前1小时到达机位",
+      "雨后初晴是拍摄云海的黄金时机",
+      "冬季镜面易起雾，备好防雾布和备用电池"
     ],
     "tipsEn": [
-      "Arrive 1 hour before sunrise",
-      "Bring tripod and filters",
-      "High chance of sea of clouds after rain",
-      "Snow scenery in winter is unique",
-      "Protect your camera equipment"
+      "Bring both wide-angle (14–24mm) and telephoto (70–200mm) lenses",
+      "Tripod is essential; arrive at sunrise spot 1 hour before dawn",
+      "Post-rain clear morning = highest cloud-sea probability",
+      "Winter lens fogging is common; bring anti-fog cloth and spare batteries"
     ]
   },
   {
     "id": "eco",
+    "title": "生态文化游",
+    "titleEn": "Eco-Cultural Tour",
+    "subtitle": "走进土家族村寨，感受自然与人文的交融",
+    "subtitleEn": "Explore Tujia villages and pristine forest ecology",
+    "badge": "New",
+    "desc": "深入了解张家界的生态保育工作和土家族传统文化，体验人与自然和谐共处的智慧。",
+    "descEn": "Discover Zhangjiajie's ecological conservation efforts and Tujia cultural heritage, experiencing the wisdom of human-nature harmony.",
+    "fullDesc": "<p>张家界国家森林公园不仅拥有世界自然遗产的绝美风光，还是土家族、白族等少数民族的世代聚居地。生态文化游将自然探索与人文体验完美结合，让游客在欣赏奇山异水的同时，深入了解当地的生态保护理念和民族文化。</p><p>行程包括参观森林公园内的生态监测站（了解红外相机监测、植被恢复等科研工作）、走访公园周边的土家族村寨（体验吊脚楼建筑、土家织锦、打糍粑等传统手工艺）、以及参加由公园生态专家带领的科普导览（识别珍稀植物、了解石英砂岩地貌形成原理）。</p><p>此线路适合家庭亲子及文化爱好者，全程有专业生态导游讲解。建议预留至少半天时间，穿着舒适的步行鞋。村寨探访需尊重当地习俗，导游会提前告知注意事项。</p>",
+    "fullDescEn": "<p>Zhangjiajie National Forest Park is not only a World Natural Heritage site of breathtaking beauty, but also the ancestral home of ethnic minorities including the Tujia and Bai peoples. The Eco-Cultural Tour seamlessly blends nature exploration with cultural immersion, allowing visitors to appreciate both the spectacular landscape and the local ecological conservation philosophy and ethnic heritage.</p><p>The itinerary includes a visit to the park's ecological monitoring station (learning about infrared camera monitoring, vegetation restoration, and other research work), a guided tour of nearby Tujia villages (experiencing stilt-house architecture, Tujia brocade weaving, and traditional food-making), and a science-guided walk led by the park's ecology experts (identifying rare plants and understanding quartz-sandstone landform formation).</p><p>This tour is ideal for families and culture enthusiasts, with professional eco-guides providing commentary throughout. Allow at least half a day; wear comfortable walking shoes. Village visits require respect for local customs — your guide will brief you on etiquette beforehand.</p>",
     "img": "assets/images/exp-eco.jpg",
-    "title": "生态教育",
-    "titleEn": "Eco Education",
-    "desc": "了解地质奇观和生态系统。张家界是世界自然遗产，拥有独特的石英砂岩峰林地貌。通过专业讲解，您将深入了解地球的演变历史和生态保护的重要性。",
-    "descEn": "Learn about geological wonders and ecosystems",
     "images": [
       "assets/images/exp-eco.jpg",
       "assets/images/exp-eco-2.jpg",
       "assets/images/exp-eco-3.jpg"
     ],
-    "infoEn": [
-      {
-        "icon": "🎓",
-        "label": "Age",
-        "value": "8+ years"
-      },
-      {
-        "icon": "⏰",
-        "label": "Duration",
-        "value": "2-3 hours"
-      },
-      {
-        "icon": "👨‍🏫",
-        "label": "Language",
-        "value": "Chinese/English"
-      },
-      {
-        "icon": "📜",
-        "label": "Certificate",
-        "value": "Issued upon completion"
-      }
-    ],
-    "tipsEn": [
-      "Book a professional guide in advance",
-      "Great for families and study groups",
-      "Bring a notebook to take notes",
-      "Some areas require walking, watch your stamina",
-      "Can be combined with conservation activities"
-    ],
     "info": [
-      {
-        "icon": "🎓",
-        "label": "适合年龄",
-        "value": "8岁以上"
-      },
-      {
-        "icon": "⏰",
-        "label": "课程时长",
-        "value": "2-3小时"
-      },
-      {
-        "icon": "👨‍🏫",
-        "label": "讲解语言",
-        "value": "中文/英文"
-      },
-      {
-        "icon": "📜",
-        "label": "证书",
-        "value": "颁发研学证书"
-      }
-    ],
-    "tips": [
-      "提前预约专业讲解员",
-      "适合亲子家庭和研学团队",
-      "建议携带笔记本记录",
-      "部分区域需步行，注意体力",
-      "可结合环保志愿活动"
-    ]
-  },
-  {
-    "id": "stargazing",
-    "img": "assets/images/exp-stargazing.jpg",
-    "title": "观云海星空",
-    "titleEn": "Sea of Clouds & Stargazing",
-    "desc": "见证日出、云海和星空。张家界的云海被誉为'仙境'，冬季和早春是最佳观赏季节。当云海翻涌、日出金光穿透云层，您将感受到大自然的震撼之美。",
-    "descEn": "Witness sunrise, sea of clouds, and starry skies",
-    "images": [
-      "assets/images/exp-stargazing.jpg",
-      "assets/images/exp-stargazing-2.jpg",
-      "assets/images/exp-stargazing-3.jpg"
+      {"icon": "🏡", "label": "文化", "value": "土家族村寨"},
+      {"icon": "🌿", "label": "生态", "value": "监测站参观"},
+      {"icon": "👨‍👩‍👧", "label": "适合", "value": "亲子 / 文化爱好者"},
+      {"icon": "🏷️", "label": "标签", "value": "生态 / 文化"}
     ],
     "infoEn": [
-      {
-        "icon": "🌄",
-        "label": "Best Spots",
-        "value": "Tianzi Mountain, Yuanjiajie"
-      },
-      {
-        "icon": "🌤️",
-        "label": "Best Season",
-        "value": "Winter, Early Spring"
-      },
-      {
-        "icon": "🌌",
-        "label": "Stargazing",
-        "value": "Away from light pollution"
-      },
-      {
-        "icon": "🏨",
-        "label": "Accommodation",
-        "value": "Mountain hotels recommended"
-      }
+      {"icon": "🏡", "label": "Culture", "value": "Tujia Villages"},
+      {"icon": "🌿", "label": "Ecology", "value": "Monitoring Station"},
+      {"icon": "👨‍👩‍👧", "label": "Best For", "value": "Families / Culture Lovers"},
+      {"icon": "🏷️", "label": "Tags", "value": "Eco / Culture"}
     ],
-    "tipsEn": [
-      "Highest chance of sea of clouds in winter",
-      "Sunrise around 6:30-7:00 (winter)",
-      "Bring warm clothes (mountain temps are low)",
-      "Choose a clear moonless night for stargazing",
-      "Stay on the mountain for multiple viewing opportunities."
+    "highlights": [
+      "参观生态监测站，了解红外相机和植被恢复科研工作",
+      "走访土家族村寨，体验吊脚楼、织锦、打糍粑",
+      "专业生态导游带队，识别珍稀植物和地貌知识",
+      "适合亲子家庭，寓教于乐的自然科普体验"
     ],
-    "info": [
-      {
-        "icon": "🌄",
-        "label": "最佳观赏点",
-        "value": "天子山、袁家界"
-      },
-      {
-        "icon": "🌤️",
-        "label": "最佳季节",
-        "value": "冬季、早春"
-      },
-      {
-        "icon": "🌌",
-        "label": "星空观测",
-        "value": "远离光污染区域"
-      },
-      {
-        "icon": "🏨",
-        "label": "住宿建议",
-        "value": "山上酒店方便观景"
-      }
+    "highlightsEn": [
+      "Visit the ecological monitoring station — learn about infrared cameras and vegetation restoration",
+      "Tour Tujia villages — experience stilt-house architecture, brocade weaving, and traditional food-making",
+      "Led by professional eco-guides — identify rare plants and learn about landform geology",
+      "Perfect for families — fun and educational nature experience for all ages"
     ],
     "tips": [
-      "冬季云海出现概率最高",
-      "日出时间约6:30-7:00（冬季）",
-      "携带保暖衣物（山上温度低）",
-      "星空观测需选择晴朗无月夜",
-      "建议住山上，方便多次观景"
+      "全程约4-5小时，建议穿着舒适步行鞋",
+      "村寨探访请尊重当地习俗，导游会提前说明",
+      "可购买土家织锦等手工艺品，支持当地社区",
+      "生态监测站部分区域限制拍照，请听从导游指引"
+    ],
+    "tipsEn": [
+      "Tour lasts 4–5 hours; wear comfortable walking shoes",
+      "Please respect local customs in Tujia villages; your guide will brief you",
+      "Tujia brocade and handicrafts are available for purchase — supports the local community",
+      "Photography is restricted in some areas of the monitoring station; follow your guide's instructions"
     ]
   }
 ]
