@@ -1849,7 +1849,7 @@
         var full = wp(item.img);
         html += '<a href="exp-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
         html += '<div class="exp-img"><img src="' + escapeHtml(thumb) + '" ' +
-                'srcset="' + escapeHtml(thumb) + ' 400w, ' + escapeHtml(mid) + ' 1200w, ' + escapeHtml(full) + ' 2400w" ' +
+                'srcset="' + encodeURI(escapeHtml(thumb)) + ' 400w, ' + encodeURI(escapeHtml(mid)) + ' 1200w, ' + encodeURI(escapeHtml(full)) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
                 'loading="lazy" decoding="async" width="400" height="267"></div>';
@@ -2001,7 +2001,7 @@
         var mdSrc = wp(item.img.replace('assets/images/', 'assets/images/md/'));
         html += '<div class="gallery-item" onclick="openLightbox(' + index + ')">';
         html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
-                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(wp(item.img)) + ' 2400w" ' +
+                'srcset="' + encodeURI(escapeHtml(thumbSrc)) + ' 400w, ' + encodeURI(escapeHtml(mdSrc)) + ' 1200w, ' + encodeURI(escapeHtml(wp(item.img))) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
                 'loading="lazy" decoding="async" width="400" height="267">';
