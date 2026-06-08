@@ -1847,7 +1847,7 @@
         var thumb = wp(item.img.replace('assets/images/', 'assets/images/thumb/'));
         var mid = wp(item.img.replace('assets/images/', 'assets/images/md/'));
         var full = wp(item.img);
-        html += '<a href="exp-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
+        html += '<a href="experience-detail.html?id=' + escapeHtml(item.id) + '" class="exp-card">';
         html += '<div class="exp-img"><img src="' + escapeHtml(thumb) + '" ' +
                 'srcset="' + encodeURI(escapeHtml(thumb)) + ' 400w, ' + encodeURI(escapeHtml(mid)) + ' 1200w, ' + encodeURI(escapeHtml(full)) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" ' +
