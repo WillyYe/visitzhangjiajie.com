@@ -343,7 +343,7 @@
     var newsData = [];
 
     function loadNewsData() {
-      return fetch('data/news.json?t=' + Date.now())
+      return fetch('data/news.json?v=20260608')
         .then(function(r) { return r.json(); })
         .then(function(d) { newsData = d; });
     }
@@ -378,7 +378,7 @@
         document.title = 'News | Zhangjiajie National Forest Park';
         return;
       }
-      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + wp(news.img) + '?v=2\')';
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + wp(news.img) + '\')';
       document.getElementById('heroBadge').textContent = news.tag.toUpperCase();
       document.getElementById('heroTitle').textContent = news.titleEn;
 
@@ -392,7 +392,7 @@
       document.getElementById('newsDateText').textContent = dateStr;
 
       var imgEl = document.getElementById('newsFeaturedImg');
-      imgEl.src = wp(news.img) + '?v=2';
+      imgEl.src = wp(news.img);
       imgEl.alt = news.titleEn;
 
       document.getElementById('newsBody').innerHTML = news.contentEn || news.descEn;
@@ -411,7 +411,7 @@
         if (i === currentIndex) continue;
         var item = newsData[i];
         html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
-        html += '<div class="related-img" style="background-image: url(\'' + wp(item.img) + '?v=2\')"></div>';
+        html += '<div class="related-img" style="background-image: url(\'' + wp(item.img) + '\')"></div>';
         html += '<div class="related-body">';
         html += '<h4 class="related-card-title">' + item.titleEn + '</h4>';
         html += '<p class="related-card-date">' + item.date.day + ' ' + item.date.month + ' ' + item.date.year + '</p>';
