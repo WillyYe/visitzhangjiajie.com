@@ -1707,8 +1707,10 @@
           var item = newsData[j];
           html += '<a href="news-detail.html?id=' + j + '" class="news-carousel-card">';
           var newsImgSrc = (function(w){
-            if(w < 768) return wp(item.img.replace('assets/images/','assets/images/thumb/'));
-            return wp(item.img.replace('assets/images/','assets/images/md/'));
+            // Note: news cards use CSS background-image; wp() error fallback only works with <img> tags,
+            // so we skip wp() to avoid 404 when .webp versions don't exist
+            if(w < 768) return item.img.replace('assets/images/','assets/images/thumb/');
+            return item.img.replace('assets/images/','assets/images/md/');
           })(window.innerWidth);
           html += '<div class="news-carousel-img" style="background-image: url(\'' + escapeHtml(newsImgSrc) + '\')">';
           html += '<div class="news-date">';
