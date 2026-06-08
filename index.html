@@ -9,12 +9,10 @@
   <link rel="apple-touch-icon" href="favicon.svg">
   <meta name="description" content="Official website of Zhangjiajie National Forest Park — UNESCO World Natural Heritage, filming location of Avatar, China's first national forest park." />
   <meta name="theme-color" content="#1a4a30" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Cache-Control" content="max-age=3600" />
   <!-- Preload critical data for faster initial render -->
   <link rel="preload" as="fetch" href="data/experience.json" crossorigin="anonymous" />
   <link rel="preload" as="fetch" href="data/scenic.json" crossorigin="anonymous" />
-  <meta http-equiv="Expires" content="0" />
 
   <!-- DNS Prefetch for faster DNS resolution -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -1431,14 +1429,14 @@
 
     // Load all data from JSON files
     function loadData() {
-      var t = Date.now();
+      var v = '20260608';
       return Promise.all([
-        fetch('data/news.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { newsData = d; }).catch(function(e) { console.error('news.json加载失败:', e); }),
-        fetch('data/scenic.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { scenicData = d; }).catch(function(e) { console.error('scenic.json加载失败:', e); }),
-        fetch('data/experience.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { expData = d; }).catch(function(e) { console.error('experience.json加载失败:', e); }),
-        fetch('data/gallery.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { galleryData = d; }).catch(function(e) { console.error('gallery.json加载失败:', e); }),
-        fetch('data/hero.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { heroData = d; }).catch(function(e) { console.error('hero.json加载失败:', e); }),
-        fetch('data/site-config.json?t=' + t).then(function(r) { return r.json(); }).then(function(d) { siteConfig = d; }).catch(function(e) { console.error('site-config.json加载失败:', e); })
+        fetch('data/news.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { newsData = d; }).catch(function(e) { console.error('news.json加载失败:', e); }),
+        fetch('data/scenic.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { scenicData = d; }).catch(function(e) { console.error('scenic.json加载失败:', e); }),
+        fetch('data/experience.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { expData = d; }).catch(function(e) { console.error('experience.json加载失败:', e); }),
+        fetch('data/gallery.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { galleryData = d; }).catch(function(e) { console.error('gallery.json加载失败:', e); }),
+        fetch('data/hero.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { heroData = d; }).catch(function(e) { console.error('hero.json加载失败:', e); }),
+        fetch('data/site-config.json?v=' + v).then(function(r) { return r.json(); }).then(function(d) { siteConfig = d; }).catch(function(e) { console.error('site-config.json加载失败:', e); })
       ]);
     }
 
