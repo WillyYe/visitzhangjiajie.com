@@ -256,6 +256,29 @@
     .tip-box ul { margin: 12px 0 0; padding-left: 20px; }
     .tip-box li { font-size: 14px; color: var(--text-mid); margin-bottom: 8px; }
 
+    /* ========== HIGHLIGHTS ========== */
+    .highlights-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+    }
+    .highlights-list li {
+      position: relative;
+      padding: 10px 0 10px 28px;
+      font-size: 15px;
+      color: var(--text-mid);
+      border-bottom: 1px solid var(--cream-dark);
+      line-height: 1.6;
+    }
+    .highlights-list li:last-child { border-bottom: none; }
+    .highlights-list li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--green-accent);
+      font-size: 14px;
+    }
+
     /* ========== CTA ========== */
     .cta-section {
       background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
