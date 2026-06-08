@@ -10,7 +10,7 @@
     crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
+    crossorigin="" async></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -498,7 +498,7 @@
   </div>
 
   <script>
-    // ====== Leaflet Map ======
+    function initMap() {
     var map = L.map('map', {
       center: [29.25, 110.47],
       zoom: 11,
@@ -657,6 +657,15 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeDriver();
     });
+    }
+    // Initialize map when Leaflet is loaded
+    if (typeof L !== 'undefined') {
+      initMap();
+    } else {
+      window.addEventListener('load', function() {
+        if (typeof L !== 'undefined') initMap();
+      });
+    }
   </script>
 
   <!-- Baidu Analytics -->
