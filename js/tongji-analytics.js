@@ -133,50 +133,55 @@ function tongjiAutoFillSiteId() {
 }
 
 // ==================== API 请求封装 ====================
-// Baidu Tongji RPC 格式：
-//   GET https://openapi.baidu.com/rest/2.0/tongji/{method}?access_token=xxx&param={json}
-//   param 是 JSON 字符串，包含 site_id、start_date、end_date、metrics 等
-function tongjiApiCall(method, params) {
+// Baidu Tongji Open API 格式：
+//   GET https://openapi.baidu.com/rest/2.0/tongji/report/getData?access_token=xxx&site_id=xxx&method=xxx&metrics=xxx...
+//   参数全部作为 URL 查询字符串，无 JSON 包裹
+function tongjiApiCall(apiMethod, params) {
   return new Promise(function(resolve, reject) {
     if (!TONGJI.accessToken) {
       reject(new Error('Access Token 未配置，请先在设置中完成授权'));
       return;
     }
 
-    // 构造 param JSON - getSiteList 不需要 site_id
-    var param = {};
-    for (var k in params) { param[k] = params[k]; }
-    if (TONGJI.siteId) { param.site_id = TONGJI.siteId; }
+    // 构造查询字符串 — 所有参数平铺为 URL query params
+    var qs = 'access_token=' + encodeURIComponent(TONGJI.accessToken);
 
-    var url = 'https://openapi.baidu.com/rest/2.0/tongji/' + method.trim() +
-      '?access_token=' + encodeURIComponent(TONGJI.accessToken) +
-      '&param=' + encodeURIComponent(JSON.stringify(param));
-
-    // 优先 JSONP 绕过 CORS
-    var useJSONP = true;
-
-    if (useJSONP) {
-      var cbName = '_bd_cb_' + Math.random().toString(36).slice(2, 10);
-      window[cbName] = function(resp) {
-        // Baidu 返回格式：{ header: { status: 0 }, body: {...} }
-        var body = resp && resp.body ? resp.body : resp;
-        resolve(body);
-        delete window[cbName];
-      };
-      var s = document.createElement('script');
-      s.src = url + '&callback=' + encodeURIComponent(cbName);
-      s.onerror = function() { reject(new Error('JSONP 请求失败')); delete window[cbName]; };
-      document.head.appendChild(s);
-      // 15 秒超时
-      setTimeout(function() {
-        if (window[cbName]) { reject(new Error('请求超时')); delete window[cbName]; }
-      }, 15000);
-    } else {
-      fetch(url, { mode: 'cors' }).then(function(r) { return r.json(); }).then(function(d) {
-        var body = d && d.body ? d.body : d;
-        resolve(body);
-      }).catch(reject);
+    // 合并 site_id（如果未显式传入）
+    if (TONGJI.siteId && !params.site_id) {
+      qs += '&site_id=' + TONGJI.siteId;
     }
+
+    for (var k in params) {
+      qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+    }
+
+    var url = 'https://openapi.baidu.com/rest/2.0/tongji/' + apiMethod.trim() + '?' + qs;
+
+    // JSONP 绕过 CORS
+    var cbName = '_bd_cb_' + Math.random().toString(36).slice(2, 10);
+    window[cbName] = function(resp) {
+      delete window[cbName];
+      // 检查 header.status
+      if (resp && resp.header && resp.header.status !== 0 && resp.header.status !== undefined && resp.header.desc) {
+        reject(new Error(resp.header.desc || '接口返回错误'));
+        return;
+      }
+      var body = resp && typeof resp.body !== 'undefined' ? resp.body : resp;
+      resolve(body);
+    };
+
+    var s = document.createElement('script');
+    s.src = url + '&callback=' + encodeURIComponent(cbName);
+    s.onerror = function() { delete window[cbName]; reject(new Error('JSONP 请求失败')); };
+    document.head.appendChild(s);
+
+    // 15 秒超时
+    setTimeout(function() {
+      if (window[cbName]) {
+        delete window[cbName];
+        reject(new Error('API 请求超时（15秒）'));
+      }
+    }, 15000);
   });
 }
 
@@ -249,13 +254,13 @@ function loadAnalytics() {
   var rangeEl = document.getElementById('summaryRange');
   if (rangeEl) rangeEl.textContent = '（' + startDate + ' ~ ' + endDate + '）';
 
-  // 并行请求
+  // 并行请求 — 全部使用 report/getData 端点，method 参数指定具体报告
   Promise.all([
-    tongjiApiCall('report/getTimeTrendRpt', { start_date: startDate, end_date: endDate, metrics: 'pv_count,visitor_count,avg_visit_time' }),
-    tongjiApiCall('report/getSourceEngine', { start_date: startDate, end_date: endDate, metrics: 'pv_count' }),
-    tongjiApiCall('report/getVisitPage', { start_date: startDate, end_date: endDate, metrics: 'pv_count,visitor_count', max_results: 10 }),
-    tongjiApiCall('report/getKeyWord', { start_date: startDate, end_date: endDate, metrics: 'pv_count', max_results: 10 }),
-    tongjiApiCall('report/getRealTimeVisitor', {}),
+    tongjiApiCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'visit/toppage/a', metrics: 'pv_count,visitor_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'visit/word/a', metrics: 'pv_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'trend/latest/a', metrics: 'visitor_count' }),
   ]).then(function(results) {
     renderSummary(results[0]);
     renderTrendChart(results[0], startDate, endDate);
