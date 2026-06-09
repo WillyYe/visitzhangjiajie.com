@@ -132,8 +132,10 @@ function tongjiApiCall(method, params) {
       return;
     }
 
-    // 构造 param JSON
-    var param = Object.assign({ site_id: TONGJI.siteId }, params);
+    // 构造 param JSON - getSiteList 不需要 site_id
+    var param = {};
+    for (var k in params) { param[k] = params[k]; }
+    if (TONGJI.siteId) { param.site_id = TONGJI.siteId; }
 
     var url = 'https://openapi.baidu.com/rest/2.0/tongji/' + method.trim() +
       '?access_token=' + encodeURIComponent(TONGJI.accessToken) +
