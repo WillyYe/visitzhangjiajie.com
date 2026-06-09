@@ -9,6 +9,7 @@ var TONGJI = {
   siteId: localStorage.getItem('tongji_site_id') || '',
   refreshToken: localStorage.getItem('tongji_refresh_token') || '',
   tokenExpire: parseInt(localStorage.getItem('tongji_token_expire') || '0'),
+  proxyUrl: localStorage.getItem('tongji_proxy_url') || 'https://bd-oauth-proxy.mydeng1995.workers.dev/baidu-oauth',
 };
 
 // ==================== 配置保存 / 加载 ====================
@@ -97,14 +98,19 @@ function tongjiDoExchange() {
 
   showToast('正在换取 Access Token...', '');
 
-  var url = 'https://openapi.baidu.com/oauth/2.0/token' +
-    '?grant_type=authorization_code' +
-    '&code=' + encodeURIComponent(code) +
-    '&client_id=' + encodeURIComponent(apiKey) +
-    '&client_secret=' + encodeURIComponent(secretKey) +
-    '&redirect_uri=oob';
-
-  fetch(url).then(function(r) { return r.json(); }).then(function(d) {
+  // 使用 Cloudflare Worker 代理绕过 CORS
+  var proxyUrl = TONGJI.proxyUrl;
+  fetch(proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      grant_type: 'authorization_code',
+      code: code,
+      client_id: apiKey,
+      client_secret: secretKey,
+      redirect_uri: 'oob'
+    })
+  }).then(function(r) { return r.json(); }).then(function(d) {
     if (d.access_token) {
       TONGJI.accessToken = d.access_token;
       TONGJI.refreshToken = d.refresh_token || '';
@@ -125,7 +131,7 @@ function tongjiDoExchange() {
       showToast('❌ 换取失败：' + (d.error_description || d.error || '未知错误'), 'error');
     }
   }).catch(function(err) {
-    showToast('❌ 网络错误：' + err.message, 'error');
+    showToast('❌ 网络错误：' + err.message + '（请检查 Cloudflare Worker 代理是否已部署）', 'error');
   });
 }
 
