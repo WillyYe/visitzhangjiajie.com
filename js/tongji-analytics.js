@@ -72,26 +72,37 @@ function renderTongjiStatus() {
 }
 
 // ==================== OAuth 授权流程 ====================
-// 使用 Implicit Grant 模式：response_type=token，浏览器本地完成，无需服务器端交换，无 CORS 问题
+// 使用 Implicit Grant + 回调页：弹窗→授权→回调页→postMessage 自动传回 token
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
+  var redirectUri = 'https://visitzhangjiajie.com/admin/oauth-callback.html';
   var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
-    encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
+    encodeURIComponent(apiKey) + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=basic&display=popup';
   document.getElementById('tongjiGuide').style.display = 'block';
-  window.open(url, 'baiduAuth', 'width=600,height=700');
-  document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
-  showToast('请在弹窗中完成百度登录和授权，然后粘贴 access_token', '');
+  var authWin = window.open(url, 'baiduAuth', 'width=600,height=700');
+  showToast('正在弹出百度授权窗口...', '');
+
+  // 监听回调页面通过 postMessage 传来的 token
+  function onMsg(e) {
+    if (e.data && e.data.type === 'baidu_oauth_token' && e.data.access_token) {
+      window.removeEventListener('message', onMsg);
+      applyToken(e.data.access_token, parseInt(e.data.expires_in) || 2592000);
+    }
+  }
+  window.addEventListener('message', onMsg);
 }
 
-// 应用 Access Token（直接从 OOB 页面粘贴，无需交换）
+// 手动应用 Token（备用：用户从 OOB 页面手动复制）
 function tongjiApplyToken() {
   var token = document.getElementById('tongjiAuthCode').value.trim();
   if (!token) { showToast('请先粘贴 Access Token', 'error'); return; }
+  applyToken(token, 2592000);
+}
 
-  // 保存 token
+// 核心：保存 token
+function applyToken(token, expiresIn) {
   TONGJI.accessToken = token;
-  // 默认 30 天有效期
-  TONGJI.tokenExpire = Date.now() + 2592000 * 1000;
+  TONGJI.tokenExpire = Date.now() + expiresIn * 1000;
   localStorage.setItem('tongji_access_token', TONGJI.accessToken);
   localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
 
@@ -100,7 +111,7 @@ function tongjiApplyToken() {
   renderTongjiStatus();
   showToast('✅ Access Token 已保存！有效期至 ' + new Date(TONGJI.tokenExpire).toLocaleDateString(), 'success');
 
-  // 自动尝试获取站点列表
+  // 自动获取站点 ID
   tongjiAutoFillSiteId();
 }
 
