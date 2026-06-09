@@ -72,67 +72,36 @@ function renderTongjiStatus() {
 }
 
 // ==================== OAuth 授权流程 ====================
+// 使用 Implicit Grant 模式：response_type=token，浏览器本地完成，无需服务器端交换，无 CORS 问题
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=' +
+  var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
   document.getElementById('tongjiGuide').style.display = 'block';
   window.open(url, 'baiduAuth', 'width=600,height=700');
   document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
-  showToast('请在弹窗中完成百度登录和授权，然后粘贴 code', '');
+  showToast('请在弹窗中完成百度登录和授权，然后粘贴 access_token', '');
 }
 
-function tongjiExchangeToken() {
-  document.getElementById('tongjiGuide').style.display = 'block';
-  document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
-  showToast('请先获取授权码（code），再粘贴换取 Token', '');
-}
+// 应用 Access Token（直接从 OOB 页面粘贴，无需交换）
+function tongjiApplyToken() {
+  var token = document.getElementById('tongjiAuthCode').value.trim();
+  if (!token) { showToast('请先粘贴 Access Token', 'error'); return; }
 
-function tongjiDoExchange() {
-  var code = document.getElementById('tongjiAuthCode').value.trim();
-  var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  var secretKey = document.getElementById('tongjiSecretKey').value.trim() || TONGJI.secretKey;
+  // 保存 token
+  TONGJI.accessToken = token;
+  // 默认 30 天有效期
+  TONGJI.tokenExpire = Date.now() + 2592000 * 1000;
+  localStorage.setItem('tongji_access_token', TONGJI.accessToken);
+  localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
 
-  if (!code) { showToast('请先粘贴授权码（code）', 'error'); return; }
-  if (!apiKey || !secretKey) { showToast('请先填写 API Key 和 Secret Key', 'error'); return; }
+  document.getElementById('tongjiAccessToken').value = token;
+  document.getElementById('tongjiAuthCodeWrap').style.display = 'none';
+  renderTongjiStatus();
+  showToast('✅ Access Token 已保存！有效期至 ' + new Date(TONGJI.tokenExpire).toLocaleDateString(), 'success');
 
-  showToast('正在换取 Access Token...', '');
-
-  // 使用 Cloudflare Worker 代理绕过 CORS
-  var proxyUrl = TONGJI.proxyUrl;
-  fetch(proxyUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grant_type: 'authorization_code',
-      code: code,
-      client_id: apiKey,
-      client_secret: secretKey,
-      redirect_uri: 'oob'
-    })
-  }).then(function(r) { return r.json(); }).then(function(d) {
-    if (d.access_token) {
-      TONGJI.accessToken = d.access_token;
-      TONGJI.refreshToken = d.refresh_token || '';
-      // 默认 30 天有效期
-      TONGJI.tokenExpire = Date.now() + (d.expires_in || 2592000) * 1000;
-      localStorage.setItem('tongji_access_token', TONGJI.accessToken);
-      localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
-      if (d.refresh_token) localStorage.setItem('tongji_refresh_token', d.refresh_token);
-
-      document.getElementById('tongjiAccessToken').value = d.access_token;
-      document.getElementById('tongjiAuthCodeWrap').style.display = 'none';
-      renderTongjiStatus();
-      showToast('✅ Access Token 获取成功！有效期至 ' + new Date(TONGJI.tokenExpire).toLocaleDateString(), 'success');
-
-      // 自动尝试获取站点列表
-      tongjiAutoFillSiteId();
-    } else {
-      showToast('❌ 换取失败：' + (d.error_description || d.error || '未知错误'), 'error');
-    }
-  }).catch(function(err) {
-    showToast('❌ 网络错误：' + err.message + '（请检查 Cloudflare Worker 代理是否已部署）', 'error');
-  });
+  // 自动尝试获取站点列表
+  tongjiAutoFillSiteId();
 }
 
 function tongjiAutoFillSiteId() {
