@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>百度授权回调</title>
+<style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fce4ec;color:#333;text-align:center;padding:20px}.box{background:#fff;padding:40px;border-radius:16px;box-shadow:0 8px 40px rgba(233,30,99,.15);max-width:420px}.ok{font-size:48px;margin-bottom:16px}</style>
+</head>
+<body>
+<div class="box">
+<div class="ok">🎉</div>
+<h2 style="margin-bottom:8px">授权成功！</h2>
+<p id="msg">正在返回后台...</p>
+</div>
+<script>
+(function() {
+var hash = location.hash.substring(1);
+var params = {};
+hash.split('&').forEach(function(p) {
+var kv = p.split('=');
+if(kv[0]) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+});
+
+if (params.access_token) {
+// 隐式授权：access_token 直接在 hash 里
+if (window.opener) {
+window.opener.postMessage({ type: 'baidu_oauth_token', access_token: params.access_token, expires_in: params.expires_in || 2592000 }, '*');
+}
+document.getElementById('msg').textContent = 'Access Token 已获取，请回到后台页面。';
+} else {
+// 授权码模式：code 在 query string
+var code = (new URLSearchParams(location.search)).get('code');
+if (code && window.opener) {
+window.opener.postMessage({ type: 'baidu_oauth_code', code: code }, '*');
+document.getElementById('msg').textContent = '授权码已获取，请回到后台页面。';
+} else if (!window.opener){
+document.getElementById('msg').textContent = '请关闭此窗口，回到后台操作。';
+} else {
+document.getElementById('msg').textContent = '❌ 未收到授权信息，请重试。';
+}
+}
+})();
+</script>
+</body>
+</html>
