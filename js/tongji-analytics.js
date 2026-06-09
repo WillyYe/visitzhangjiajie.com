@@ -184,25 +184,48 @@ function tongjiApiCall(method, params) {
 function testTongjiConnection() {
   if (!TONGJI.accessToken) { showToast('请先完成授权获取 Access Token', 'error'); return; }
   showToast('正在测试连接...', '');
+
+  // 如果已有 siteId，直接用概览接口验证
+  if (TONGJI.siteId) {
+    var today = dStr(new Date());
+    tongjiApiCall('report/getData', {
+      site_id: TONGJI.siteId,
+      method: 'overview/getTimeTrendRpt',
+      start_date: today,
+      end_date: today,
+      metrics: 'pv_count'
+    }).then(function() {
+      showToast('✅ 连接成功！站点 ID: ' + TONGJI.siteId, 'success');
+    }).catch(function(err) {
+      showToast('❌ 连接失败：' + err.message, 'error');
+    });
+    return;
+  }
+
+  // 没有 siteId，尝试自动获取
   tongjiApiCall('config/getSiteList', {}).then(function(d) {
-    var list = d.list || d.data || d.sites || (Array.isArray(d) ? d : []);
+    var list = Array.isArray(d) ? d : (d.list || d.data || d.sites || d.items || []);
     if (list.length > 0) {
       var info = list[0];
-      showToast('✅ 连接成功！站点: ' + esc(info.domain || info.site_name || ''), 'success');
-      if (!TONGJI.siteId && (info.site_id || info.id)) {
-        TONGJI.siteId = String(info.site_id || info.id);
+      var sid = info.site_id || info.id || '';
+      if (sid) {
+        TONGJI.siteId = String(sid);
         localStorage.setItem('tongji_site_id', TONGJI.siteId);
         var el = document.getElementById('tongjiSiteId');
         if (el) el.value = TONGJI.siteId;
         renderTongjiStatus();
       }
+      showToast('✅ 连接成功！站点: ' + (info.domain || info.site_name || sid), 'success');
     } else {
-      showToast('⚠️ 连接成功但未获取到站点，请检查站点 ID', '');
+      showToast('⚠️ 连接成功，请手动输入站点 ID', '');
     }
   }).catch(function(err) {
     showToast('❌ 连接失败：' + err.message, 'error');
   });
 }
+
+// 日期格式化辅助
+function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slice(-2) + ('0'+date.getDate()).slice(-2); }
 
 // ==================== 数据分析展示 ====================
 var trendChart = null, sourceChart = null;
