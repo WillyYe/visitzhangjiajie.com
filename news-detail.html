@@ -379,7 +379,13 @@
         document.title = 'News | Zhangjiajie National Forest Park';
         return;
       }
-      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + wp(news.img) + '\')';
+      var heroBgUrl = window._webp ? news.img.replace(/\.(jpe?g|png)$/i,'.webp') : news.img;
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + heroBgUrl + '\')';
+      // Fallback for CSS background-image webp errors
+      var heroBgEl = document.getElementById('heroBg');
+      var heroBgImg = new Image();
+      heroBgImg.onerror = function() { heroBgEl.style.backgroundImage = 'url(\'' + news.img + '\')'; };
+      heroBgImg.src = heroBgUrl;
       document.getElementById('heroBadge').textContent = news.tag.toUpperCase();
       document.getElementById('heroTitle').textContent = news.titleEn;
 
@@ -412,7 +418,8 @@
         if (i === currentIndex) continue;
         var item = newsData[i];
         html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
-        html += '<div class="related-img" style="background-image: url(\'' + wp(item.img) + '\')"></div>';
+        // Use original image for CSS background-image (webp fallback only works with <img> tags)
+        html += '<div class="related-img" style="background-image: url(\'' + item.img + '\')"></div>';
         html += '<div class="related-body">';
         html += '<h4 class="related-card-title">' + item.titleEn + '</h4>';
         html += '<p class="related-card-date">' + item.date.day + ' ' + item.date.month + ' ' + item.date.year + '</p>';
