@@ -384,7 +384,7 @@ function testTongjiConnection() {
 function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slice(-2) + ('0'+date.getDate()).slice(-2); }
 
 // ==================== 数据展示 ====================
-var trendChart = null, sourceChart = null;
+var trendChart = null, sourceChart = null, analyticsRefreshTimer = null;
 function extractItems(body) {
   if (!body) return [];
   // 真实 API 格式: {result:{items:[...]}}
@@ -557,7 +557,15 @@ function renderRealTime(data) {
   var num = (data.result && typeof data.result.onlineNumber === 'number') ? data.result.onlineNumber : 0;
   el.textContent = num;
 }
-function onAnalyticsSectionShow() { loadTongjiConfig(); if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics(); }
+function onAnalyticsSectionShow() {
+  loadTongjiConfig();
+  if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics();
+  // 每60秒自动刷新
+  if (analyticsRefreshTimer) clearInterval(analyticsRefreshTimer);
+  analyticsRefreshTimer = setInterval(function() {
+    if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics();
+  }, 60000);
+}
 </script>
 </head>
 <body>
@@ -862,6 +870,8 @@ document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
     document.getElementById('sec-' + section).classList.add('active');
     document.getElementById('pageTitle').textContent = this.textContent.trim();
     // Re-render section when navigated to
+    // 离开分析页面时停止定时刷新
+    if (section !== 'analytics' && analyticsRefreshTimer) { clearInterval(analyticsRefreshTimer); analyticsRefreshTimer = null; }
     if (section === 'news') renderNews();
     if (section === 'scenic') renderScenic();
     if (section === 'experience') renderExp();
