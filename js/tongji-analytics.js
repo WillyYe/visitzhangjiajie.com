@@ -72,17 +72,18 @@ function renderTongjiStatus() {
 }
 
 // ==================== OAuth 授权流程 ====================
-// 使用 Implicit Grant + redirect_uri=oob 避免 referer_mismatch
-// 弹窗→用户授权→百度在页面上直接显示 access_token → 用户复制粘贴
+// 使用中间跳转页 + no-referrer 消除 HTTP Referer
+// bridge 页含 <meta name="referrer" content="no-referrer"> → 百度的 Referer 检查失效
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  // response_type=token + redirect_uri=oob：百度在页面上显示 token，不跳转，无 referer 检查
-  var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
+  var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
+  // 通过 bridge 页跳转，消除 Referer
+  var bridgeUrl = 'admin/baidu-auth-bridge.html?url=' + encodeURIComponent(oauthUrl);
   document.getElementById('tongjiGuide').style.display = 'block';
   document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
-  var authWin = window.open(url, 'baiduAuth', 'width=600,height=700');
-  showToast('请在弹窗中授权，授权成功后复制页面上显示的 access_token 值粘贴到下方', '');
+  var authWin = window.open(bridgeUrl, 'baiduAuth', 'width=600,height=700');
+  showToast('正在跳转授权页面…授权成功后复制页面上显示的 access_token 值粘贴到下方', '');
 }
 
 // 手动应用 Token（备用：用户从 OOB 页面手动复制）
