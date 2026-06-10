@@ -47,7 +47,6 @@ function renderAll() {
   renderHeroSlider();
   renderInfoCards();
   renderDesc();
-  renderHighlights();
   renderTips();
 
   document.title = (currentExp.titleEn || 'Experience') + ' | Zhangjiajie Park';
@@ -82,11 +81,10 @@ function renderHeroSlider() {
     }
     slidesHtml += '<div class="hero-overlay"></div>';
     slidesHtml += '<div class="hero-content">';
-    slidesHtml += '<div class="hero-badge">' + escHtml(currentExp.badge || 'Experience') + '</div>';
+    slidesHtml += '<div class="hero-badge">Experience</div>';
     slidesHtml += '<h1 class="hero-title">' + escHtml(currentExp.titleEn || '') + '</h1>';
-    slidesHtml += '<p class="hero-subtitle">' + escHtml(currentExp.subtitleEn || '') + '</p>';
-    var heroDesc = (currentExp.fullDescEn || currentExp.descEn || '').replace(/<[^>]+>/g, '').substring(0, 150);
-    slidesHtml += '<p class="hero-desc">' + escHtml(heroDesc) + '...</p>';
+    slidesHtml += '<p class="hero-subtitle">' + escHtml(currentExp.descEn || '') + '</p>';
+    slidesHtml += '<p class="hero-desc">' + escHtml((currentExp.descEn || '').substring(0, 150)) + '...</p>';
     slidesHtml += '</div></div>';
 
     dotsHtml += '<button class="indicator-dot' + (isActive ? ' active' : '') + '" onclick="goToSlide(' + idx + ')"></button>';
@@ -153,17 +151,12 @@ function nextSlide() { goToSlide(currentSlide + 1); }
 
 function updateNavButtons() {
   var slides = document.querySelectorAll('.hero-slide');
-  var prevBtn = document.getElementById('prevBtn');
-  var nextBtn = document.getElementById('nextBtn');
-  if (prevBtn) prevBtn.classList.toggle('disabled', currentSlide === 0);
-  if (nextBtn) nextBtn.classList.toggle('disabled', currentSlide === slides.length - 1);
+  document.getElementById('prevBtn').classList.toggle('disabled', currentSlide === 0);
+  document.getElementById('nextBtn').classList.toggle('disabled', currentSlide === slides.length - 1);
 
-  var expPrev = document.getElementById('expPrevBtn');
-  var expNext = document.getElementById('expNextBtn');
-  if (!expPrev && !expNext) return;
   var idx = expData.indexOf(currentExp);
-  if (expPrev) expPrev.classList.toggle('disabled', idx === 0);
-  if (expNext) expNext.classList.toggle('disabled', idx === expData.length - 1);
+  document.getElementById('expPrevBtn').classList.toggle('disabled', idx === 0);
+  document.getElementById('expNextBtn').classList.toggle('disabled', idx === expData.length - 1);
 }
 
 // ========== EXPERIENCE NAVIGATION ==========
@@ -215,7 +208,7 @@ function renderDesc() {
   var container = document.getElementById('experienceContent');
   var html = '<div class="section">';
   html += '<h2 class="section-title">About ' + escHtml(currentExp.titleEn || '') + '</h2>';
-  html += (currentExp.fullDescEn || currentExp.descEn || '').replace(/<p>/g, '<p>').replace(/<\/p>/g, '</p>');
+  html += '<p>' + escHtml(currentExp.descEn || '') + '</p>';
   html += '</div>';
   var infoGrid = container.querySelector('.info-grid');
   if (infoGrid) infoGrid.insertAdjacentHTML('afterend', html);
@@ -232,24 +225,6 @@ function renderTips() {
   });
   html += '</ul></div>';
   container.insertAdjacentHTML('beforeend', html);
-}
-
-// ========== RENDER HIGHLIGHTS ==========
-function renderHighlights() {
-  if (!currentExp) return;
-  var highlights = currentExp.highlightsEn || currentExp.highlights || [];
-  if (highlights.length === 0) return;
-  var container = document.getElementById('experienceContent');
-  var html = '<div class="section">';
-  html += '<h2 class="section-title">Highlights</h2>';
-  html += '<ul class="highlights-list">';
-  highlights.forEach(function(h) {
-    html += '<li>' + escHtml(h) + '</li>';
-  });
-  html += '</ul></div>';
-  var tipBox = container.querySelector('.tip-box');
-  if (tipBox) tipBox.insertAdjacentHTML('beforebegin', html);
-  else container.insertAdjacentHTML('beforeend', html);
 }
 
 // ========== BFCACHE SUPPORT ==========

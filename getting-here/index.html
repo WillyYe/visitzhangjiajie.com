@@ -10,7 +10,7 @@
     crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin="" async></script>
+    crossorigin=""></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -498,36 +498,17 @@
   </div>
 
   <script>
-    function initMap() {
+    // ====== Leaflet Map ======
     var map = L.map('map', {
       center: [29.25, 110.47],
       zoom: 11,
       scrollWheelZoom: true
     });
 
-    // Primary tile layer (OpenStreetMap)
-    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 18
-    });
-
-    // Fallback tile layer (Amap/Gaode — accessible from mainland China)
-    var amapLayer = L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
-      subdomains: '1234',
-      attribution: '&copy; <a href="https://www.amap.com/">Gaode Maps</a>',
-      maxZoom: 18
-    });
-
-    var fallbackTriggered = false;
-    osmLayer.on('tileerror', function() {
-      if (!fallbackTriggered) {
-        fallbackTriggered = true;
-        map.removeLayer(osmLayer);
-        amapLayer.addTo(map);
-      }
-    });
-
-    osmLayer.addTo(map);
+    }).addTo(map);
 
     // Custom green marker icon
     var greenIcon = L.divIcon({
@@ -676,26 +657,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeDriver();
     });
-    }
-    // Initialize map when Leaflet is loaded
-    if (typeof L !== 'undefined') {
-      initMap();
-    } else {
-      window.addEventListener('load', function() {
-        if (typeof L !== 'undefined') initMap();
-      });
-    }
   </script>
 
-  <!-- Baidu Analytics -->
-  <script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?5aff4b613bfa9c5ce45ea0862b545a79";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 </body>
 </html>

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>window._webp=(function(){var c=document.createElement('canvas');c.width=1;c.height=1;return c.toDataURL&&c.toDataURL('image/webp').indexOf('data:image/webp')===0})();function wp(p){return window._webp?p.replace(/\.(jpe?g|png)$/i,'.webp'):p}document.addEventListener('error',function(e){if(e.target.tagName==='IMG'&&e.target.src&&/\.webp$/i.test(e.target.src)){e.target.src=e.target.src.replace(/\.webp$/i,'.jpg')}},true)</script>
   <title id="pageTitle">News Detail | Zhangjiajie National Forest Park</title>
   <meta name="description" id="metaDesc" content="Latest news from Zhangjiajie National Forest Park." />
   <meta name="theme-color" content="#1a4a30" />
@@ -12,8 +11,7 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" /></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
 
   <style>
     /* ========== RESET & BASE ========== */
@@ -336,7 +334,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>© 2026 Zhangjiajie National Forest Park · World Natural Heritage</p>
+    <p>© 2024 Zhangjiajie National Forest Park · World Natural Heritage</p>
   </footer>
 
   <script defer>
@@ -344,7 +342,7 @@
     var newsData = [];
 
     function loadNewsData() {
-      return fetch('data/news.json?v=20260608')
+      return fetch('data/news.json?t=' + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(d) { newsData = d; });
     }
@@ -379,13 +377,7 @@
         document.title = 'News | Zhangjiajie National Forest Park';
         return;
       }
-      var heroBgUrl = window._webp ? news.img.replace(/\.(jpe?g|png)$/i,'.webp') : news.img;
-      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + heroBgUrl + '\')';
-      // Fallback for CSS background-image webp errors
-      var heroBgEl = document.getElementById('heroBg');
-      var heroBgImg = new Image();
-      heroBgImg.onerror = function() { heroBgEl.style.backgroundImage = 'url(\'' + news.img + '\')'; };
-      heroBgImg.src = heroBgUrl;
+      document.getElementById('heroBg').style.backgroundImage = 'url(\'' + news.img + '?v=2\')';
       document.getElementById('heroBadge').textContent = news.tag.toUpperCase();
       document.getElementById('heroTitle').textContent = news.titleEn;
 
@@ -399,7 +391,7 @@
       document.getElementById('newsDateText').textContent = dateStr;
 
       var imgEl = document.getElementById('newsFeaturedImg');
-      imgEl.src = wp(news.img);
+      imgEl.src = news.img + '?v=2';
       imgEl.alt = news.titleEn;
 
       document.getElementById('newsBody').innerHTML = news.contentEn || news.descEn;
@@ -418,8 +410,7 @@
         if (i === currentIndex) continue;
         var item = newsData[i];
         html += '<a href="news-detail.html?id=' + i + '" class="related-card">';
-        // Use original image for CSS background-image (webp fallback only works with <img> tags)
-        html += '<div class="related-img" style="background-image: url(\'' + item.img + '\')"></div>';
+        html += '<div class="related-img" style="background-image: url(\'' + item.img + '?v=2\')"></div>';
         html += '<div class="related-body">';
         html += '<h4 class="related-card-title">' + item.titleEn + '</h4>';
         html += '<p class="related-card-date">' + item.date.day + ' ' + item.date.month + ' ' + item.date.year + '</p>';
@@ -441,17 +432,6 @@
         renderRelatedNews();
       });
     });
-  </script>
-
-  <!-- Baidu Analytics -->
-  <script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?5aff4b613bfa9c5ce45ea0862b545a79";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
   </script>
 </body>
 </html>
