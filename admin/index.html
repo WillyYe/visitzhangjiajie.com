@@ -455,9 +455,11 @@ function renderSummary(data) {
   var totalPv = 0, totalUv = 0, totalTime = 0, count = 0;
   combined.forEach(function(row) {
     var r = Array.isArray(row) ? row : [row];
-    totalPv += parseInt(r[0]) || 0;
-    totalUv += parseInt(r[1]) || 0;
-    if (r.length >= 3) { totalTime += parseInt(r[2]) || 0; count++; }
+    var pv = parseInt(r[0]), uv = parseInt(r[1]);
+    if (isNaN(pv)) return; // "--" 等空数据行跳过
+    totalPv += pv || 0;
+    totalUv += uv || 0;
+    if (r.length >= 3) { var t = parseInt(r[2]); if (!isNaN(t)) { totalTime += t; count++; } }
   });
   var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
   if (pvEl) pvEl.textContent = totalPv >= 10000 ? (totalPv/10000).toFixed(1) + 'w' : totalPv;
@@ -498,11 +500,12 @@ function renderSourceChart(data) {
   if (!data) { var wrap2 = document.getElementById('sourceChartWrap'); if (wrap2) wrap2.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var canvas = document.getElementById('sourceChart'); if (!canvas) return;
   var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
-  // items[0] = [[{name:"直接访问",source:"through"},...]] → 提取 name
-  var rawLabels = items[0];
-  if (rawLabels && rawLabels.length > 0 && Array.isArray(rawLabels[0])) rawLabels = rawLabels[0];
-  var labels = rawLabels.map(function(o) { return (typeof o === 'object' && o.name) ? o.name : String(o); }).slice(0, 8);
-  // items[1] = [[156],[7]] → 展平
+  // items[0] = [[{name:"直接访问",...}],[{name:"外部链接",...}],...] → 二维展平提取 name
+  var rawLabels = items[0] || [];
+  var flatLabels = [];
+  rawLabels.forEach(function(entry) { flatLabels.push(Array.isArray(entry) ? entry[0] : entry); });
+  var labels = flatLabels.map(function(o) { return (typeof o === 'object' && o.name) ? o.name : String(o); }).slice(0, 8);
+  // items[1] = [[156],[7],...] → 展平
   var rawValues = items[1] || [];
   var values = rawValues.map(function(v) { return Array.isArray(v) ? (parseInt(v[0]) || 0) : (parseInt(v) || 0); }).slice(0, 8);
   if (sourceChart) sourceChart.destroy();
@@ -517,13 +520,14 @@ function renderTopPages(data) {
   if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
-  // items[0] = [[{name:"https://...",pageId:"..."},...]] → 展平
-  var rawPages = items[0];
-  if (rawPages && rawPages.length > 0 && Array.isArray(rawPages[0])) rawPages = rawPages[0];
+  // items[0] = [[{name:"https://...",...}],[{name:"https://...",...}],...] → 二维展平
+  var rawPages = items[0] || [];
+  var flatPages = [];
+  rawPages.forEach(function(entry) { flatPages.push(Array.isArray(entry) ? entry[0] : entry); });
   // items[1] = [[55,28],[10,6],...] → 每行 = [pv, visitor]
   var rawPvs = items[1] || [];
   var h = '<table class="analytics-table"><thead><tr><th>页面</th><th>浏览量</th><th>访客数</th></tr></thead><tbody>';
-  rawPages.forEach(function(p, i) { if (i >= 10) return;
+  flatPages.forEach(function(p, i) { if (i >= 10) return;
     var pageStr = (typeof p === 'object' && p.name) ? String(p.name).replace(/^https?:\/\/[^\/]+/, '') : String(p).replace(/^https?:\/\/[^\/]+/, '');
     var pv = Array.isArray(rawPvs[i]) ? (parseInt(rawPvs[i][0])||0) : (parseInt(rawPvs[i])||0);
     var uv = Array.isArray(rawPvs[i]) && rawPvs[i].length >= 2 ? (parseInt(rawPvs[i][1])||0) : 0;
@@ -535,10 +539,12 @@ function renderTopWords(data) {
   if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
-  var rawWords = items[0]; var rawPvs = items[1] || [];
-  if (rawWords && rawWords.length > 0 && Array.isArray(rawWords[0])) rawWords = rawWords[0];
+  var rawWords = items[0] || [];
+  var flatWords = [];
+  rawWords.forEach(function(entry) { flatWords.push(Array.isArray(entry) ? entry[0] : entry); });
+  var rawPvs = items[1] || [];
   var h = '<table class="analytics-table"><thead><tr><th>搜索词</th><th>浏览量</th></tr></thead><tbody>';
-  rawWords.forEach(function(w, i) { if (i >= 10) return;
+  flatWords.forEach(function(w, i) { if (i >= 10) return;
     var word = (typeof w === 'object' && w.name) ? w.name : String(w);
     var pv = Array.isArray(rawPvs[i]) ? (parseInt(rawPvs[i][0])||0) : (parseInt(rawPvs[i])||0);
     h += '<tr><td>' + esc(word) + '</td><td>' + pv + '</td></tr>'; });
@@ -546,14 +552,21 @@ function renderTopWords(data) {
 }
 function renderRealTime(data) {
   var el = document.getElementById('rtVisitorNum'); if (!el) return;
-  if (!data) { el.textContent = '-'; return; }
-  var num = extractTotal(data);
-  if (!num && data) {
-    if (typeof data === 'number') num = data;
-    else if (data.count) num = data.count;
-    else { var items = extractItems(data); if (items.length > 0 && items[0].length > 0) { var v = items[0][0]; num = Array.isArray(v) ? v[0] : v; } }
+  if (!data) { el.textContent = '0'; return; }
+  // trend/latest/a 不提供真正的「当前在线」数
+  // items 为空时说明无实时数据，显示 0
+  var items = extractItems(data);
+  var num = 0;
+  // 尝试从 items[1]（visitor 趋势数组）取最后一个非零值
+  if (items.length > 1 && Array.isArray(items[1])) {
+    var arr = items[1];
+    for (var i = arr.length - 1; i >= 0; i--) {
+      var v = Array.isArray(arr[i]) ? (parseInt(arr[i][0]) || 0) : (parseInt(arr[i]) || 0);
+      if (v > 0) { num = v; break; }
+    }
   }
-  el.textContent = num || 0;
+  // 如果有 total 但 items 为空，total 是累计值不是实时值，仍然显示 0
+  el.textContent = num;
 }
 function onAnalyticsSectionShow() { loadTongjiConfig(); if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics(); }
 </script>
