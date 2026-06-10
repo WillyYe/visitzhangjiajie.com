@@ -235,6 +235,31 @@ function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slic
 // ==================== 数据分析展示 ====================
 var trendChart = null, sourceChart = null;
 
+// 从百度 API 响应 body 中提取 items 数组
+// 百度响应结构: body.data[0].result.items 或 body.items
+function extractItems(body) {
+  if (!body) return [];
+  if (Array.isArray(body.items) && body.items.length > 0) return body.items;
+  if (Array.isArray(body.data) && body.data.length > 0) {
+    var d = body.data[0];
+    if (d && d.result && Array.isArray(d.result.items)) return d.result.items;
+    if (d && Array.isArray(d.items)) return d.items;
+  }
+  return [];
+}
+
+// 提取总数
+function extractTotal(body) {
+  if (!body) return 0;
+  if (typeof body.total === 'number') return body.total;
+  if (Array.isArray(body.data) && body.data.length > 0) {
+    var d = body.data[0];
+    if (d && d.result && typeof d.result.total === 'number') return d.result.total;
+    if (d && typeof d.total === 'number') return d.total;
+  }
+  return 0;
+}
+
 function loadAnalytics() {
   if (!TONGJI.accessToken || !TONGJI.siteId) {
     var nc = document.getElementById('analyticsNotConfig');
@@ -254,6 +279,12 @@ function loadAnalytics() {
   var rangeEl = document.getElementById('summaryRange');
   if (rangeEl) rangeEl.textContent = '（' + startDate + ' ~ ' + endDate + '）';
 
+  // 显示加载状态
+  var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
+  if (pvEl) pvEl.textContent = '...';
+  if (uvEl) uvEl.textContent = '...';
+  if (timeEl) timeEl.textContent = '...';
+
   // 并行请求 — 全部使用 report/getData 端点，method 参数指定具体报告
   Promise.all([
     tongjiApiCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
@@ -271,7 +302,7 @@ function loadAnalytics() {
   }).catch(function(err) {
     var ac = document.getElementById('analyticsContent');
     if (ac) ac.innerHTML =
-      '<div class="analytics-error">数据加载失败：' + esc(err.message) + '<br><br>' +
+      '<div class="analytics-error">❌ 数据加载失败：' + esc(err.message) + '<br><br>' +
       '可能原因：1. Access Token 已过期；2. 站点 ID 错误；3. API 权限不足。<br>' +
       '请前往「设置」重新配置。</div>' +
       ac.innerHTML;
@@ -287,9 +318,7 @@ function formatDate(d) {
 }
 
 function renderSummary(data) {
-  var items = (data && data.items) || [];
-  if (!Array.isArray(items) || items.length === 0) return;
-  // Baidu 返回格式：items = [dates, metric1, metric2, ...]
+  var items = extractItems(data);
   if (items.length < 3) return;
   var pvArr = items[1] || [];
   var uvArr = items[2] || [];
@@ -315,12 +344,18 @@ function renderTrendChart(data, startDate, endDate) {
   var canvas = document.getElementById('trendChart');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
-  var items = (data && data.items) || [];
-  if (!Array.isArray(items) || items.length < 3) return;
+  var items = extractItems(data);
+  if (items.length < 3) return;
 
   var labels = items[0] || [];
   var pvData = items[1] || [];
   var uvData = items[2] || [];
+
+  // 日期格式美化
+  labels = labels.map(function(d) {
+    var s = String(d);
+    return s.length === 8 ? s.slice(4,6) + '/' + s.slice(6) : s;
+  });
 
   if (trendChart) trendChart.destroy();
   trendChart = new Chart(ctx, {
@@ -328,8 +363,8 @@ function renderTrendChart(data, startDate, endDate) {
     data: {
       labels: labels,
       datasets: [
-        { label: '浏览量 PV', data: pvData, borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: true, tension: 0.35 },
-        { label: '访客数 UV', data: uvData, borderColor: '#2196f3', backgroundColor: 'rgba(33,150,243,0.08)', fill: true, tension: 0.35 },
+        { label: '浏览量 PV', data: pvData.map(Number), borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: true, tension: 0.35 },
+        { label: '访客数 UV', data: uvData.map(Number), borderColor: '#2196f3', backgroundColor: 'rgba(33,150,243,0.08)', fill: true, tension: 0.35 },
       ]
     },
     options: {
@@ -344,8 +379,8 @@ function renderSourceChart(data) {
   var canvas = document.getElementById('sourceChart');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
-  var items = (data && data.items) || [];
-  if (!Array.isArray(items) || items.length < 2) return;
+  var items = extractItems(data);
+  if (items.length < 2) return;
 
   var labels = items[0] || [];
   var values = items[1] || [];
@@ -353,7 +388,7 @@ function renderSourceChart(data) {
   if (sourceChart) sourceChart.destroy();
   sourceChart = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#e91e63','#2196f3','#4caf50','#ff9800','#9c27b0','#00bcd4'] }] },
+    data: { labels: labels, datasets: [{ data: values.map(Number), backgroundColor: ['#e91e63','#2196f3','#4caf50','#ff9800','#9c27b0','#00bcd4','#ff5722','#607d8b'] }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
   });
 }
@@ -361,7 +396,7 @@ function renderSourceChart(data) {
 function renderTopPages(data) {
   var wrap = document.getElementById('topPagesWrap');
   if (!wrap) return;
-  var items = (data && data.items) || [];
+  var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
 
   var pages = items[0] || [];
@@ -381,7 +416,7 @@ function renderTopPages(data) {
 function renderTopWords(data) {
   var wrap = document.getElementById('topWordsWrap');
   if (!wrap) return;
-  var items = (data && data.items) || [];
+  var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
 
   var words = items[0] || [];
@@ -402,7 +437,10 @@ function renderRealTime(data) {
   var num = 0;
   if (typeof data === 'number') num = data;
   else if (data && data.count) num = data.count;
-  else if (data && data.items && data.items[0]) num = data.items[0][0];
+  else {
+    var items = extractItems(data);
+    if (items.length > 0 && items[0].length > 0) num = items[0][0];
+  }
   el.textContent = num;
 }
 
