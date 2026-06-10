@@ -79,7 +79,7 @@ function tongjiOpenAuth() {
   var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
   // 通过 bridge 页跳转，消除 Referer
-  var bridgeUrl = 'admin/baidu-auth-bridge.html?url=' + encodeURIComponent(oauthUrl);
+  var bridgeUrl = '/admin/baidu-auth-bridge.html?url=' + encodeURIComponent(oauthUrl);
   document.getElementById('tongjiGuide').style.display = 'block';
   document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
   var authWin = window.open(bridgeUrl, 'baiduAuth', 'width=600,height=700');
