@@ -72,71 +72,17 @@ function renderTongjiStatus() {
 }
 
 // ==================== OAuth 授权流程 ====================
-// 改用 authorization_code 模式 + redirect_uri=oob（避免 referer_mismatch）
-// 弹窗→用户授权→页面上显示授权码→复制粘贴→代理服务器换 Token
+// 使用 Implicit Grant + redirect_uri=oob 避免 referer_mismatch
+// 弹窗→用户授权→百度在页面上直接显示 access_token → 用户复制粘贴
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  // 使用 response_type=code + redirect_uri=oob 绕过 referer 白名单检查
-  var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=' +
+  // response_type=token + redirect_uri=oob：百度在页面上显示 token，不跳转，无 referer 检查
+  var url = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
   document.getElementById('tongjiGuide').style.display = 'block';
   document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
   var authWin = window.open(url, 'baiduAuth', 'width=600,height=700');
-  showToast('请在弹窗中授权，然后复制页面上的授权码粘贴到下方', '');
-}
-
-// 通过代理服务器用 authorization code 换 access token
-function tongjiExchangeCode() {
-  var code = document.getElementById('tongjiAuthCode').value.trim();
-  if (!code) { showToast('请先粘贴授权码', 'error'); return; }
-
-  var apiKey = TONGJI.apiKey;
-  var secretKey = document.getElementById('tongjiSecretKey').value.trim() || TONGJI.secretKey;
-  if (!secretKey) { showToast('请先填写 Secret Key', 'error'); return; }
-
-  showToast('正在通过代理交换 Access Token...', '');
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', TONGJI.proxyUrl, true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.timeout = 15000;
-
-  xhr.onload = function() {
-    try {
-      var data = JSON.parse(xhr.responseText);
-      if (data.error) {
-        showToast('❌ Token 交换失败：' + data.error + ' — ' + (data.error_description || ''), 'error');
-        return;
-      }
-      if (data.access_token) {
-        applyToken(data.access_token, parseInt(data.expires_in) || 2592000);
-        if (data.refresh_token) {
-          TONGJI.refreshToken = data.refresh_token;
-          localStorage.setItem('tongji_refresh_token', data.refresh_token);
-        }
-      } else {
-        showToast('❌ 未获取到 Access Token，请检查授权码是否正确', 'error');
-      }
-    } catch(e) {
-      showToast('❌ 解析响应失败：' + e.message, 'error');
-    }
-  };
-
-  xhr.onerror = function() {
-    showToast('❌ 代理请求失败，请检查网络或代理地址', 'error');
-  };
-
-  xhr.ontimeout = function() {
-    showToast('❌ 代理请求超时', 'error');
-  };
-
-  xhr.send(JSON.stringify({
-    grant_type: 'authorization_code',
-    code: code,
-    client_id: apiKey,
-    client_secret: secretKey,
-    redirect_uri: 'oob'
-  }));
+  showToast('请在弹窗中授权，授权成功后复制页面上显示的 access_token 值粘贴到下方', '');
 }
 
 // 手动应用 Token（备用：用户从 OOB 页面手动复制）
