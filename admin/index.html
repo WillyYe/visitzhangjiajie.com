@@ -240,7 +240,274 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 <script src="../js/scenic-admin.js?v=5"></script>
 <script src="../js/experience-admin.js?v=5"></script>
 <script src="../js/gallery-admin.js?v=3"></script>
-<script src="../js/tongji-analytics.js?v=10"></script>
+<!-- tongji-analytics v10 INLINE — 内联避免浏览器缓存问题 -->
+<script>
+// ==================== 百度统计数据分析 ====================
+var TONGJI = {
+  apiKey: localStorage.getItem('tongji_api_key') || 'QhCUTm5cHNdXzXXS4p17IaaRarzqT9HO',
+  secretKey: localStorage.getItem('tongji_secret_key') || '',
+  accessToken: localStorage.getItem('tongji_access_token') || '',
+  siteId: localStorage.getItem('tongji_site_id') || '',
+  refreshToken: localStorage.getItem('tongji_refresh_token') || '',
+  tokenExpire: parseInt(localStorage.getItem('tongji_token_expire') || '0'),
+  proxyUrl: localStorage.getItem('tongji_proxy_url') || 'https://bd-oauth-proxy.mydeng1995.workers.dev/baidu-oauth',
+};
+
+function saveTongjiConfig() {
+  var apiKey = document.getElementById('tongjiApiKey').value.trim();
+  var secretKey = document.getElementById('tongjiSecretKey').value.trim();
+  var accessToken = document.getElementById('tongjiAccessToken').value.trim();
+  var siteId = document.getElementById('tongjiSiteId').value.trim();
+  if (!apiKey) { showToast('请输入 API Key', 'error'); return; }
+  if (!secretKey) { showToast('请输入 Secret Key', 'error'); return; }
+  TONGJI.apiKey = apiKey; TONGJI.secretKey = secretKey; TONGJI.accessToken = accessToken; TONGJI.siteId = siteId;
+  localStorage.setItem('tongji_api_key', apiKey);
+  localStorage.setItem('tongji_secret_key', secretKey);
+  localStorage.setItem('tongji_access_token', accessToken);
+  localStorage.setItem('tongji_site_id', siteId);
+  showToast('百度统计配置已保存 ✅', 'success');
+  renderTongjiStatus();
+}
+function loadTongjiConfig() {
+  var ak = document.getElementById('tongjiApiKey'); var sk = document.getElementById('tongjiSecretKey');
+  var at = document.getElementById('tongjiAccessToken'); var si = document.getElementById('tongjiSiteId');
+  if (ak) ak.value = TONGJI.apiKey; if (sk) sk.value = TONGJI.secretKey;
+  if (at) at.value = TONGJI.accessToken; if (si) si.value = TONGJI.siteId;
+  renderTongjiStatus();
+}
+function renderTongjiStatus() {
+  var el = document.getElementById('tongjiTokenStatus'); if (!el) return;
+  if (TONGJI.accessToken && TONGJI.siteId) {
+    var expired = TONGJI.tokenExpire > 0 && Date.now() > TONGJI.tokenExpire;
+    if (expired) {
+      el.className = 'tongji-status err'; el.innerHTML = '<span>⚠️</span><span>Access Token 已过期，请重新授权</span>';
+      el.style.display = 'inline-flex';
+    } else {
+      el.className = 'tongji-status ok'; el.innerHTML = '<span>✅</span><span>已配置，站点 ID: ' + esc(TONGJI.siteId) + '</span>';
+      el.style.display = 'inline-flex';
+    }
+  } else if (TONGJI.accessToken) {
+    el.className = 'tongji-status pending'; el.innerHTML = '<span>⏳</span><span>已获取 Token，请输入站点 ID</span>';
+    el.style.display = 'inline-flex';
+  } else { el.style.display = 'none'; }
+}
+
+// ==================== OAuth 授权（Blob URL 方案 — 无外部文件、无缓存） ====================
+function tongjiOpenAuth() {
+  var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
+  var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
+    encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="referrer" content="no-referrer">' +
+    '<title>跳转中…</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;' +
+    'height:100vh;margin:0;background:#f5f5f5;color:#333}.s{width:28px;height:28px;border:3px solid #ddd;' +
+    'border-top-color:#3b6bf4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}' +
+    '@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div><div class="s"></div><p>正在跳转授权…</p></div>' +
+    '<script>location.replace("' + oauthUrl + '")<\/script></body></html>';
+  var blob = new Blob([html], {type: 'text/html'});
+  var blobUrl = URL.createObjectURL(blob);
+  document.getElementById('tongjiGuide').style.display = 'block';
+  document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
+  var authWin = window.open(blobUrl, 'baiduAuth', 'width=600,height=700');
+  if (!authWin) { showToast('弹窗被拦截，请允许本站弹窗后重试', 'error'); }
+  else { showToast('已弹出授权窗口，授权后复制页面上显示的 access_token 粘贴到下方', ''); }
+}
+function tongjiApplyToken() {
+  var token = document.getElementById('tongjiAuthCode').value.trim();
+  if (!token) { showToast('请先粘贴 Access Token', 'error'); return; }
+  applyToken(token, 2592000);
+}
+function applyToken(token, expiresIn) {
+  TONGJI.accessToken = token; TONGJI.tokenExpire = Date.now() + expiresIn * 1000;
+  localStorage.setItem('tongji_access_token', TONGJI.accessToken);
+  localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
+  document.getElementById('tongjiAccessToken').value = token;
+  document.getElementById('tongjiAuthCodeWrap').style.display = 'none';
+  renderTongjiStatus();
+  showToast('✅ Access Token 已保存！有效期至 ' + new Date(TONGJI.tokenExpire).toLocaleDateString(), 'success');
+  tongjiAutoFillSiteId();
+}
+function tongjiAutoFillSiteId() {
+  tongjiApiCall('config/getSiteList', {}).then(function(d) {
+    var list = d.list || d.data || d.sites || (Array.isArray(d) ? d : []);
+    if (Array.isArray(list) && list.length > 0) {
+      var sid = list[0].site_id || list[0].id || '';
+      if (sid) { TONGJI.siteId = String(sid); localStorage.setItem('tongji_site_id', TONGJI.siteId);
+        var el = document.getElementById('tongjiSiteId'); if (el) el.value = TONGJI.siteId;
+        renderTongjiStatus(); showToast('✅ 自动获取站点 ID: ' + sid, 'success'); }
+    }
+  }).catch(function() {});
+}
+
+// ==================== API ====================
+function tongjiApiCall(apiMethod, params) {
+  return new Promise(function(resolve, reject) {
+    if (!TONGJI.accessToken) { reject(new Error('Access Token 未配置')); return; }
+    var qs = 'access_token=' + encodeURIComponent(TONGJI.accessToken);
+    if (TONGJI.siteId && !params.site_id) qs += '&site_id=' + TONGJI.siteId;
+    for (var k in params) qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+    var url = 'https://openapi.baidu.com/rest/2.0/tongji/' + apiMethod.trim() + '?' + qs;
+    var cbName = '_bd_cb_' + Math.random().toString(36).slice(2, 10);
+    window[cbName] = function(resp) {
+      delete window[cbName];
+      if (resp && resp.error_code) { reject(new Error(resp.error_msg || ('API 错误码 ' + resp.error_code))); return; }
+      if (resp && resp.header && resp.header.status !== 0 && resp.header.status !== undefined && resp.header.desc) { reject(new Error(resp.header.desc || '接口返回错误')); return; }
+      var body = resp && typeof resp.body !== 'undefined' ? resp.body : resp;
+      resolve(body);
+    };
+    var s = document.createElement('script');
+    s.src = url + '&callback=' + encodeURIComponent(cbName);
+    s.onerror = function() { delete window[cbName]; reject(new Error('JSONP 请求失败')); };
+    document.head.appendChild(s);
+    setTimeout(function() { if (window[cbName]) { delete window[cbName]; reject(new Error('API 请求超时')); } }, 15000);
+  });
+}
+function testTongjiConnection() {
+  if (!TONGJI.accessToken) { showToast('请先完成授权获取 Access Token', 'error'); return; }
+  showToast('正在测试连接...', '');
+  if (TONGJI.siteId) {
+    var today = dStr(new Date());
+    tongjiApiCall('report/getData', { site_id: TONGJI.siteId, method: 'overview/getTimeTrendRpt', start_date: today, end_date: today, metrics: 'pv_count' })
+    .then(function() { showToast('✅ 连接成功！站点 ID: ' + TONGJI.siteId, 'success'); })
+    .catch(function(err) { showToast('❌ 连接失败：' + err.message, 'error'); });
+    return;
+  }
+  tongjiApiCall('config/getSiteList', {}).then(function(d) {
+    var list = Array.isArray(d) ? d : (d.list || d.data || d.sites || d.items || []);
+    if (list.length > 0) {
+      var info = list[0]; var sid = info.site_id || info.id || '';
+      if (sid) { TONGJI.siteId = String(sid); localStorage.setItem('tongji_site_id', TONGJI.siteId);
+        var el = document.getElementById('tongjiSiteId'); if (el) el.value = TONGJI.siteId; renderTongjiStatus(); }
+      showToast('✅ 连接成功！站点: ' + (info.domain || info.site_name || sid), 'success');
+    } else { showToast('⚠️ 连接成功，请手动输入站点 ID', ''); }
+  }).catch(function(err) { showToast('❌ 连接失败：' + err.message, 'error'); });
+}
+function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slice(-2) + ('0'+date.getDate()).slice(-2); }
+
+// ==================== 数据展示 ====================
+var trendChart = null, sourceChart = null;
+function extractItems(body) {
+  if (!body) return [];
+  if (Array.isArray(body.items) && body.items.length > 0) return body.items;
+  if (Array.isArray(body.data) && body.data.length > 0) {
+    var d = body.data[0]; if (d && d.result && Array.isArray(d.result.items)) return d.result.items;
+    if (d && Array.isArray(d.items)) return d.items;
+  } return [];
+}
+function extractTotal(body) {
+  if (!body) return 0;
+  if (typeof body.total === 'number') return body.total;
+  if (Array.isArray(body.data) && body.data.length > 0) {
+    var d = body.data[0]; if (d && d.result && typeof d.result.total === 'number') return d.result.total;
+    if (d && typeof d.total === 'number') return d.total;
+  } return 0;
+}
+function loadAnalytics() {
+  if (!TONGJI.accessToken || !TONGJI.siteId) {
+    var nc = document.getElementById('analyticsNotConfig'); var ac = document.getElementById('analyticsContent');
+    if (nc) nc.style.display = 'block'; if (ac) ac.style.display = 'none'; return;
+  }
+  var nc = document.getElementById('analyticsNotConfig'); var ac = document.getElementById('analyticsContent');
+  if (nc) nc.style.display = 'none'; if (ac) ac.style.display = 'block';
+  var days = parseInt(document.getElementById('analyticsRange').value) || 30;
+  var endDate = formatDate(new Date()); var startDate = formatDate(new Date(Date.now() - days * 86400000));
+  var rangeEl = document.getElementById('summaryRange'); if (rangeEl) rangeEl.textContent = '（' + startDate + ' ~ ' + endDate + '）';
+  var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
+  if (pvEl) pvEl.textContent = '...'; if (uvEl) uvEl.textContent = '...'; if (timeEl) timeEl.textContent = '...';
+  Promise.all([
+    tongjiApiCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'visit/toppage/a', metrics: 'pv_count,visitor_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'visit/word/a', metrics: 'pv_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    tongjiApiCall('report/getData', { method: 'trend/latest/a', metrics: 'visitor_count' }),
+  ]).then(function(results) {
+    renderSummary(results[0]); renderTrendChart(results[0], startDate, endDate);
+    renderSourceChart(results[1]); renderTopPages(results[2]); renderTopWords(results[3]); renderRealTime(results[4]);
+  }).catch(function(err) {
+    var msg = esc(err.message);
+    var isTokenErr = msg.indexOf('110') !== -1 || msg.indexOf('token') !== -1 || msg.indexOf('Token') !== -1 || msg.indexOf('invalid') !== -1 || msg.indexOf('Access') !== -1;
+    var ac = document.getElementById('analyticsContent');
+    if (ac) ac.innerHTML =
+      '<div class="analytics-error" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:24px;margin:20px 0;text-align:center">' +
+      '<div style="font-size:48px;margin-bottom:12px">🔑</div>' +
+      '<h3 style="margin:0 0 8px;color:#856404">' + (isTokenErr ? 'Access Token 已失效' : '数据加载失败') + '</h3>' +
+      '<p style="color:#856404;margin:0 0 16px;font-size:14px">' + msg + '</p>' +
+      (isTokenErr
+        ? '<button onclick="switchAdminSection(\'settings\');setTimeout(function(){var el=document.getElementById(\'tongjiApiKey\');if(el)el.scrollIntoView({behavior:\'smooth\'})},300)" style="background:#ff9800;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600">🔗 前往设置重新授权</button>' +
+          '<p style="color:#856404;font-size:12px;margin-top:12px">Token 已失效，需要重新授权百度统计</p>'
+        : '<p style="color:#856404;font-size:13px">请前往「设置」检查 Token 和站点 ID 配置</p>') +
+      '</div>';
+  });
+}
+function formatDate(d) { return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2); }
+function renderSummary(data) {
+  var items = extractItems(data); if (items.length < 3) return;
+  var pvArr = items[1] || [], uvArr = items[2] || [], timeArr = items[3] || [];
+  var totalPv = 0, totalUv = 0, totalTime = 0;
+  pvArr.forEach(function(v) { totalPv += parseInt(v) || 0; });
+  uvArr.forEach(function(v) { totalUv += parseInt(v) || 0; });
+  timeArr.forEach(function(v) { totalTime += parseInt(v) || 0; });
+  var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
+  if (pvEl) pvEl.textContent = totalPv >= 10000 ? (totalPv/10000).toFixed(1) + 'w' : totalPv;
+  if (uvEl) uvEl.textContent = totalUv >= 10000 ? (totalUv/10000).toFixed(1) + 'w' : totalUv;
+  if (timeEl) { var avgSec = timeArr.length > 0 ? Math.round(totalTime / timeArr.length) : 0;
+    timeEl.textContent = avgSec >= 60 ? Math.floor(avgSec/60) + '分' + (avgSec%60) + '秒' : avgSec + '秒'; }
+}
+function renderTrendChart(data, startDate, endDate) {
+  var canvas = document.getElementById('trendChart'); if (!canvas) return;
+  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 3) return;
+  var labels = items[0] || [], pvData = items[1] || [], uvData = items[2] || [];
+  labels = labels.map(function(d) { var s = String(d); return s.length === 8 ? s.slice(4,6) + '/' + s.slice(6) : s; });
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(ctx, {
+    type: 'line', data: { labels: labels,
+      datasets: [
+        { label: '浏览量 PV', data: pvData.map(Number), borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: true, tension: 0.35 },
+        { label: '访客数 UV', data: uvData.map(Number), borderColor: '#2196f3', backgroundColor: 'rgba(33,150,243,0.08)', fill: true, tension: 0.35 },
+      ] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+function renderSourceChart(data) {
+  var canvas = document.getElementById('sourceChart'); if (!canvas) return;
+  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
+  var labels = items[0] || [], values = items[1] || [];
+  if (sourceChart) sourceChart.destroy();
+  sourceChart = new Chart(ctx, {
+    type: 'doughnut', data: { labels: labels, datasets: [{ data: values.map(Number),
+      backgroundColor: ['#e91e63','#2196f3','#4caf50','#ff9800','#9c27b0','#00bcd4','#ff5722','#607d8b'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+function renderTopPages(data) {
+  var wrap = document.getElementById('topPagesWrap'); if (!wrap) return;
+  var items = extractItems(data);
+  if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
+  var pages = items[0] || [], pvs = items[1] || [], uvs = items[2] || [];
+  var h = '<table class="analytics-table"><thead><tr><th>页面</th><th>浏览量</th><th>访客数</th></tr></thead><tbody>';
+  pages.forEach(function(p, i) { if (i >= 10) return;
+    var pageStr = String(p).replace(/^https?:\/\/[^\/]+/, '');
+    h += '<tr><td>' + esc(pageStr) + '</td><td>' + (pvs[i] || 0) + '</td><td>' + (uvs[i] || 0) + '</td></tr>'; });
+  h += '</tbody></table>'; wrap.innerHTML = h;
+}
+function renderTopWords(data) {
+  var wrap = document.getElementById('topWordsWrap'); if (!wrap) return;
+  var items = extractItems(data);
+  if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
+  var words = items[0] || [], pvs = items[1] || [];
+  var h = '<table class="analytics-table"><thead><tr><th>搜索词</th><th>浏览量</th></tr></thead><tbody>';
+  words.forEach(function(w, i) { if (i >= 10) return;
+    h += '<tr><td>' + esc(String(w)) + '</td><td>' + (pvs[i] || 0) + '</td></tr>'; });
+  h += '</tbody></table>'; wrap.innerHTML = h;
+}
+function renderRealTime(data) {
+  var el = document.getElementById('rtVisitorNum'); if (!el) return;
+  var num = 0; if (typeof data === 'number') num = data;
+  else if (data && data.count) num = data.count;
+  else { var items = extractItems(data); if (items.length > 0 && items[0].length > 0) num = items[0][0]; }
+  el.textContent = num;
+}
+function onAnalyticsSectionShow() { loadTongjiConfig(); if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics(); }
+</script>
 </head>
 <body>
 
