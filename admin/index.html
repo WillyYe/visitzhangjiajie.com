@@ -425,7 +425,7 @@ function loadAnalytics() {
     safeCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
     safeCall('report/getData', { method: 'visit/toppage/a', metrics: 'pv_count,visitor_count', max_results: '10', start_date: startDate, end_date: endDate }),
     safeCall('report/getData', { method: 'source/searchword/a', metrics: 'pv_count', max_results: '10', start_date: startDate, end_date: endDate }),
-    safeCall('report/getData', { method: 'trend/latest/a', metrics: 'visitor_count' }),
+    safeCall('report/getData', { method: 'trend/latest/f', metrics: 'visitor_count' }),
   ]).then(function(results) {
     renderSummary(results[0]); renderTrendChart(results[0], startDate, endDate);
     renderSourceChart(results[1]); renderTopPages(results[2]); renderTopWords(results[3]); renderRealTime(results[4]);
@@ -553,19 +553,8 @@ function renderTopWords(data) {
 function renderRealTime(data) {
   var el = document.getElementById('rtVisitorNum'); if (!el) return;
   if (!data) { el.textContent = '0'; return; }
-  // trend/latest/a 不提供真正的「当前在线」数
-  // items 为空时说明无实时数据，显示 0
-  var items = extractItems(data);
-  var num = 0;
-  // 尝试从 items[1]（visitor 趋势数组）取最后一个非零值
-  if (items.length > 1 && Array.isArray(items[1])) {
-    var arr = items[1];
-    for (var i = arr.length - 1; i >= 0; i--) {
-      var v = Array.isArray(arr[i]) ? (parseInt(arr[i][0]) || 0) : (parseInt(arr[i]) || 0);
-      if (v > 0) { num = v; break; }
-    }
-  }
-  // 如果有 total 但 items 为空，total 是累计值不是实时值，仍然显示 0
+  // trend/latest/f 返回 result.onlineNumber = 当前在线人数
+  var num = (data.result && typeof data.result.onlineNumber === 'number') ? data.result.onlineNumber : 0;
   el.textContent = num;
 }
 function onAnalyticsSectionShow() { loadTongjiConfig(); if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics(); }
