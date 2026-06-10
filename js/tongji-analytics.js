@@ -161,6 +161,11 @@ function tongjiApiCall(apiMethod, params) {
     var cbName = '_bd_cb_' + Math.random().toString(36).slice(2, 10);
     window[cbName] = function(resp) {
       delete window[cbName];
+      // 检查顶层 error_code（token 过期/无效等情况，不含 header）
+      if (resp && resp.error_code) {
+        reject(new Error(resp.error_msg || ('API 错误码 ' + resp.error_code)));
+        return;
+      }
       // 检查 header.status
       if (resp && resp.header && resp.header.status !== 0 && resp.header.status !== undefined && resp.header.desc) {
         reject(new Error(resp.header.desc || '接口返回错误'));
@@ -300,12 +305,19 @@ function loadAnalytics() {
     renderTopWords(results[3]);
     renderRealTime(results[4]);
   }).catch(function(err) {
+    var msg = esc(err.message);
+    var isTokenErr = msg.indexOf('110') !== -1 || msg.indexOf('token') !== -1 || msg.indexOf('Token') !== -1 || msg.indexOf('invalid') !== -1 || msg.indexOf('Access') !== -1;
     var ac = document.getElementById('analyticsContent');
     if (ac) ac.innerHTML =
-      '<div class="analytics-error">❌ 数据加载失败：' + esc(err.message) + '<br><br>' +
-      '可能原因：1. Access Token 已过期；2. 站点 ID 错误；3. API 权限不足。<br>' +
-      '请前往「设置」重新配置。</div>' +
-      ac.innerHTML;
+      '<div class="analytics-error" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:24px;margin:20px 0;text-align:center">' +
+      '<div style="font-size:48px;margin-bottom:12px">🔑</div>' +
+      '<h3 style="margin:0 0 8px;color:#856404">' + (isTokenErr ? 'Access Token 已失效' : '数据加载失败') + '</h3>' +
+      '<p style="color:#856404;margin:0 0 16px;font-size:14px">' + msg + '</p>' +
+      (isTokenErr
+        ? '<button onclick="switchAdminSection(\'settings\');setTimeout(function(){var el=document.getElementById(\'tongjiApiKey\');if(el)el.scrollIntoView({behavior:\'smooth\'})},300)" style="background:#ff9800;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600">🔗 前往设置重新授权</button>' +
+          '<p style="color:#856404;font-size:12px;margin-top:12px">Token 已失效，需要重新授权百度统计</p>'
+        : '<p style="color:#856404;font-size:13px">请前往「设置」检查 Token 和站点 ID 配置</p>') +
+      '</div>';
   });
 }
 
