@@ -387,7 +387,11 @@ function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slic
 var trendChart = null, sourceChart = null;
 function extractItems(body) {
   if (!body) return [];
-  if (Array.isArray(body.items) && body.items.length > 0) return body.items;
+  // 真实 API 格式: {result:{items:[...]}}
+  if (body.result && Array.isArray(body.result.items)) return body.result.items;
+  if (Array.isArray(body.items)) return body.items;
+  // list 格式 (config/getSiteList)
+  if (body.list) return body.list;
   if (Array.isArray(body.data) && body.data.length > 0) {
     var d = body.data[0]; if (d && d.result && Array.isArray(d.result.items)) return d.result.items;
     if (d && Array.isArray(d.items)) return d.items;
@@ -395,6 +399,7 @@ function extractItems(body) {
 }
 function extractTotal(body) {
   if (!body) return 0;
+  if (body.result && typeof body.result.total === 'number') return body.result.total;
   if (typeof body.total === 'number') return body.total;
   if (Array.isArray(body.data) && body.data.length > 0) {
     var d = body.data[0]; if (d && d.result && typeof d.result.total === 'number') return d.result.total;
@@ -413,12 +418,14 @@ function loadAnalytics() {
   var rangeEl = document.getElementById('summaryRange'); if (rangeEl) rangeEl.textContent = '（' + startDate + ' ~ ' + endDate + '）';
   var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
   if (pvEl) pvEl.textContent = '...'; if (uvEl) uvEl.textContent = '...'; if (timeEl) timeEl.textContent = '...';
+  // 每个调用独立 catch，一个失败不影响其他
+  var safeCall = function(apiMethod, params) { return tongjiApiCall(apiMethod, params).catch(function(e) { console.warn('[Tongji] ' + apiMethod + ' 失败:', e.message); return null; }); };
   Promise.all([
-    tongjiApiCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
-    tongjiApiCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
-    tongjiApiCall('report/getData', { method: 'visit/toppage/a', metrics: 'pv_count,visitor_count', max_results: '10', start_date: startDate, end_date: endDate }),
-    tongjiApiCall('report/getData', { method: 'visit/word/a', metrics: 'pv_count', max_results: '10', start_date: startDate, end_date: endDate }),
-    tongjiApiCall('report/getData', { method: 'trend/latest/a', metrics: 'visitor_count' }),
+    safeCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
+    safeCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
+    safeCall('report/getData', { method: 'visit/toppage/a', metrics: 'pv_count,visitor_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    safeCall('report/getData', { method: 'source/searchword/a', metrics: 'pv_count', max_results: '10', start_date: startDate, end_date: endDate }),
+    safeCall('report/getData', { method: 'trend/latest/a', metrics: 'visitor_count' }),
   ]).then(function(results) {
     renderSummary(results[0]); renderTrendChart(results[0], startDate, endDate);
     renderSourceChart(results[1]); renderTopPages(results[2]); renderTopWords(results[3]); renderRealTime(results[4]);
@@ -440,71 +447,113 @@ function loadAnalytics() {
 }
 function formatDate(d) { return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2); }
 function renderSummary(data) {
-  var items = extractItems(data); if (items.length < 3) return;
-  var pvArr = items[1] || [], uvArr = items[2] || [], timeArr = items[3] || [];
-  var totalPv = 0, totalUv = 0, totalTime = 0;
-  pvArr.forEach(function(v) { totalPv += parseInt(v) || 0; });
-  uvArr.forEach(function(v) { totalUv += parseInt(v) || 0; });
-  timeArr.forEach(function(v) { totalTime += parseInt(v) || 0; });
+  if (!data) return;
+  var items = extractItems(data); if (items.length < 2) return;
+  // API 把多指标合并: items[1] = [[pv,visitor,time],[pv,visitor,time],...]
+  var combined = items[1] || [];
+  if (!Array.isArray(combined)) return;
+  var totalPv = 0, totalUv = 0, totalTime = 0, count = 0;
+  combined.forEach(function(row) {
+    var r = Array.isArray(row) ? row : [row];
+    totalPv += parseInt(r[0]) || 0;
+    totalUv += parseInt(r[1]) || 0;
+    if (r.length >= 3) { totalTime += parseInt(r[2]) || 0; count++; }
+  });
   var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
   if (pvEl) pvEl.textContent = totalPv >= 10000 ? (totalPv/10000).toFixed(1) + 'w' : totalPv;
   if (uvEl) uvEl.textContent = totalUv >= 10000 ? (totalUv/10000).toFixed(1) + 'w' : totalUv;
-  if (timeEl) { var avgSec = timeArr.length > 0 ? Math.round(totalTime / timeArr.length) : 0;
+  if (timeEl) { var avgSec = count > 0 ? Math.round(totalTime / count) : 0;
     timeEl.textContent = avgSec >= 60 ? Math.floor(avgSec/60) + '分' + (avgSec%60) + '秒' : avgSec + '秒'; }
 }
 function renderTrendChart(data, startDate, endDate) {
+  if (!data) return;
   var canvas = document.getElementById('trendChart'); if (!canvas) return;
-  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 3) return;
-  var labels = items[0] || [], pvData = items[1] || [], uvData = items[2] || [];
-  labels = labels.map(function(d) { var s = String(d); return s.length === 8 ? s.slice(4,6) + '/' + s.slice(6) : s; });
+  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
+  // items[0] = [["2026/06/03"],...] → 展平为字符串数组
+  var rawLbls = items[0] || [];
+  var labels = rawLbls.map(function(d) {
+    var s = Array.isArray(d) ? String(d[0] || '') : String(d);
+    return s.replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, '$2/$3');
+  });
+  // items[1] = [[pv,visitor,time],...] → 拆分
+  var combined = items[1] || [];
+  var pvData = [], uvData = [];
+  combined.forEach(function(row) {
+    var r = Array.isArray(row) ? row : [row];
+    pvData.push(parseInt(r[0]) || 0);
+    uvData.push(parseInt(r[1]) || 0);
+  });
+  if (pvData.length === 0) return;
   if (trendChart) trendChart.destroy();
   trendChart = new Chart(ctx, {
     type: 'line', data: { labels: labels,
       datasets: [
-        { label: '浏览量 PV', data: pvData.map(Number), borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: true, tension: 0.35 },
-        { label: '访客数 UV', data: uvData.map(Number), borderColor: '#2196f3', backgroundColor: 'rgba(33,150,243,0.08)', fill: true, tension: 0.35 },
+        { label: '浏览量 PV', data: pvData, borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: true, tension: 0.35 },
+        { label: '访客数 UV', data: uvData, borderColor: '#2196f3', backgroundColor: 'rgba(33,150,243,0.08)', fill: true, tension: 0.35 },
       ] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
   });
 }
 function renderSourceChart(data) {
+  if (!data) { var wrap2 = document.getElementById('sourceChartWrap'); if (wrap2) wrap2.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var canvas = document.getElementById('sourceChart'); if (!canvas) return;
   var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
-  var labels = items[0] || [], values = items[1] || [];
+  // items[0] = [[{name:"直接访问",source:"through"},...]] → 提取 name
+  var rawLabels = items[0];
+  if (rawLabels && rawLabels.length > 0 && Array.isArray(rawLabels[0])) rawLabels = rawLabels[0];
+  var labels = rawLabels.map(function(o) { return (typeof o === 'object' && o.name) ? o.name : String(o); }).slice(0, 8);
+  // items[1] = [[156],[7]] → 展平
+  var rawValues = items[1] || [];
+  var values = rawValues.map(function(v) { return Array.isArray(v) ? (parseInt(v[0]) || 0) : (parseInt(v) || 0); }).slice(0, 8);
   if (sourceChart) sourceChart.destroy();
   sourceChart = new Chart(ctx, {
-    type: 'doughnut', data: { labels: labels, datasets: [{ data: values.map(Number),
+    type: 'doughnut', data: { labels: labels, datasets: [{ data: values,
       backgroundColor: ['#e91e63','#2196f3','#4caf50','#ff9800','#9c27b0','#00bcd4','#ff5722','#607d8b'] }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
   });
 }
 function renderTopPages(data) {
   var wrap = document.getElementById('topPagesWrap'); if (!wrap) return;
+  if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
-  var pages = items[0] || [], pvs = items[1] || [], uvs = items[2] || [];
+  // items[0] = [[{name:"https://...",pageId:"..."},...]] → 展平
+  var rawPages = items[0];
+  if (rawPages && rawPages.length > 0 && Array.isArray(rawPages[0])) rawPages = rawPages[0];
+  // items[1] = [[55,28],[10,6],...] → 每行 = [pv, visitor]
+  var rawPvs = items[1] || [];
   var h = '<table class="analytics-table"><thead><tr><th>页面</th><th>浏览量</th><th>访客数</th></tr></thead><tbody>';
-  pages.forEach(function(p, i) { if (i >= 10) return;
-    var pageStr = String(p).replace(/^https?:\/\/[^\/]+/, '');
-    h += '<tr><td>' + esc(pageStr) + '</td><td>' + (pvs[i] || 0) + '</td><td>' + (uvs[i] || 0) + '</td></tr>'; });
+  rawPages.forEach(function(p, i) { if (i >= 10) return;
+    var pageStr = (typeof p === 'object' && p.name) ? String(p.name).replace(/^https?:\/\/[^\/]+/, '') : String(p).replace(/^https?:\/\/[^\/]+/, '');
+    var pv = Array.isArray(rawPvs[i]) ? (parseInt(rawPvs[i][0])||0) : (parseInt(rawPvs[i])||0);
+    var uv = Array.isArray(rawPvs[i]) && rawPvs[i].length >= 2 ? (parseInt(rawPvs[i][1])||0) : 0;
+    h += '<tr><td>' + esc(pageStr) + '</td><td>' + pv + '</td><td>' + uv + '</td></tr>'; });
   h += '</tbody></table>'; wrap.innerHTML = h;
 }
 function renderTopWords(data) {
   var wrap = document.getElementById('topWordsWrap'); if (!wrap) return;
+  if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
-  var words = items[0] || [], pvs = items[1] || [];
+  var rawWords = items[0]; var rawPvs = items[1] || [];
+  if (rawWords && rawWords.length > 0 && Array.isArray(rawWords[0])) rawWords = rawWords[0];
   var h = '<table class="analytics-table"><thead><tr><th>搜索词</th><th>浏览量</th></tr></thead><tbody>';
-  words.forEach(function(w, i) { if (i >= 10) return;
-    h += '<tr><td>' + esc(String(w)) + '</td><td>' + (pvs[i] || 0) + '</td></tr>'; });
+  rawWords.forEach(function(w, i) { if (i >= 10) return;
+    var word = (typeof w === 'object' && w.name) ? w.name : String(w);
+    var pv = Array.isArray(rawPvs[i]) ? (parseInt(rawPvs[i][0])||0) : (parseInt(rawPvs[i])||0);
+    h += '<tr><td>' + esc(word) + '</td><td>' + pv + '</td></tr>'; });
   h += '</tbody></table>'; wrap.innerHTML = h;
 }
 function renderRealTime(data) {
   var el = document.getElementById('rtVisitorNum'); if (!el) return;
-  var num = 0; if (typeof data === 'number') num = data;
-  else if (data && data.count) num = data.count;
-  else { var items = extractItems(data); if (items.length > 0 && items[0].length > 0) num = items[0][0]; }
-  el.textContent = num;
+  if (!data) { el.textContent = '-'; return; }
+  var num = extractTotal(data);
+  if (!num && data) {
+    if (typeof data === 'number') num = data;
+    else if (data.count) num = data.count;
+    else { var items = extractItems(data); if (items.length > 0 && items[0].length > 0) { var v = items[0][0]; num = Array.isArray(v) ? v[0] : v; } }
+  }
+  el.textContent = num || 0;
 }
 function onAnalyticsSectionShow() { loadTongjiConfig(); if (TONGJI.accessToken && TONGJI.siteId) loadAnalytics(); }
 </script>
