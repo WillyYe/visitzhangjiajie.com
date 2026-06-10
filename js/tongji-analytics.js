@@ -72,18 +72,32 @@ function renderTongjiStatus() {
 }
 
 // ==================== OAuth 授权流程 ====================
-// 使用中间跳转页 + no-referrer 消除 HTTP Referer
-// bridge 页含 <meta name="referrer" content="no-referrer"> → 百度的 Referer 检查失效
+// 用 Blob URL 内联创建跳转页，消除 HTTP Referer（无需外部文件，无缓存问题）
+// blob: URL → <meta referrer=no-referrer> → 跳转百度 OAuth → 百度看不到来源
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
   var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
-  // 通过 bridge 页跳转，消除 Referer
-  var bridgeUrl = '/admin/baidu-auth-bridge.html?url=' + encodeURIComponent(oauthUrl);
+
+  // 内联创建 no-referrer 跳转页
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="referrer" content="no-referrer">' +
+    '<title>跳转中…</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;' +
+    'height:100vh;margin:0;background:#f5f5f5;color:#333}.s{width:28px;height:28px;border:3px solid #ddd;' +
+    'border-top-color:#3b6bf4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}' +
+    '@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div><div class="s"></div><p>正在跳转授权…</p></div>' +
+    '<script>location.replace("' + oauthUrl + '")<\/script></body></html>';
+
+  var blob = new Blob([html], {type: 'text/html'});
+  var blobUrl = URL.createObjectURL(blob);
+
   document.getElementById('tongjiGuide').style.display = 'block';
   document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
-  var authWin = window.open(bridgeUrl, 'baiduAuth', 'width=600,height=700');
-  showToast('正在跳转授权页面…授权成功后复制页面上显示的 access_token 值粘贴到下方', '');
+  var authWin = window.open(blobUrl, 'baiduAuth', 'width=600,height=700');
+  if (!authWin) {
+    showToast('弹窗被拦截，请允许本站弹窗后重试', 'error');
+  } else {
+    showToast('已弹出授权窗口，授权后复制页面上显示的 access_token 粘贴到下方', '');
+  }
 }
 
 // 手动应用 Token（备用：用户从 OOB 页面手动复制）
