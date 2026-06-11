@@ -1504,5 +1504,34 @@ function initApp() {
 if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 </script>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+<!-- iOS Safari Polyfill: make onclick work on dynamic HTML -->
+<script>
+(function() {
+  function fixOnClick(el) {
+    if (!el || el._ocFixed || !el.hasAttribute('onclick')) return;
+    try {
+      var code = el.getAttribute('onclick');
+      el.removeAttribute('onclick'); // 移除原始属性防双重点击
+      el.onclick = new Function('event', code); // 转为 property（移动端可靠触发）
+      el._ocFixed = true;
+    } catch(e) { console.warn('onclick polyfill failed:', e); }
+  }
+  // Fix existing elements
+  document.querySelectorAll('[onclick]').forEach(fixOnClick);
+  // Watch for dynamically added elements
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType !== 1) return;
+        if (node.hasAttribute('onclick')) fixOnClick(node);
+        node.querySelectorAll('[onclick]').forEach(fixOnClick);
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
 </body>
 </html>
