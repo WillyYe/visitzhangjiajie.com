@@ -1505,75 +1505,58 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 </script>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- iOS Safari Polyfill: convert onclick/onchange attributes to property handlers -->
+<!-- Inline Event Polyfill: convert onclick/onchange attributes to addEventListener for mobile compatibility -->
 <script>
 (function() {
-  // P2 fix: only activate on iOS/iPadOS — desktop browsers handle inline handlers natively
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (!isIOS) return;
+  // Run on ALL browsers — inline handlers on dynamic HTML can fail on iOS Safari AND some Android WebViews
+  var attrs = { onclick: 'click', onchange: 'change' };
 
-  var ATTRS_TO_FIX = ['onclick', 'onchange'];
-
-  function fixInlineHandler(el, attrName) {
+  function fix(el, attrName) {
     if (!el || el.nodeType !== 1) return;
     var code = el.getAttribute(attrName);
     if (!code) return;
 
-    var storageKey = '__wb_' + attrName;
-    // P1 fix: re-fix if code changed (e.g. via setAttribute), not just first-time
-    if (el[storageKey] === code) return;
+    var key = '__wb_' + attrName;
+    if (el[key] === code) return; // already fixed with same code
 
-    // P0 fix: create function BEFORE removing attribute (preserve attribute on failure)
+    // Create function BEFORE removing attribute (preserve on failure)
     try {
       var fn = new Function('event', code);
       el.removeAttribute(attrName);
-      el[attrName] = fn;
-      el[storageKey] = code;
+      // Use addEventListener — more reliable on mobile than property assignment
+      el.addEventListener(attrs[attrName], fn, false);
+      el[key] = code;
     } catch(e) {
-      console.warn('[polyfill] ' + attrName + ' failed:', code.slice(0, 80), e);
-      // Attribute preserved so desktop browsers can still fall back to it
+      console.warn('[polyfill] ' + attrName + ' failed:', code.slice(0, 80));
     }
   }
 
   function fixTree(root) {
     if (root.nodeType !== 1) return;
-    // Check the root itself
-    for (var a = 0; a < ATTRS_TO_FIX.length; a++) {
-      var attr = ATTRS_TO_FIX[a];
-      if (root.hasAttribute(attr)) fixInlineHandler(root, attr);
+    for (var a in attrs) {
+      if (root.hasAttribute(a)) fix(root, a);
     }
-    // Check all descendants
-    for (var b = 0; b < ATTRS_TO_FIX.length; b++) {
-      var attr2 = ATTRS_TO_FIX[b];
-      var nodes = root.querySelectorAll('[' + attr2 + ']');
-      for (var c = 0; c < nodes.length; c++) {
-        fixInlineHandler(nodes[c], attr2);
-      }
+    for (var b in attrs) {
+      var nodes = root.querySelectorAll('[' + b + ']');
+      for (var i = 0; i < nodes.length; i++) fix(nodes[i], b);
     }
   }
 
-  // Initial scan of existing elements
   fixTree(document.body);
+  console.log('[polyfill] active — ' + (('ontouchstart' in window) ? '📱 touch device' : '💻 desktop'));
 
-  // P1 fix: watch both child additions AND attribute changes (setAttribute + innerHTML)
-  var observer = new MutationObserver(function(mutations) {
+  new MutationObserver(function(mutations) {
     for (var i = 0; i < mutations.length; i++) {
       var m = mutations[i];
       if (m.type === 'childList') {
-        for (var j = 0; j < m.addedNodes.length; j++) {
-          fixTree(m.addedNodes[j]);
-        }
+        for (var j = 0; j < m.addedNodes.length; j++) fixTree(m.addedNodes[j]);
       } else if (m.type === 'attributes') {
-        fixInlineHandler(m.target, m.attributeName);
+        fix(m.target, m.attributeName);
       }
     }
-  });
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ATTRS_TO_FIX
+  }).observe(document.body, {
+    childList: true, subtree: true,
+    attributes: true, attributeFilter: Object.keys(attrs)
   });
 })();
 </script>
