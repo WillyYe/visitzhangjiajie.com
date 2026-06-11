@@ -409,5 +409,53 @@
 
   <script src="js/common.js?v=2"></script>
   <script src="js/scenic-detail.js?v=2"></script>
+
+<!-- Inline Event Polyfill: convert onclick/onchange attributes to addEventListener for mobile compatibility -->
+<script>
+(function() {
+  var attrs = { onclick: 'click', onchange: 'change' };
+
+  function fix(el, attrName) {
+    if (!el || el.nodeType !== 1) return;
+    var code = el.getAttribute(attrName);
+    if (!code) return;
+    var key = '__wb_' + attrName;
+    if (el[key] === code) return;
+    try {
+      var fn = new Function('event', code);
+      el.removeAttribute(attrName);
+      el.addEventListener(attrs[attrName], fn, false);
+      el[key] = code;
+    } catch(e) { console.warn('[polyfill] ' + attrName + ' failed:', code.slice(0, 80)); }
+  }
+
+  function fixTree(root) {
+    if (root.nodeType !== 1) return;
+    for (var a in attrs) {
+      if (root.hasAttribute(a)) fix(root, a);
+    }
+    for (var b in attrs) {
+      var nodes = root.querySelectorAll('[' + b + ']');
+      for (var i = 0; i < nodes.length; i++) fix(nodes[i], b);
+    }
+  }
+
+  fixTree(document.body);
+
+  new MutationObserver(function(mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var m = mutations[i];
+      if (m.type === 'childList') {
+        for (var j = 0; j < m.addedNodes.length; j++) fixTree(m.addedNodes[j]);
+      } else if (m.type === 'attributes') {
+        fix(m.target, m.attributeName);
+      }
+    }
+  }).observe(document.body, {
+    childList: true, subtree: true, attributes: true, attributeFilter: Object.keys(attrs)
+  });
+})();
+</script>
+
 </body>
 </html>
