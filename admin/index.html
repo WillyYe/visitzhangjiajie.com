@@ -349,6 +349,7 @@ function tongjiApiCall(apiMethod, params) {
     var cbName = '_bd_cb_' + Math.random().toString(36).slice(2, 10);
     window[cbName] = function(resp) {
       delete window[cbName];
+      try { console.log('[Tongji] ' + apiMethod + ' raw:', JSON.stringify(resp).slice(0, 500)); } catch(e) { console.log('[Tongji] ' + apiMethod + ' raw: [unserializable]'); }
       if (resp && resp.error_code) { reject(new Error(resp.error_msg || ('API 错误码 ' + resp.error_code))); return; }
       if (resp && resp.header && resp.header.status !== 0 && resp.header.status !== undefined && resp.header.desc) { reject(new Error(resp.header.desc || '接口返回错误')); return; }
       var body = resp && typeof resp.body !== 'undefined' ? resp.body : resp;
@@ -418,8 +419,15 @@ function loadAnalytics() {
   var rangeEl = document.getElementById('summaryRange'); if (rangeEl) rangeEl.textContent = '（' + startDate + ' ~ ' + endDate + '）';
   var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
   if (pvEl) pvEl.textContent = '...'; if (uvEl) uvEl.textContent = '...'; if (timeEl) timeEl.textContent = '...';
-  // 每个调用独立 catch，一个失败不影响其他
-  var safeCall = function(apiMethod, params) { return tongjiApiCall(apiMethod, params).catch(function(e) { console.warn('[Tongji] ' + apiMethod + ' 失败:', e.message); return null; }); };
+  // 每个调用独立 catch，一个失败不影响其他；返回 {__error:true, msg} 以便上层统一显示
+  var errors = [];
+  var safeCall = function(apiMethod, params) {
+    return tongjiApiCall(apiMethod, params).catch(function(e) {
+      console.warn('[Tongji] ' + apiMethod + ' 失败:', e.message);
+      errors.push(apiMethod + ': ' + e.message);
+      return { __error: true, __api: apiMethod, message: e.message };
+    });
+  };
   Promise.all([
     safeCall('report/getData', { method: 'overview/getTimeTrendRpt', metrics: 'pv_count,visitor_count,avg_visit_time', start_date: startDate, end_date: endDate }),
     safeCall('report/getData', { method: 'source/all/a', metrics: 'pv_count', start_date: startDate, end_date: endDate }),
@@ -429,9 +437,24 @@ function loadAnalytics() {
   ]).then(function(results) {
     renderSummary(results[0]); renderTrendChart(results[0], startDate, endDate);
     renderSourceChart(results[1]); renderTopPages(results[2]); renderTopWords(results[3]); renderRealTime(results[4]);
+    // 如果有部分接口失败，在页面底部显示诊断信息
+    if (errors.length > 0) {
+      var diag = document.getElementById('analyticsDiag');
+      if (diag) {
+        var isTokenErr = errors.some(function(m){ return /token|invalid|Access|110|权限|过期|失效/i.test(m); });
+        diag.innerHTML = '<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:16px;margin-top:20px;font-size:13px;color:#856404">' +
+          '<strong>⚠️ 部分数据加载失败</strong> (' + errors.length + '/5)<br>' +
+          errors.map(function(e){ return '• ' + esc(e); }).join('<br>') +
+          (isTokenErr ? '<br><button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="switchAdminSection(\'settings\')">前往设置重新授权</button>' : '') +
+          '</div>';
+        diag.style.display = 'block';
+      }
+    } else {
+      var diag = document.getElementById('analyticsDiag'); if (diag) diag.style.display = 'none';
+    }
   }).catch(function(err) {
-    var msg = esc(err.message);
-    var isTokenErr = msg.indexOf('110') !== -1 || msg.indexOf('token') !== -1 || msg.indexOf('Token') !== -1 || msg.indexOf('invalid') !== -1 || msg.indexOf('Access') !== -1;
+    var msg = esc(err.message || '未知错误');
+    var isTokenErr = /token|invalid|Access|110|权限|过期|失效/i.test(msg);
     var ac = document.getElementById('analyticsContent');
     if (ac) ac.innerHTML =
       '<div class="analytics-error" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:24px;margin:20px 0;text-align:center">' +
@@ -447,8 +470,15 @@ function loadAnalytics() {
 }
 function formatDate(d) { return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2); }
 function renderSummary(data) {
-  if (!data) return;
-  var items = extractItems(data); if (items.length < 2) return;
+  var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
+  if (!data || data.__error) {
+    if (pvEl) pvEl.textContent = '—'; if (uvEl) uvEl.textContent = '—'; if (timeEl) timeEl.textContent = '—';
+    return;
+  }
+  var items = extractItems(data); if (items.length < 2) {
+    if (pvEl) pvEl.textContent = '0'; if (uvEl) uvEl.textContent = '0'; if (timeEl) timeEl.textContent = '0秒';
+    return;
+  }
   // API 把多指标合并: items[1] = [[pv,visitor,time],[pv,visitor,time],...]
   var combined = items[1] || [];
   if (!Array.isArray(combined)) return;
@@ -461,16 +491,16 @@ function renderSummary(data) {
     totalUv += uv || 0;
     if (r.length >= 3) { var t = parseInt(r[2]); if (!isNaN(t)) { totalTime += t; count++; } }
   });
-  var pvEl = document.getElementById('sumPv'), uvEl = document.getElementById('sumUv'), timeEl = document.getElementById('sumAvgTime');
   if (pvEl) pvEl.textContent = totalPv >= 10000 ? (totalPv/10000).toFixed(1) + 'w' : totalPv;
   if (uvEl) uvEl.textContent = totalUv >= 10000 ? (totalUv/10000).toFixed(1) + 'w' : totalUv;
   if (timeEl) { var avgSec = count > 0 ? Math.round(totalTime / count) : 0;
     timeEl.textContent = avgSec >= 60 ? Math.floor(avgSec/60) + '分' + (avgSec%60) + '秒' : avgSec + '秒'; }
 }
 function renderTrendChart(data, startDate, endDate) {
-  if (!data) return;
   var canvas = document.getElementById('trendChart'); if (!canvas) return;
-  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
+  var ctx = canvas.getContext('2d');
+  if (!data || data.__error) { if (trendChart) { trendChart.destroy(); trendChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+  var items = extractItems(data); if (items.length < 2) { if (trendChart) { trendChart.destroy(); trendChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
   // items[0] = [["2026/06/03"],...] → 展平为字符串数组
   var rawLbls = items[0] || [];
   var labels = rawLbls.map(function(d) {
@@ -497,9 +527,11 @@ function renderTrendChart(data, startDate, endDate) {
   });
 }
 function renderSourceChart(data) {
-  if (!data) { var wrap2 = document.getElementById('sourceChartWrap'); if (wrap2) wrap2.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var canvas = document.getElementById('sourceChart'); if (!canvas) return;
-  var ctx = canvas.getContext('2d'); var items = extractItems(data); if (items.length < 2) return;
+  var ctx = canvas.getContext('2d');
+  if (!data || data.__error) { if (sourceChart) { sourceChart.destroy(); sourceChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+  var items = extractItems(data);
+  if (items.length < 2) { if (sourceChart) { sourceChart.destroy(); sourceChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
   // items[0] = [[{name:"直接访问",...}],[{name:"外部链接",...}],...] → 二维展平提取 name
   var rawLabels = items[0] || [];
   var flatLabels = [];
@@ -517,7 +549,7 @@ function renderSourceChart(data) {
 }
 function renderTopPages(data) {
   var wrap = document.getElementById('topPagesWrap'); if (!wrap) return;
-  if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
+  if (!data || data.__error) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   // items[0] = [[{name:"https://...",...}],[{name:"https://...",...}],...] → 二维展平
@@ -536,7 +568,7 @@ function renderTopPages(data) {
 }
 function renderTopWords(data) {
   var wrap = document.getElementById('topWordsWrap'); if (!wrap) return;
-  if (!data) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
+  if (!data || data.__error) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var items = extractItems(data);
   if (!Array.isArray(items) || items.length < 2) { wrap.innerHTML = '<div class="analytics-empty">暂无数据</div>'; return; }
   var rawWords = items[0] || [];
@@ -552,7 +584,7 @@ function renderTopWords(data) {
 }
 function renderRealTime(data) {
   var el = document.getElementById('rtVisitorNum'); if (!el) return;
-  if (!data) { el.textContent = '0'; return; }
+  if (!data || data.__error) { el.textContent = '0'; return; }
   // trend/latest/f 返回 result.onlineNumber = 当前在线人数
   var num = (data.result && typeof data.result.onlineNumber === 'number') ? data.result.onlineNumber : 0;
   el.textContent = num;
@@ -800,6 +832,7 @@ function onAnalyticsSectionShow() {
           <h4>🔍 热门搜索词</h4>
           <div id="topWordsWrap" style="max-height:300px;overflow-y:auto"></div>
         </div>
+        <div id="analyticsDiag" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -1563,3 +1596,4 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 
 </body>
 </html>
+
