@@ -7,6 +7,32 @@
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../favicon.svg">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <!-- Token 自动捕获：OAuth 回调或手动 URL 均自动保存 -->
+  <script>
+  (function() {
+    var h = location.hash;
+    if (!h) return;
+    var m = h.match(/[#&]access_token=([^&]+)/);
+    if (!m) return;
+    var tk = decodeURIComponent(m[1]);
+    var em = h.match(/[#&]expires_in=(\d+)/);
+    var exp = em ? parseInt(em[1]) : 2592000;
+    localStorage.setItem('tongji_access_token', tk);
+    localStorage.setItem('tongji_token_expire', String(Date.now() + exp * 1000));
+    history.replaceState(null, '', location.pathname + (location.search || ''));
+    // 如果在弹窗中（OAuth 回调），显示成功提示并自动关闭
+    if (window.opener && !window.opener.closed) {
+      document.documentElement.innerHTML =
+        '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f0fdf4}' +
+        '.box{text-align:center}.box .icon{font-size:64px}.box h2{color:#166534;margin:16px 0 8px}.box p{color:#4ade80;font-size:14px}</style>' +
+        '</head><body><div class="box"><div class="icon">✅</div><h2>授权成功！</h2><p>Token 已自动保存，窗口即将关闭…</p></div></body>';
+      setTimeout(function() { window.close(); }, 2000);
+      return;
+    }
+    location.reload();
+  })();
+  </script>
 <style>
 :root {
   --pink: #e91e63; --pink-light: #fce4ec; --pink-dark: #c2185b;
@@ -295,8 +321,9 @@ function renderTongjiStatus() {
 // ==================== OAuth 授权（Blob URL 方案 — 无外部文件、无缓存） ====================
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
+  var redirectUri = location.origin + location.pathname; // 自动回到当前管理页面
   var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
-    encodeURIComponent(apiKey) + '&redirect_uri=oob&scope=basic&display=popup';
+    encodeURIComponent(apiKey) + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=basic&display=popup';
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="referrer" content="no-referrer">' +
     '<title>跳转中…</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;' +
     'height:100vh;margin:0;background:#f5f5f5;color:#333}.s{width:28px;height:28px;border:3px solid #ddd;' +
@@ -305,11 +332,9 @@ function tongjiOpenAuth() {
     '<script>location.replace("' + oauthUrl + '")<\/script></body></html>';
   var blob = new Blob([html], {type: 'text/html'});
   var blobUrl = URL.createObjectURL(blob);
-  document.getElementById('tongjiGuide').style.display = 'block';
-  document.getElementById('tongjiAuthCodeWrap').style.display = 'block';
   var authWin = window.open(blobUrl, 'baiduAuth', 'width=600,height=700');
   if (!authWin) { showToast('弹窗被拦截，请允许本站弹窗后重试', 'error'); }
-  else { showToast('已弹出授权窗口，授权后复制页面上显示的 access_token 粘贴到下方', ''); }
+  else { showToast('已弹出授权窗口，授权完成后 Token 将自动保存 ⚡', ''); }
 }
 function tongjiApplyToken() {
   var token = document.getElementById('tongjiAuthCode').value.trim();
@@ -1596,4 +1621,5 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 
 </body>
 </html>
+
 
