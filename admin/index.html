@@ -285,19 +285,34 @@ function loadTokenFromRepo() {
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(data) {
       if (data && data.access_token && data.access_token.length > 10) {
-        // localStorage 优先（可能已通过 OAuth 更新），仓库文件作为 fallback
-        if (!localStorage.getItem('tongji_access_token')) {
-          TONGJI.accessToken = data.access_token;
+        // 总是用仓库中的 token 覆盖本地（实现跨浏览器同步）
+        var localToken = localStorage.getItem('tongji_access_token') || '';
+        var repoToken  = data.access_token || '';
+        var repoUpdated = data.updated_at || '';
+        var localUpdated = localStorage.getItem('tongji_token_updated') || '';
+        // 如果仓库中的 token 不同，或者仓库文件更新，就覆盖
+        var shouldUpdate = (localToken !== repoToken) || (repoUpdated > localUpdated);
+        if (shouldUpdate) {
+          TONGJI.accessToken = repoToken;
+          localStorage.setItem('tongji_access_token', repoToken);
+          localStorage.setItem('tongji_token_updated', repoUpdated || new Date().toISOString());
           if (data.expires_in) {
             TONGJI.tokenExpire = Date.now() + data.expires_in * 1000;
             localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
           }
-          if (data.site_id && !localStorage.getItem('tongji_site_id')) {
-            TONGJI.siteId = data.site_id;
-            localStorage.setItem('tongji_site_id', data.site_id);
-          }
-          console.log('[Tongji] Token loaded from baidu-token.json (fallback)');
+          console.log('[Tongji] Token loaded from baidu-token.json (updated)');
         }
+        // site_id 也同步
+        if (data.site_id) {
+          TONGJI.siteId = data.site_id;
+          localStorage.setItem('tongji_site_id', data.site_id);
+        }
+        // 更新表单显示
+        var at = document.getElementById('tongjiAccessToken');
+        var si = document.getElementById('tongjiSiteId');
+        if (at) at.value = TONGJI.accessToken;
+        if (si) si.value = TONGJI.siteId;
+        renderTongjiStatus();
       }
     })
     .catch(function() {
@@ -361,17 +376,22 @@ function saveTongjiConfig() {
   var secretKey = document.getElementById('tongjiSecretKey').value.trim();
   var accessToken = document.getElementById('tongjiAccessToken').value.trim();
   var siteId = document.getElementById('tongjiSiteId').value.trim();
-  if (!apiKey) { showToast('请输入 API Key', 'error'); return; }
-  if (!secretKey) { showToast('请输入 Secret Key', 'error'); return; }
-  TONGJI.apiKey = apiKey; TONGJI.secretKey = secretKey; TONGJI.accessToken = accessToken; TONGJI.siteId = siteId;
-  localStorage.setItem('tongji_api_key', apiKey);
-  localStorage.setItem('tongji_secret_key', secretKey);
+  // 只校验 access_token 和 site_id 是必须的；apiKey/secretKey 可以为空（已保存在仓库中）
+  if (!accessToken) { showToast('请输入 Access Token', 'error'); return; }
+  if (!siteId) { showToast('请输入站点 ID', 'error'); return; }
+  // apiKey/secretKey 如果留空，保留原有值
+  if (apiKey) TONGJI.apiKey = apiKey;
+  if (secretKey) TONGJI.secretKey = secretKey;
+  TONGJI.accessToken = accessToken;
+  TONGJI.siteId = siteId;
+  localStorage.setItem('tongji_api_key', TONGJI.apiKey);
+  localStorage.setItem('tongji_secret_key', TONGJI.secretKey);
   localStorage.setItem('tongji_access_token', accessToken);
   localStorage.setItem('tongji_site_id', siteId);
   showToast('百度统计配置已保存 ✅', 'success');
   renderTongjiStatus();
   // 自动同步到 GitHub 仓库，实现跨浏览器共享
-  if (accessToken) saveTokenToRepo().catch(function(){});
+  saveTokenToRepo().catch(function(){});
 }
 function loadTongjiConfig() {
   var ak = document.getElementById('tongjiApiKey'); var sk = document.getElementById('tongjiSecretKey');
@@ -1719,6 +1739,7 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 
 </body>
 </html>
+
 
 
 
