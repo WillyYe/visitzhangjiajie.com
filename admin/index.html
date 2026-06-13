@@ -492,7 +492,9 @@ function dStr(date) { return date.getFullYear() + ('0'+(date.getMonth()+1)).slic
 var trendChart = null, sourceChart = null, analyticsRefreshTimer = null;
 function extractItems(body) {
   if (!body) return [];
-  // 真实 API 格式: {result:{items:[...]}}
+  // 格式1: {status:0, data:{total:N, items:[...]}} ← 百度统计 JSONP 实际返回格式
+  if (body.data && Array.isArray(body.data.items)) return body.data.items;
+  // 格式2: {result:{items:[...]}}
   if (body.result && Array.isArray(body.result.items)) return body.result.items;
   if (Array.isArray(body.items)) return body.items;
   // list 格式 (config/getSiteList)
@@ -506,6 +508,8 @@ function extractTotal(body) {
   if (!body) return 0;
   if (body.result && typeof body.result.total === 'number') return body.result.total;
   if (typeof body.total === 'number') return body.total;
+  // 格式: {status:0, data:{total:N, items:[...]}}
+  if (body.data && typeof body.data.total === 'number') return body.data.total;
   if (Array.isArray(body.data) && body.data.length > 0) {
     var d = body.data[0]; if (d && d.result && typeof d.result.total === 'number') return d.result.total;
     if (d && typeof d.total === 'number') return d.total;
@@ -583,17 +587,21 @@ function renderSummary(data) {
     if (pvEl) pvEl.textContent = '0'; if (uvEl) uvEl.textContent = '0'; if (timeEl) timeEl.textContent = '0秒';
     return;
   }
-  // API 把多指标合并: items[1] = [[pv,visitor,time],[pv,visitor,time],...]
+  // API 返回格式: items[0] = [{date:"20260608"},...] (日期维度), items[1] = [{pv_count:"146",visitor_count:"97",avg_visit_time:"88"},...]
   var combined = items[1] || [];
   if (!Array.isArray(combined)) return;
   var totalPv = 0, totalUv = 0, totalTime = 0, count = 0;
   combined.forEach(function(row) {
     var r = Array.isArray(row) ? row : [row];
-    var pv = parseInt(r[0]), uv = parseInt(r[1]);
+    // 兼容对象格式 {pv_count:"146", visitor_count:"97"} 和数组格式 ["146","97","88"]
+    var isObj = typeof r[0] === 'object' && r[0] !== null;
+    var pv = isObj ? parseInt(r[0].pv_count || 0) : parseInt(r[0]);
+    var uv = isObj ? parseInt(r[0].visitor_count || 0) : parseInt(r[1]);
     if (isNaN(pv)) return; // "--" 等空数据行跳过
     totalPv += pv || 0;
     totalUv += uv || 0;
-    if (r.length >= 3) { var t = parseInt(r[2]); if (!isNaN(t)) { totalTime += t; count++; } }
+    var t = isObj ? parseInt(r[0].avg_visit_time || 0) : (r.length >= 3 ? parseInt(r[2]) : NaN);
+    if (!isNaN(t)) { totalTime += t; count++; }
   });
   if (pvEl) pvEl.textContent = totalPv >= 10000 ? (totalPv/10000).toFixed(1) + 'w' : totalPv;
   if (uvEl) uvEl.textContent = totalUv >= 10000 ? (totalUv/10000).toFixed(1) + 'w' : totalUv;
@@ -605,19 +613,25 @@ function renderTrendChart(data, startDate, endDate) {
   var ctx = canvas.getContext('2d');
   if (!data || data.__error) { if (trendChart) { trendChart.destroy(); trendChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
   var items = extractItems(data); if (items.length < 2) { if (trendChart) { trendChart.destroy(); trendChart = null; } ctx.clearRect(0,0,canvas.width,canvas.height); return; }
-  // items[0] = [["2026/06/03"],...] → 展平为字符串数组
+  // items[0] = [{date:"20260608"},...] 或 [["2026/06/03"],...]
   var rawLbls = items[0] || [];
   var labels = rawLbls.map(function(d) {
-    var s = Array.isArray(d) ? String(d[0] || '') : String(d);
-    return s.replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, '$2/$3');
+    if (Array.isArray(d)) { var s = String(d[0] || ''); return s.replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, '$2/$3'); }
+    if (typeof d === 'object' && d !== null) {
+      var ds = String(d.date || d[0] || ''); return ds.replace(/^(\d{4})(\d{2})(\d{2})$/, '$2/$3');
+    }
+    return String(d);
   });
-  // items[1] = [[pv,visitor,time],...] → 拆分
+  // items[1] = [{pv_count:"146",visitor_count:"97",...},...] 或 [[pv,visitor,time],...]
   var combined = items[1] || [];
   var pvData = [], uvData = [];
   combined.forEach(function(row) {
     var r = Array.isArray(row) ? row : [row];
-    pvData.push(parseInt(r[0]) || 0);
-    uvData.push(parseInt(r[1]) || 0);
+    var isObj = typeof r[0] === 'object' && r[0] !== null;
+    var pv = isObj ? parseInt(r[0].pv_count || 0) : parseInt(r[0]);
+    var uv = isObj ? parseInt(r[0].visitor_count || 0) : parseInt(r[1]);
+    pvData.push(pv || 0);
+    uvData.push(uv || 0);
   });
   if (pvData.length === 0) return;
   if (trendChart) trendChart.destroy();
@@ -1705,6 +1719,7 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 
 </body>
 </html>
+
 
 
 
