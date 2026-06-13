@@ -273,7 +273,7 @@ var TONGJI = {
   apiKey: localStorage.getItem('tongji_api_key') || 'QhCUTm5cHNdXzXXS4p17IaaRarzqT9HO',
   secretKey: localStorage.getItem('tongji_secret_key') || '',
   accessToken: localStorage.getItem('tongji_access_token') || '',
-  siteId: localStorage.getItem('tongji_site_id') || '',
+  siteId: localStorage.getItem('tongji_site_id') || '5aff4b613bfa9c5ce45ea0862b545a79',
   refreshToken: localStorage.getItem('tongji_refresh_token') || '',
   tokenExpire: parseInt(localStorage.getItem('tongji_token_expire') || '0'),
   proxyUrl: localStorage.getItem('tongji_proxy_url') || 'https://bd-oauth-proxy.mydeng1995.workers.dev/baidu-oauth',
@@ -381,7 +381,7 @@ function renderTongjiStatus() {
 // ==================== OAuth 授权（Blob URL 方案 — 无外部文件、无缓存） ====================
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  var redirectUri = location.origin + location.pathname; // 自动回到当前管理页面
+  var redirectUri = 'https://www.visitzhangjiajie.com/admin/'; // 必须与百度开放平台配置一致
   var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=basic&display=popup';
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="referrer" content="no-referrer">' +
