@@ -307,6 +307,21 @@ function loadTokenFromRepo() {
           TONGJI.siteId = data.site_id;
           localStorage.setItem('tongji_site_id', data.site_id);
         }
+        // GitHub Token 也同步（用于跨浏览器共享）
+        if (data.gh_token && !localStorage.getItem('gh_token')) {
+          localStorage.setItem('gh_token', data.gh_token);
+          console.log('[GitHub] Token loaded from baidu-token.json');
+        }
+        if (data.gh_repo && !localStorage.getItem('gh_repo')) {
+          localStorage.setItem('gh_repo', data.gh_repo);
+          GH_REPO = data.gh_repo;
+        }
+        // 更新 GitHub 配置显示
+        var gitEl = document.getElementById('ghToken');
+        var repoEl = document.getElementById('ghRepo');
+        if (gitEl && !gitEl.value) gitEl.value = localStorage.getItem('gh_token') || '';
+        if (repoEl && !repoEl.value) repoEl.value = localStorage.getItem('gh_repo') || GH_REPO;
+        renderGhStatus();
         // 更新表单显示
         var at = document.getElementById('tongjiAccessToken');
         var si = document.getElementById('tongjiSiteId');
@@ -324,14 +339,17 @@ function saveTokenToRepo(retryCount) {
   retryCount = retryCount || 0;
   var token = getGhToken();
   if (!token) {
-    showToast('⚠️ 请先在「GitHub 配置」中保存 Token', 'error');
-    return Promise.reject(new Error('GitHub Token 未配置'));
+    showToast('⚠️ GitHub Token 未配置，跳过同步', '');
+    return Promise.resolve();
   }
   var data = {
     access_token: TONGJI.accessToken,
     expires_in: 2592000,
     updated_at: new Date().toISOString(),
-    site_id: TONGJI.siteId
+    site_id: TONGJI.siteId,
+    // 同步 GitHub Token 到仓库，实现跨浏览器共享
+    gh_token: localStorage.getItem('gh_token') || token,
+    gh_repo: GH_REPO
   };
   var content = JSON.stringify(data, null, 2);
   var body = {
@@ -1612,6 +1630,8 @@ function saveGitHubConfig() {
   GH_REPO = repo;
   showToast('GitHub 配置已保存 ✅','success');
   renderGhStatus();
+  // 自动同步 GitHub Token 到仓库，实现跨浏览器共享
+  if (TONGJI.accessToken) saveTokenToRepo().catch(function(){});
 }
 function testGitHubConnection() {
   var token = getGhToken();
@@ -1624,8 +1644,9 @@ function testGitHubConnection() {
 }
 function renderGhStatus() {
   var el = document.getElementById('ghConfigStatus');
+  if (!el) return;
   var token = getGhToken();
-  if (!token) { el.innerHTML = '<span style="color:#e53935">⚠️ GitHub Token 未配置，无法同步到 GitHub</span>'; return; }
+  if (!token) { el.innerHTML = '<span style="color:#ff9800">⏳ GitHub Token 未配置 — 可在下方设置后自动同步到所有浏览器</span>'; return; }
   el.innerHTML = '<span style="color:#43a047">✅ 已配置 Token，仓库: ' + esc(GH_REPO) + '</span>';
 }
 function changePassword() {
