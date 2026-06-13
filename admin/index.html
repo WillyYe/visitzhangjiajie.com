@@ -381,7 +381,7 @@ function renderTongjiStatus() {
 // ==================== OAuth 授权（Blob URL 方案 — 无外部文件、无缓存） ====================
 function tongjiOpenAuth() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim() || TONGJI.apiKey;
-  var redirectUri = 'https://www.visitzhangjiajie.com/admin/'; // 必须与百度开放平台配置一致
+  var redirectUri = 'oob'; // out-of-band: 授权后显示 token，手动粘贴；避免 redirect_uri_mismatch
   var oauthUrl = 'https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&client_id=' +
     encodeURIComponent(apiKey) + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=basic&display=popup';
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="referrer" content="no-referrer">' +
