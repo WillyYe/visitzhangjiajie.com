@@ -305,7 +305,8 @@ function loadTokenFromRepo() {
     });
 }
 
-function saveTokenToRepo() {
+function saveTokenToRepo(retryCount) {
+  retryCount = retryCount || 0;
   var token = getGhToken();
   if (!token) {
     showToast('⚠️ 请先在「GitHub 配置」中保存 Token', 'error');
@@ -318,21 +319,39 @@ function saveTokenToRepo() {
     site_id: TONGJI.siteId
   };
   var content = JSON.stringify(data, null, 2);
-  
-  return ghFetch('admin/baidu-token.json', 'GET').then(function(r) { return r.ok ? r.json() : null; })
+  var body = {
+    content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
+    message: 'Update Baidu Tongji access token'
+  };
+
+  // 先获取最新文件的 SHA
+  return ghFetch('admin/baidu-token.json?ref=main&t=' + Date.now(), 'GET', null, 'application/vnd.github.v3+json')
+    .then(function(r) {
+      if (!r.ok) {
+        // 文件不存在，尝试创建
+        return { sha: null };
+      }
+      return r.json().then(function(info) { return { sha: info.sha }; });
+    })
     .then(function(fileInfo) {
-      return ghFetch('admin/baidu-token.json', 'PUT', {
-        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
-        message: 'Update Baidu Tongji access token',
-        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
-      });
+      if (fileInfo.sha) body.sha = fileInfo.sha;
+      return ghFetch('admin/baidu-token.json', 'PUT', body, 'application/vnd.github.v3+json');
     })
     .then(function(r) {
-      if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
-      showToast('✅ Token 已同步到仓库，换电脑也能直接用', 'success');
+      if (!r.ok) {
+        return r.json().then(function(d) {
+          // 如果是 SHA 冲突且还没重试过，重试一次
+          if (d.message && d.message.indexOf('SHA') >= 0 && retryCount < 1) {
+            console.log('[TokenSync] SHA mismatch, retrying...');
+            return saveTokenToRepo(retryCount + 1);
+          }
+          throw new Error(d.message || 'HTTP ' + r.status);
+        });
+      }
+      showToast('✅ Token 已同步到仓库', 'success');
     })
     .catch(function(err) {
-      showToast('⚠️ 同步失败：' + friendlyError(err.message), 'error');
+      showToast('⚠️ 同步失败：' + (err.message || '网络错误'), 'error');
       throw err;
     });
 }
