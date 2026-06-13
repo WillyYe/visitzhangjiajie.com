@@ -307,11 +307,8 @@ function loadTokenFromRepo() {
           TONGJI.siteId = data.site_id;
           localStorage.setItem('tongji_site_id', data.site_id);
         }
-        // GitHub Token 也同步（用于跨浏览器共享）
-        if (data.gh_token && !localStorage.getItem('gh_token')) {
-          localStorage.setItem('gh_token', data.gh_token);
-          console.log('[GitHub] Token loaded from baidu-token.json');
-        }
+        // GitHub Token 无法直接存入公开仓库（GitHub 安全扫描会拦截），需每台浏览器手动输入
+        // 但仓库名可以同步（非敏感信息）
         if (data.gh_repo && !localStorage.getItem('gh_repo')) {
           localStorage.setItem('gh_repo', data.gh_repo);
           GH_REPO = data.gh_repo;
@@ -346,10 +343,7 @@ function saveTokenToRepo(retryCount) {
     access_token: TONGJI.accessToken,
     expires_in: 2592000,
     updated_at: new Date().toISOString(),
-    site_id: TONGJI.siteId,
-    // 同步 GitHub Token 到仓库，实现跨浏览器共享
-    gh_token: localStorage.getItem('gh_token') || token,
-    gh_repo: GH_REPO
+    site_id: TONGJI.siteId
   };
   var content = JSON.stringify(data, null, 2);
   var body = {
