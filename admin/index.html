@@ -279,6 +279,64 @@ var TONGJI = {
   proxyUrl: localStorage.getItem('tongji_proxy_url') || 'https://bd-oauth-proxy.mydeng1995.workers.dev/baidu-oauth',
 };
 
+// ==================== 跨浏览器 Token 共享（从 GitHub 仓库加载） ====================
+function loadTokenFromRepo() {
+  return fetch('baidu-token.json?t=' + Date.now())
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (data && data.access_token && data.access_token.length > 10) {
+        // localStorage 优先（可能已通过 OAuth 更新），仓库文件作为 fallback
+        if (!localStorage.getItem('tongji_access_token')) {
+          TONGJI.accessToken = data.access_token;
+          if (data.expires_in) {
+            TONGJI.tokenExpire = Date.now() + data.expires_in * 1000;
+            localStorage.setItem('tongji_token_expire', String(TONGJI.tokenExpire));
+          }
+          if (data.site_id && !localStorage.getItem('tongji_site_id')) {
+            TONGJI.siteId = data.site_id;
+            localStorage.setItem('tongji_site_id', data.site_id);
+          }
+          console.log('[Tongji] Token loaded from baidu-token.json (fallback)');
+        }
+      }
+    })
+    .catch(function() {
+      // baidu-token.json 可能不存在或网络错误，静默忽略
+    });
+}
+
+function saveTokenToRepo() {
+  var token = getGhToken();
+  if (!token) {
+    showToast('⚠️ 请先在「GitHub 配置」中保存 Token', 'error');
+    return Promise.reject(new Error('GitHub Token 未配置'));
+  }
+  var data = {
+    access_token: TONGJI.accessToken,
+    expires_in: 2592000,
+    updated_at: new Date().toISOString(),
+    site_id: TONGJI.siteId
+  };
+  var content = JSON.stringify(data, null, 2);
+  
+  return ghFetch('admin/baidu-token.json', 'GET').then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(fileInfo) {
+      return ghFetch('admin/baidu-token.json', 'PUT', {
+        content: btoa(Array.from(new TextEncoder().encode(content), function(b){ return String.fromCharCode(b); }).join('')),
+        message: 'Update Baidu Tongji access token',
+        sha: fileInfo && fileInfo.sha ? fileInfo.sha : null
+      });
+    })
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(d){ throw new Error(d.message); });
+      showToast('✅ Token 已同步到仓库，换电脑也能直接用', 'success');
+    })
+    .catch(function(err) {
+      showToast('⚠️ 同步失败：' + friendlyError(err.message), 'error');
+      throw err;
+    });
+}
+
 function saveTongjiConfig() {
   var apiKey = document.getElementById('tongjiApiKey').value.trim();
   var secretKey = document.getElementById('tongjiSecretKey').value.trim();
@@ -293,6 +351,8 @@ function saveTongjiConfig() {
   localStorage.setItem('tongji_site_id', siteId);
   showToast('百度统计配置已保存 ✅', 'success');
   renderTongjiStatus();
+  // 自动同步到 GitHub 仓库，实现跨浏览器共享
+  if (accessToken) saveTokenToRepo().catch(function(){});
 }
 function loadTongjiConfig() {
   var ak = document.getElementById('tongjiApiKey'); var sk = document.getElementById('tongjiSecretKey');
@@ -783,6 +843,7 @@ function onAnalyticsSectionShow() {
         <button class="btn btn-outline" onclick="tongjiOpenAuth()">🔑 获取 Access Token</button>
         <button class="btn btn-primary" onclick="saveTongjiConfig()">💾 保存配置</button>
         <button class="btn btn-outline" onclick="testTongjiConnection()">🔍 测试连接</button>
+        <button class="btn btn-outline" onclick="saveTokenToRepo().catch(function(){})" title="将 Token 保存到 GitHub 仓库，换电脑也能直接用">☁️ 同步 Token 到仓库</button>
       </div>
       <div id="tongjiGuide" class="tongji-guide" style="display:none">
         <strong>📋 授权步骤：</strong>
@@ -1534,6 +1595,10 @@ function initApp() {
   if (savedRepo) document.getElementById('ghRepo').value = savedRepo;
   renderGhStatus();
   loadTongjiConfig();
+  // 从 GitHub 仓库加载 token（跨浏览器 fallback）
+  loadTokenFromRepo().then(function() {
+    loadTongjiConfig();
+  });
 
   loadAllData().then(function() {
     renderDashboard();
@@ -1621,5 +1686,6 @@ if (localStorage.getItem(AUTH_KEY) === '1') initApp();
 
 </body>
 </html>
+
 
 
