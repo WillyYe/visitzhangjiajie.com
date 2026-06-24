@@ -1877,10 +1877,25 @@
       resumeScenicAutoplay();
     }
 
+    /* ========== GALLERY IMAGE ERROR RECOVERY ========== */
+    window._galleryRetryMap = {};
+    function handleGalleryImgError(img, thumbSrc, fullSrc) {
+      var key = img.src || '';
+      if (window._galleryRetryMap[key]) return; // already retried
+      window._galleryRetryMap[key] = true;
+      img.onerror = null; // prevent infinite loop
+      // Retry with full-src first (thumb may not exist for some items)
+      if (img.src !== fullSrc) {
+        img.src = fullSrc;
+      }
+    }
+
     function renderGallery() {
       var masonry = document.getElementById('galleryMasonry');
+      // Reset retry map on re-render
+      window._galleryRetryMap = {};
       var html = '';
-      
+
       galleryData.forEach(function(item, index) {
         var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
         var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
@@ -1889,12 +1904,15 @@
                 'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(item.img) + ' 2400w" ' +
                 'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
-                'loading="lazy" decoding="async" width="400" height="267">';
+                'decoding="async" width="400" height="267" ' +
+                'data-full="' + escapeHtml(item.img) + '" ' +
+                'data-thumb="' + escapeHtml(thumbSrc) + '" ' +
+                'onerror="handleGalleryImgError(this,this.getAttribute(\'data-thumb\'),this.getAttribute(\'data-full\'))">';
         html += '<div class="gallery-overlay">';
         html += '<span class="gallery-title">' + escapeHtml(item.titleEn) + '</span>';
         html += '</div></div>';
       });
-      
+
       masonry.innerHTML = html;
     }
 
