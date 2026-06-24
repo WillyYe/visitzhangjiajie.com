@@ -798,19 +798,19 @@
       width: 100%;
       display: block;
       border-radius: 12px;
-      background: linear-gradient(135deg, #e8e0d5 25%, #f5f0eb 50%, #e8e0d5 75%);
-      background-size: 200% 200%;
-      animation: galleryShimmer 1.5s ease-in-out infinite;
+      background: #f0ebe3;
       min-height: 180px;
       object-fit: cover;
-    }
-    @keyframes galleryShimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
     .gallery-item img.loaded {
-      animation: none;
-      background: transparent;
+      opacity: 1;
+    }
+    .gallery-item img.error {
+      opacity: 1;
+      background: #e8e0d5;
+      min-height: 200px;
     }
     .gallery-overlay {
       position: absolute;
@@ -1895,16 +1895,21 @@
 
     function handleGalleryImgError(img, thumbSrc, fullSrc) {
       var key = img.src || '';
-      if (window._galleryRetryMap[key]) return;
+      if (window._galleryRetryMap[key]) {
+        // Already retried - mark as error state
+        img.classList.add('error');
+        return;
+      }
       window._galleryRetryMap[key] = true;
-      img.onerror = null;
 
       // If thumb failed, try full-src as fallback
       if (img.src.indexOf('/thumb/') !== -1 && fullSrc) {
-        // Delayed retry to avoid network congestion
         setTimeout(function() {
           if (img.naturalWidth === 0) img.src = fullSrc;
         }, 1500);
+      } else {
+        // Full-src also failed
+        img.classList.add('error');
       }
     }
 
@@ -1916,15 +1921,13 @@
       galleryData.forEach(function(item, index) {
         var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
         var fullSrc = item.img;
+        // data-src for lazy loading, img src set by IntersectionObserver
         html += '<div class="gallery-item" onclick="openLightbox(' + index + ')">';
-        // Use only thumb for masonry (small, fast). No srcset to avoid browser picking slow large URLs.
-        // Lightbox loads full-res on demand.
-        html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
+        html += '<img data-src="' + escapeHtml(thumbSrc) + '" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
-                'decoding="async" width="400" height="267" ' +
                 'data-full="' + escapeHtml(fullSrc) + '" ' +
                 'data-thumb="' + escapeHtml(thumbSrc) + '" ' +
-                'onerror="handleGalleryImgError(this,this.getAttribute(\'data-thumb\'),this.getAttribute(\'data-full\'))">';
+                'width="400" height="267" decoding="async">';
         html += '<div class="gallery-overlay">';
         html += '<span class="gallery-title">' + escapeHtml(item.titleEn) + '</span>';
         html += '</div></div>';
@@ -1932,24 +1935,40 @@
 
       masonry.innerHTML = html;
 
-      // Pre-load visible images with a small stagger to avoid network congestion
-      requestAnimationFrame(function() {
-        var imgs = masonry.querySelectorAll('img');
-        imgs.forEach(function(img, i) {
-          // Mark as loaded when image completes
-          img.addEventListener('load', function() { this.classList.add('loaded'); });
-          // If already complete (cached), mark immediately
-          if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
-          // Stagger preload by 100ms per image to spread out requests
-          setTimeout(function() {
-            if (img.naturalWidth === 0) {
-              var reload = new Image();
-              reload.onload = function() { if(img.naturalWidth === 0) img.src = img.src; };
-              reload.src = img.src;
+      // Lazy load images when they enter viewport (faster perceived performance)
+      var imgs = masonry.querySelectorAll('img');
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              var img = entry.target;
+              var src = img.getAttribute('data-src');
+              if (src && !img.src || img.src !== location.origin + '/' + src) {
+                img.src = src;
+                img.addEventListener('load', function() { this.classList.add('loaded'); });
+                img.addEventListener('error', function() {
+                  handleGalleryImgError(this,
+                    this.getAttribute('data-thumb'),
+                    this.getAttribute('data-full'));
+                });
+              }
+              observer.unobserve(img);
             }
-          }, i * 100);
+          });
+        }, { rootMargin: '200px' }); // start loading 200px before visible
+        imgs.forEach(function(img) { observer.observe(img); });
+      } else {
+        // Fallback: load all immediately
+        imgs.forEach(function(img) {
+          img.src = img.getAttribute('data-src');
+          img.addEventListener('load', function() { this.classList.add('loaded'); });
+          img.addEventListener('error', function() {
+            handleGalleryImgError(this,
+              this.getAttribute('data-thumb'),
+              this.getAttribute('data-full'));
+          });
         });
-      });
+      }
     }
 
     /* ========== HERO SLIDER ========== */
