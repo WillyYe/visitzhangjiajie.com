@@ -798,6 +798,19 @@
       width: 100%;
       display: block;
       border-radius: 12px;
+      background: linear-gradient(135deg, #e8e0d5 25%, #f5f0eb 50%, #e8e0d5 75%);
+      background-size: 200% 200%;
+      animation: galleryShimmer 1.5s ease-in-out infinite;
+      min-height: 180px;
+      object-fit: cover;
+    }
+    @keyframes galleryShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .gallery-item img.loaded {
+      animation: none;
+      background: transparent;
     }
     .gallery-overlay {
       position: absolute;
@@ -1877,35 +1890,39 @@
       resumeScenicAutoplay();
     }
 
-    /* ========== GALLERY IMAGE ERROR RECOVERY ========== */
+    /* ========== GALLERY IMAGE LOADING ========== */
     window._galleryRetryMap = {};
+
     function handleGalleryImgError(img, thumbSrc, fullSrc) {
       var key = img.src || '';
-      if (window._galleryRetryMap[key]) return; // already retried
+      if (window._galleryRetryMap[key]) return;
       window._galleryRetryMap[key] = true;
-      img.onerror = null; // prevent infinite loop
-      // Retry with full-src first (thumb may not exist for some items)
-      if (img.src !== fullSrc) {
-        img.src = fullSrc;
+      img.onerror = null;
+
+      // If thumb failed, try full-src as fallback
+      if (img.src.indexOf('/thumb/') !== -1 && fullSrc) {
+        // Delayed retry to avoid network congestion
+        setTimeout(function() {
+          if (img.naturalWidth === 0) img.src = fullSrc;
+        }, 1500);
       }
     }
 
     function renderGallery() {
       var masonry = document.getElementById('galleryMasonry');
-      // Reset retry map on re-render
       window._galleryRetryMap = {};
       var html = '';
 
       galleryData.forEach(function(item, index) {
         var thumbSrc = item.img.replace('assets/images/', 'assets/images/thumb/');
-        var mdSrc = item.img.replace('assets/images/', 'assets/images/md/');
+        var fullSrc = item.img;
         html += '<div class="gallery-item" onclick="openLightbox(' + index + ')">';
+        // Use only thumb for masonry (small, fast). No srcset to avoid browser picking slow large URLs.
+        // Lightbox loads full-res on demand.
         html += '<img src="' + escapeHtml(thumbSrc) + '" ' +
-                'srcset="' + escapeHtml(thumbSrc) + ' 400w, ' + escapeHtml(mdSrc) + ' 1200w, ' + escapeHtml(item.img) + ' 2400w" ' +
-                'sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" ' +
                 'alt="' + escapeHtml(item.titleEn) + '" ' +
                 'decoding="async" width="400" height="267" ' +
-                'data-full="' + escapeHtml(item.img) + '" ' +
+                'data-full="' + escapeHtml(fullSrc) + '" ' +
                 'data-thumb="' + escapeHtml(thumbSrc) + '" ' +
                 'onerror="handleGalleryImgError(this,this.getAttribute(\'data-thumb\'),this.getAttribute(\'data-full\'))">';
         html += '<div class="gallery-overlay">';
@@ -1914,6 +1931,25 @@
       });
 
       masonry.innerHTML = html;
+
+      // Pre-load visible images with a small stagger to avoid network congestion
+      requestAnimationFrame(function() {
+        var imgs = masonry.querySelectorAll('img');
+        imgs.forEach(function(img, i) {
+          // Mark as loaded when image completes
+          img.addEventListener('load', function() { this.classList.add('loaded'); });
+          // If already complete (cached), mark immediately
+          if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
+          // Stagger preload by 100ms per image to spread out requests
+          setTimeout(function() {
+            if (img.naturalWidth === 0) {
+              var reload = new Image();
+              reload.onload = function() { if(img.naturalWidth === 0) img.src = img.src; };
+              reload.src = img.src;
+            }
+          }, i * 100);
+        });
+      });
     }
 
     /* ========== HERO SLIDER ========== */
